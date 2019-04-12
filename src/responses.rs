@@ -1,7 +1,7 @@
 use serde::Deserialize;
 
 #[derive(Deserialize, Debug, Clone)]
-pub struct TgResponse<T> {
+pub(crate) struct TgResponse<T> {
     /// If  equals true, the request was successful and the result
     /// of the query can be found in the ‘result’ field
     pub ok: bool,

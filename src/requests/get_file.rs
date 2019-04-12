@@ -3,8 +3,10 @@ use serde::Serialize;
 use crate::requests::Request;
 use crate::responses::File;
 
+
 #[derive(Serialize, Debug, Clone)]
 pub struct GetFileRequest<'a> {
+    /// File identifier to get info about
     pub file_id: &'a str
 }
 
