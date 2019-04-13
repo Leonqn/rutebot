@@ -4,7 +4,6 @@ use std::time::Duration;
 
 use hyper;
 use serde_json;
-use tokio;
 
 use crate::responses::ResponseParameters;
 
@@ -12,7 +11,6 @@ use crate::responses::ResponseParameters;
 #[derive(Debug)]
 pub enum Error {
     Hyper(hyper::Error),
-    TokioTimer(tokio::timer::Error),
     Serde(serde_json::Error),
     /// Telegram bot api error
     Api {
@@ -34,8 +32,6 @@ impl error::Error for Error {
                 Some(hyper),
             Error::Serde(serde) =>
                 Some(serde),
-            Error::TokioTimer(timer) =>
-                Some(timer),
             _ =>
                 None
         }
@@ -47,8 +43,6 @@ impl fmt::Display for Error {
         match self {
             Error::Hyper(hyper) =>
                 write!(f, "Hyper error has occurred: {}", hyper),
-            Error::TokioTimer(tokio) =>
-                write!(f, "Tokio timer error has occurred: {}", tokio),
             Error::Serde(serde) =>
                 write!(f, "Serde error has occurred: {}", serde),
             Error::Api { error_code, description, parameters } =>

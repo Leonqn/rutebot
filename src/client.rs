@@ -1,20 +1,15 @@
 use std::collections::VecDeque;
 use std::marker::PhantomData;
 use std::sync::Arc;
-use std::time::{Duration, Instant};
 
 use futures::future::Future;
-use futures::IntoFuture;
 use futures::stream::Stream;
 use hyper::{Body, Client, Request};
 use hyper::client::HttpConnector;
 use hyper_tls::HttpsConnector;
 use serde::de::DeserializeOwned;
-use serde::Deserialize;
 use serde_json;
-use tokio::timer::Delay;
 
-use crate::error;
 use crate::error::Error;
 use crate::requests;
 use crate::requests::get_updates::GetUpdatesRequest;
@@ -56,7 +51,7 @@ impl<TResponse: DeserializeOwned> ApiRequest<TResponse> {
     /// #    allowed_updates: Some(&allowed_updates),
     /// #    ..GetUpdatesRequest::new()
     /// # };
-    /// # let request = bot.create_api_request(&get_updates);
+    /// # let request = bot.prepare_api_request(&get_updates);
     /// let future = request.send();
     /// # }
     /// ```
@@ -116,10 +111,10 @@ impl Rutebot {
     ///     allowed_updates: Some(&allowed_updates),
     ///     ..GetUpdatesRequest::new()
     /// };
-    /// let request = bot.create_api_request(&get_updates);
+    /// let request = bot.prepare_api_request(&get_updates);
     /// # }
     /// ```
-    pub fn create_api_request<TRequest, TResponse>(&self, request: &TRequest) -> ApiRequest<TResponse>
+    pub fn prepare_api_request<TRequest, TResponse>(&self, request: &TRequest) -> ApiRequest<TResponse>
         where TRequest: requests::Request<ResponseType=TResponse>,
               TResponse: DeserializeOwned,
     {
@@ -130,20 +125,6 @@ impl Rutebot {
             _data: PhantomData,
         }
     }
-
-    pub fn send<TRequest, TResponse>(&self, request: &TRequest) -> impl Future<Item=TResponse, Error=Error>
-        where TRequest: requests::Request<ResponseType=TResponse>,
-              TResponse: DeserializeOwned + 'static,
-    {
-        let req = ApiRequest {
-            inner: self.inner.clone(),
-            request_body: serde_json::to_vec(request).expect("Error while serializing request"),
-            method: request.method(),
-            _data: PhantomData,
-        };
-        req.send()
-    }
-
 
     /// Recieve updates using polling.
     ///
@@ -178,9 +159,9 @@ impl Rutebot {
                 timeout,
                 allowed_updates: allowed_updates.as_ref().map(|x| x.as_slice()),
             };
-            self_1.create_api_request(&request).send()
+            self_1.prepare_api_request(&request).send()
         };
-        let first_request = self.create_api_request(request).send();
+        let first_request = self.prepare_api_request(request).send();
 
         UpdatesPoolStream {
             send_request,

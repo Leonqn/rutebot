@@ -5,26 +5,12 @@ use serde::Serialize;
 /// Contains types for sending [sendMessage](https://core.telegram.org/bots/api#sendmessage) request
 pub mod send_text_message;
 
-///Unique identifier for the target chat or username of the target channel (in the format `@channelusername`)
-#[derive(Serialize, Debug, Clone)]
-#[serde(untagged)]
-pub enum ChatId<'a> {
-    Id(i64),
-    Username(&'a str),
-}
-
 #[derive(Serialize, Debug, Clone)]
 #[serde(untagged)]
 pub enum FileKind<'a> {
     FileId(&'a str),
     Url(&'a str),
 //    InputFile(Vec<u8>),
-}
-
-#[derive(Serialize, Debug, Clone, Copy)]
-pub enum ParseMode {
-    Html,
-    Markdown,
 }
 
 #[derive(Serialize, Debug, Clone)]

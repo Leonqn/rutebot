@@ -18,3 +18,11 @@ pub trait Request: Serialize {
 
     fn method(&self) -> &'static str;
 }
+
+///Unique identifier for the target chat or username of the target channel (in the format `@channelusername`)
+#[derive(Serialize, Debug, Clone)]
+#[serde(untagged)]
+pub enum ChatId<'a> {
+    Id(i64),
+    Username(&'a str),
+}
