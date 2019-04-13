@@ -1,10 +1,12 @@
-use serde::Serialize;
 use std::ops::Not;
 
-use crate::requests::Request;
-use crate::responses::{Message, Update};
-use crate::requests::send_message::*;
+use serde::Serialize;
 
+use crate::requests::Request;
+use crate::requests::send_message::*;
+use crate::responses::Message;
+
+/// Represents [sendMessage](https://core.telegram.org/bots/api#sendMessage) request
 #[derive(Serialize, Debug, Clone)]
 pub struct SendTextMessageRequest<'a, 'b, 'c, 'd, 'e, 'f, 'g> {
     /// Identifier for the target chat
@@ -37,7 +39,9 @@ pub struct SendTextMessageRequest<'a, 'b, 'c, 'd, 'e, 'f, 'g> {
 }
 
 
-impl<'a, 'b, 'c, 'd, 'e, 'f, 'g> Request<Message> for SendTextMessageRequest<'a, 'b, 'c, 'd, 'e, 'f, 'g> {
+impl<'a, 'b, 'c, 'd, 'e, 'f, 'g> Request for SendTextMessageRequest<'a, 'b, 'c, 'd, 'e, 'f, 'g> {
+    type ResponseType = Message;
+
     fn method(&self) -> &'static str {
         "sendMessage"
     }

@@ -1,4 +1,3 @@
-use serde::de::DeserializeOwned;
 use serde::Serialize;
 
 /// Contains types for sending [getUpdates](https://core.telegram.org/bots/api#getupdates) request
@@ -14,6 +13,8 @@ pub mod get_me;
 pub mod send_message;
 
 /// Basic request type.
-pub trait Request<Response: DeserializeOwned>: Serialize {
+pub trait Request: Serialize {
+    type ResponseType;
+
     fn method(&self) -> &'static str;
 }

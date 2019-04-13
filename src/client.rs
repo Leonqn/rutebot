@@ -4,6 +4,7 @@ use std::sync::Arc;
 use std::time::{Duration, Instant};
 
 use futures::future::Future;
+use futures::IntoFuture;
 use futures::stream::Stream;
 use hyper::{Body, Client, Request};
 use hyper::client::HttpConnector;
@@ -119,7 +120,7 @@ impl Rutebot {
     /// # }
     /// ```
     pub fn create_api_request<TRequest, TResponse>(&self, request: &TRequest) -> ApiRequest<TResponse>
-        where TRequest: requests::Request<TResponse>,
+        where TRequest: requests::Request<ResponseType=TResponse>,
               TResponse: DeserializeOwned,
     {
         ApiRequest {
@@ -129,6 +130,20 @@ impl Rutebot {
             _data: PhantomData,
         }
     }
+
+    pub fn send<TRequest, TResponse>(&self, request: &TRequest) -> impl Future<Item=TResponse, Error=Error>
+        where TRequest: requests::Request<ResponseType=TResponse>,
+              TResponse: DeserializeOwned + 'static,
+    {
+        let req = ApiRequest {
+            inner: self.inner.clone(),
+            request_body: serde_json::to_vec(request).expect("Error while serializing request"),
+            method: request.method(),
+            _data: PhantomData,
+        };
+        req.send()
+    }
+
 
     /// Recieve updates using polling.
     ///

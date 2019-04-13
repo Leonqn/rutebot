@@ -3,7 +3,7 @@ use serde::Serialize;
 use crate::requests::Request;
 use crate::responses::Update;
 
-/// Request to send [getUpdates](https://core.telegram.org/bots/api#getUpdates) request
+/// Represents [getUpdates](https://core.telegram.org/bots/api#getUpdates) request
 #[derive(Serialize, Debug, Clone)]
 pub struct GetUpdatesRequest<'a> {
     /// Identifier of the first update to be returned. Must be greater by one than the highest
@@ -47,7 +47,9 @@ pub enum AllowedUpdate {
     PreCheckoutQuery,
 }
 
-impl<'a> Request<Vec<Update>> for GetUpdatesRequest<'a> {
+impl<'a> Request for GetUpdatesRequest<'a> {
+    type ResponseType = Vec<Update>;
+
     fn method(&self) -> &'static str {
         "getUpdates"
     }

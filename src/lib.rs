@@ -31,8 +31,8 @@ mod tests {
         let get_file = GetFileRequest::new(&file_id);
 
         let resp = bot
-            .create_api_request(&get_updates)
-            .send()
+            .send(&get_updates)
+//            .send()
             .map(|_| ());
 
         let resp2 = bot.create_api_request(&get_file).send().map(|_| ());

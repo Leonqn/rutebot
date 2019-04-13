@@ -2,9 +2,6 @@ use std::ops::Not;
 
 use serde::Serialize;
 
-use crate::requests::Request;
-use crate::responses::{Message, Update};
-
 /// Contains types for sending [sendMessage](https://core.telegram.org/bots/api#sendmessage) request
 pub mod send_text_message;
 

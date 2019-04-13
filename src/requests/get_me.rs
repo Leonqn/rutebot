@@ -3,11 +3,13 @@ use serde::Serialize;
 use crate::requests::Request;
 use crate::responses::User;
 
-/// Struct to send [getMe](https://core.telegram.org/bots/api#getMe) request
+/// Represents [getMe](https://core.telegram.org/bots/api#getMe) request
 #[derive(Serialize, Debug, Clone, Copy)]
 pub struct GetMe;
 
-impl Request<User> for GetMe {
+impl Request for GetMe {
+    type ResponseType = User;
+
     fn method(&self) -> &'static str {
         "getMe"
     }
