@@ -533,10 +533,8 @@ pub struct SuccessfulPayment {}
 #[derive(Deserialize, Debug, Clone)]
 pub struct PassportData {}
 
-//todo describe method how file can be downloaded
-/// This object represents a file ready to be downloaded. The file can be downloaded via the link
-/// https://api.telegram.org/file/bot<token>/<file_path>. It is guaranteed that the link will be
-/// valid for at least 1 hour. When the link expires, a new one can be requested by calling [get_file]
+/// This object represents a file ready to be downloaded. The file can be downloaded via method
+/// `download_file`
 #[derive(Deserialize, Debug, Clone)]
 pub struct File {
     /// Unique identifier for this file
@@ -545,7 +543,7 @@ pub struct File {
     /// File size, if known
     pub file_size: Option<i64>,
 
-    /// File path. Use https://api.telegram.org/file/bot<token>/<file_path> to get the file
+    /// File path. Pass it to `download_file` method to download it
     pub file_path: Option<String>,
 }
 

@@ -1,6 +1,5 @@
 use std::error;
 use std::fmt;
-use std::time::Duration;
 
 use hyper;
 use serde_json;

@@ -129,6 +129,51 @@ impl Rutebot {
         }
     }
 
+    /// Download file from telegram. Before downloading you need to prepare file and obtain `file_path`
+    /// using `GetFileRequest`, see example below.
+    /// ## Example
+    /// Download file by it file_id
+    /// ```
+    /// # use futures::future::Future;
+    ///
+    /// # use rutebot::requests::get_file::GetFileRequest;
+    /// # fn main() {
+    /// let bot = rutebot::client::Rutebot::new("token");
+    /// let get_file = GetFileRequest::new("file-id");
+    /// let file_fut = bot.prepare_api_request(&get_file)
+    ///     .send()
+    ///     .and_then(move |file| bot.download_file(&file.file_path.unwrap_or("".to_string())));
+    ///
+    /// # }
+    /// ```
+    pub fn download_file(&self, file_path: &str) -> impl Future<Item=Vec<u8>, Error=Error> {
+        let uri = format!("{}{}/{}", GET_FILE_URI, self.inner.token, file_path)
+            .parse()
+            .expect("Error has occurred while creating get_file uri");
+        self.inner.http_client.get(uri)
+            .map_err(Error::Hyper)
+            .and_then(|response| {
+                let http_code = response.status();
+                response
+                    .into_body()
+                    .concat2()
+                    .map_err(Error::Hyper)
+                    .then(move |body| {
+                        let body = body?;
+                        if http_code.is_success() {
+                            Ok(body.to_vec())
+                        } else {
+                            let response: TgResponse<()> = serde_json::from_slice(&body).map_err(Error::Serde)?;
+                            Err(Error::Api {
+                                error_code: response.error_code.unwrap_or(0),
+                                description: response.description.unwrap_or("Unknown error".to_string()),
+                                parameters: response.parameters,
+                            })
+                        }
+                    })
+            })
+    }
+
     /// Recieve updates using polling.
     /// ## Example
     /// Create future to recieve all incoming messages using long polling with poll timeout 30 seconds
