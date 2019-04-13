@@ -41,7 +41,8 @@ pub struct ApiRequest<TResponse: DeserializeOwned> {
 }
 
 impl<TResponse: DeserializeOwned> ApiRequest<TResponse> {
-    /// Send request to telegram bot api
+    /// Send request to telegram bot api.
+    /// ## Example
     /// ```
     /// # use rutebot::requests::get_updates::{AllowedUpdate, GetUpdatesRequest};
     /// # fn main() {
@@ -99,9 +100,11 @@ impl Rutebot {
         }
     }
 
-    /// Create api request that you can send
+    /// Prepare request for sending. Generic method for interaction with telegram bot api.
     ///
-    /// Create request to recieve all unconfirmed messages. After creating request you can send it by method `send()`
+    /// Use Request structs from `requests` module for preparing needed api method
+    /// ## Example
+    /// Prepare request to recieve all unconfirmed messages. After creating request you can send it by method `send()`
     /// ```
     /// # use rutebot::requests::get_updates::{AllowedUpdate, GetUpdatesRequest};
     /// # fn main() {
@@ -127,7 +130,7 @@ impl Rutebot {
     }
 
     /// Recieve updates using polling.
-    ///
+    /// ## Example
     /// Create future to recieve all incoming messages using long polling with poll timeout 30 seconds
     /// ```
     /// # use futures::future::Future;

@@ -2,7 +2,7 @@ use std::ops::Not;
 
 use serde::Serialize;
 
-/// Contains types for sending [sendMessage](https://core.telegram.org/bots/api#sendmessage) request
+/// Contains types for sending [sendMessage](https://core.telegram.org/bots/api#sendMessage) request
 pub mod send_text_message;
 
 #[derive(Serialize, Debug, Clone)]
