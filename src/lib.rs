@@ -1,3 +1,6 @@
+//! Crate with bindings to telegram bot api.s
+
+
 /// Telegram bot api responses
 pub mod responses;
 /// Requests that you can send to telegram bot api

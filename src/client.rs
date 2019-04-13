@@ -23,16 +23,16 @@ use crate::updates_poll_stream::UpdatesPoolStream;
 const BASE_API_URI: &'static str = "https://api.telegram.org/bot";
 const GET_FILE_URI: &'static str = "https://api.telegram.org/file/bot";
 
-/// Main type for sending requests to telegram bot api
-#[derive(Clone)]
-pub struct Rutebot {
-    inner: Arc<Inner>,
-}
-
 #[derive(Clone)]
 struct Inner {
     http_client: Client<HttpsConnector<HttpConnector>, Body>,
     token: String,
+}
+
+/// Main type for sending requests to telegram bot api
+#[derive(Clone)]
+pub struct Rutebot {
+    inner: Arc<Inner>,
 }
 
 /// Represents ready request to telegram bot api.

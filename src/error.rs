@@ -13,9 +13,18 @@ use crate::responses::ResponseParameters;
 pub enum Error {
     Hyper(hyper::Error),
     TokioTimer(tokio::timer::Error),
-    TimedOut(Duration),
     Serde(serde_json::Error),
-    Api { error_code: i32, description: String, parameters: Option<ResponseParameters> },
+    /// Telegram bot api error
+    Api {
+        /// Error code returned by api
+        error_code: i32,
+
+        /// Human-readable description of the error
+        description: String,
+
+        /// Parameters which can help to automatically handle the error
+        parameters: Option<ResponseParameters>,
+    },
 }
 
 impl error::Error for Error {
@@ -40,8 +49,6 @@ impl fmt::Display for Error {
                 write!(f, "Hyper error has occurred: {}", hyper),
             Error::TokioTimer(tokio) =>
                 write!(f, "Tokio timer error has occurred: {}", tokio),
-            Error::TimedOut(timeout) =>
-                write!(f, "Request timed out. Provided budget: {} seconds", timeout.as_secs()),
             Error::Serde(serde) =>
                 write!(f, "Serde error has occurred: {}", serde),
             Error::Api { error_code, description, parameters } =>

@@ -10,12 +10,12 @@ use crate::error::Error;
 use crate::responses::Update;
 
 pub struct UpdatesPoolStream<Fut, Sender> {
-    pub send_request: Sender,
-    pub buffer: VecDeque<Update>,
-    pub executing_request: Fut,
-    pub is_canceled: bool,
-    pub last_id: Option<i64>,
-    pub has_error: bool,
+    send_request: Sender,
+    buffer: VecDeque<Update>,
+    executing_request: Fut,
+    is_canceled: bool,
+    last_id: Option<i64>,
+    has_error: bool,
 }
 
 impl<Fut, Sender> Stream for UpdatesPoolStream<Fut, Sender>

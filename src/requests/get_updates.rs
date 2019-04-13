@@ -3,6 +3,7 @@ use serde::Serialize;
 use crate::requests::Request;
 use crate::responses::Update;
 
+/// Request to send [getUpdates](https://core.telegram.org/bots/api#getUpdates) request
 #[derive(Serialize, Debug, Clone)]
 pub struct GetUpdatesRequest<'a> {
     /// Identifier of the first update to be returned. Must be greater by one than the highest
@@ -31,6 +32,7 @@ pub struct GetUpdatesRequest<'a> {
     pub allowed_updates: Option<&'a [AllowedUpdate]>,
 }
 
+/// Enumeration of possible update types from telegram bot api
 #[derive(Serialize, Debug, Clone, Copy)]
 #[serde(rename_all = "snake_case")]
 pub enum AllowedUpdate {
@@ -52,8 +54,9 @@ impl<'a> Request<Vec<Update>> for GetUpdatesRequest<'a> {
 }
 
 impl<'a> GetUpdatesRequest<'a> {
-    pub fn new() -> GetUpdatesRequest<'static> {
-        GetUpdatesRequest {
+    /// Create default request.
+    pub fn new() -> Self {
+        Self {
             offset: None,
             limit: None,
             timeout: None,
