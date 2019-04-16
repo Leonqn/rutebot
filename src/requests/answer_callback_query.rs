@@ -4,7 +4,7 @@ use serde::Serialize;
 
 use crate::requests::Request;
 
-/// Use this method to send answers to callback queries sent from inline keyboards.
+/// Use this struct to send answers to callback queries sent from inline keyboards.
 /// The answer will be displayed to the user as a notification at the top of the chat screen or as an alert.
 /// On success, `True` is returned.
 #[derive(Serialize, Debug, Clone)]
@@ -36,5 +36,17 @@ impl<'a, 'b, 'c> Request for AnswerCallbackQuery<'a, 'b, 'c> {
 
     fn method(&self) -> &'static str {
         "answerCallbackQuery"
+    }
+}
+
+impl<'a, 'b, 'c> AnswerCallbackQuery<'a, 'b, 'c> {
+    pub fn new(query_id: &'a str, notification_text: &'b str) -> Self {
+        Self {
+            callback_query_id: query_id,
+            text: Some(notification_text),
+            show_alert: false,
+            url: None,
+            cache_time: None,
+        }
     }
 }

@@ -3,7 +3,7 @@ use serde::Serialize;
 use crate::requests::Request;
 use crate::responses::User;
 
-/// A simple method for testing your bot's auth token. Requires no parameters.
+/// A simple struct for testing your bot's auth token. Requires no parameters.
 /// Returns basic information about the bot in form of a `User` object.
 #[derive(Serialize, Debug, Clone, Copy)]
 pub struct GetMe;
