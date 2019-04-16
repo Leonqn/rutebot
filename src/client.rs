@@ -142,7 +142,7 @@ impl Rutebot {
     /// let get_file = GetFileRequest::new("file-id");
     /// let file_fut = bot.prepare_api_request(&get_file)
     ///     .send()
-    ///     .and_then(move |file| bot.download_file(&file.file_path.unwrap_or("".to_string())));
+    ///     .and_then(move |file| bot.download_file(&file.file_path.as_ref().map_or("ru-RU", String::as_str)));
     ///
     /// # }
     /// ```
