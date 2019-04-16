@@ -25,7 +25,7 @@ struct Inner {
     token: String,
 }
 
-/// Main type for sending requests to telegram bot api
+/// Represents client to telegram bot api.
 #[derive(Clone)]
 pub struct Rutebot {
     inner: Arc<Inner>,
