@@ -21,20 +21,22 @@
 //!            ..GetUpdatesRequest::new()
 //!        };
 //!    let updates = rutebot.incoming_updates(&get_updates)
-//!        .map_err(|x| println!("Got error while getting updates {:?}", x))
 //!        .then(Ok)
 //!        .for_each(move |x| {
-//!            let x = x.unwrap();
 //!            let reply_msg_request =
 //!                match x {
-//!                    Update { message: Some(Message { message_id, ref chat, text: Some(ref text), .. }), .. } => {
+//!                    Ok(Update { message: Some(Message { message_id, ref chat, text: Some(ref text), .. }), .. }) => {
 //!                        let request =
 //!                            SendTextMessageRequest::new_reply(ChatId::Id(chat.id), text, message_id);
 //!                        Some(request)
 //!                    }
-//!                    Update { message: Some(Message { message_id, ref chat, .. }), .. } => {
+//!                    Ok(Update { message: Some(Message { message_id, ref chat, .. }), .. }) => {
 //!                        let request = SendTextMessageRequest::new_reply(ChatId::Id(chat.id), "I can echo only text message", message_id);
 //!                        Some(request)
+//!                    }
+//!                    Err(e) => {
+//!                       println!("Got error while getting updates {:?}", e);
+//!                       None
 //!                    }
 //!                    _ => None
 //!                };
