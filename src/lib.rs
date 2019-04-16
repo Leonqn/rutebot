@@ -57,11 +57,11 @@
 /// Telegram bot api responses
 pub mod responses;
 
-/// Requests that you can send to telegram bot api
-pub mod requests;
-
-/// Main types for sending requests
+/// Types for sending requests to telegram bot api
 pub mod client;
+
+/// Requests for `client::Rutebot`. Each request struct represent some method telegram bot api
+pub mod requests;
 
 /// Errors definitions
 pub mod error;
