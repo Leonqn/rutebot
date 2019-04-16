@@ -16,7 +16,6 @@ impl Request for GetMe {
 }
 
 impl GetMe {
-    /// Create default request
     pub fn new() -> Self {
         GetMe
     }

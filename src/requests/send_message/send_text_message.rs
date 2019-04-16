@@ -8,7 +8,7 @@ use crate::responses::Message;
 
 /// Represents [sendMessage](https://core.telegram.org/bots/api#sendMessage) request
 #[derive(Serialize, Debug, Clone)]
-pub struct SendTextMessageRequest<'a, 'b, 'c, 'd, 'e, 'f, 'g> {
+pub struct SendTextMessageRequest<'a, 'b, 'c, 'd, 'e> {
     /// Identifier for the target chat
     pub chat_id: ChatId<'a>,
 
@@ -36,7 +36,7 @@ pub struct SendTextMessageRequest<'a, 'b, 'c, 'd, 'e, 'f, 'g> {
 
     /// Additional interface options.
     #[serde(skip_serializing_if = "Option::is_none")]
-    pub reply_markup: Option<ReplyMarkup<'c, 'd, 'e, 'f, 'g>>,
+    pub reply_markup: Option<ReplyMarkup<'c, 'd, 'e>>,
 }
 
 
@@ -55,6 +55,7 @@ impl<'a, 'b, 'c, 'd, 'e, 'f, 'g> Request for SendTextMessageRequest<'a, 'b, 'c, 
 }
 
 impl<'a, 'b, 'c, 'd, 'e, 'f, 'g> SendTextMessageRequest<'a, 'b, 'c, 'd, 'e, 'f, 'g> {
+
     pub fn new(chat_id: ChatId<'a>, text: &'b str) -> Self {
         Self {
             chat_id,

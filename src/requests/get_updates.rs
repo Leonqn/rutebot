@@ -56,7 +56,6 @@ impl<'a> Request for GetUpdatesRequest<'a> {
 }
 
 impl<'a> GetUpdatesRequest<'a> {
-    /// Create default request.
     pub fn new() -> Self {
         Self {
             offset: None,

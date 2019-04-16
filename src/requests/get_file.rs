@@ -11,7 +11,6 @@ pub struct GetFileRequest<'a> {
 }
 
 impl<'a> GetFileRequest<'a> {
-    /// Create request with given file_id
     pub fn new(file_id: &'a str) -> Self {
         Self {
             file_id
