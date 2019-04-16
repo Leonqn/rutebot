@@ -5,13 +5,13 @@ use serde::Serialize;
 /// Contains types for sending [sendMessage](https://core.telegram.org/bots/api#sendMessage) request
 pub mod send_text_message;
 
-#[derive(Serialize, Debug, Clone)]
-#[serde(untagged)]
-pub enum FileKind<'a> {
-    FileId(&'a str),
-    Url(&'a str),
-//    InputFile(Vec<u8>),
-}
+//#[derive(Serialize, Debug, Clone)]
+//#[serde(untagged)]
+//pub enum FileKind<'a> {
+//    FileId(&'a str),
+//    Url(&'a str),
+////    InputFile(Vec<u8>),
+//}
 
 /// Additional interface options
 #[derive(Serialize, Debug, Clone)]

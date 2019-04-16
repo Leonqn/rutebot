@@ -46,7 +46,7 @@ pub enum ParseMode {
     Markdown,
 }
 
-impl<'a, 'b, 'c, 'd, 'e, 'f, 'g> Request for SendTextMessageRequest<'a, 'b, 'c, 'd, 'e, 'f, 'g> {
+impl<'a, 'b, 'c, 'd, 'e> Request for SendTextMessageRequest<'a, 'b, 'c, 'd, 'e> {
     type ResponseType = Message;
 
     fn method(&self) -> &'static str {
@@ -54,7 +54,7 @@ impl<'a, 'b, 'c, 'd, 'e, 'f, 'g> Request for SendTextMessageRequest<'a, 'b, 'c, 
     }
 }
 
-impl<'a, 'b, 'c, 'd, 'e, 'f, 'g> SendTextMessageRequest<'a, 'b, 'c, 'd, 'e, 'f, 'g> {
+impl<'a, 'b, 'c, 'd, 'e> SendTextMessageRequest<'a, 'b, 'c, 'd, 'e> {
 
     pub fn new(chat_id: ChatId<'a>, text: &'b str) -> Self {
         Self {
