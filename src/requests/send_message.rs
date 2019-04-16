@@ -28,14 +28,14 @@ pub enum ReplyMarkup<'a, 'b, 'c> {
 #[derive(Serialize, Debug, Clone)]
 pub struct InlineKeyboard<'a, 'b, 'c> {
     /// Array of button rows, each represented by an Array of `InlineKeyboardButton` objects
-    pub inline_keyboard: &'c [&'c [InlineKeyboardButton<'a, 'b>]]
+    pub inline_keyboard: &'c [Vec<InlineKeyboardButton<'a, 'b>>]
 }
 
 /// This object represents a custom keyboard with reply options.
 #[derive(Serialize, Debug, Clone)]
 pub struct ReplyKeyboardMarkup<'a, 'b> {
     /// Array of button rows, each represented by an Array of `KeyboardButton` objects
-    pub keyboard: &'b [&'b [KeyboardButton<'a>]],
+    pub keyboard: &'b [Vec<KeyboardButton<'a>>],
 
     /// Requests clients to resize the keyboard vertically for optimal fit
     /// (e.g., make the keyboard smaller if there are just two rows of buttons).
