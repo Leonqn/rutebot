@@ -3,7 +3,8 @@ use serde::Serialize;
 use crate::requests::Request;
 use crate::responses::User;
 
-/// Represents [getMe](https://core.telegram.org/bots/api#getMe) request
+/// A simple method for testing your bot's auth token. Requires no parameters.
+/// Returns basic information about the bot in form of a `User` object.
 #[derive(Serialize, Debug, Clone, Copy)]
 pub struct GetMe;
 

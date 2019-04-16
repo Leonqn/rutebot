@@ -12,6 +12,9 @@ pub mod get_me;
 /// Contains types for sending messages
 pub mod send_message;
 
+/// Contains types for sending [answerCallbackQuery](https://core.telegram.org/bots/api#answercallbackquery) request
+pub mod answer_callback_query;
+
 /// Basic request type.
 pub trait Request: Serialize {
     type ResponseType;

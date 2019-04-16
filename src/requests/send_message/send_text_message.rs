@@ -6,7 +6,7 @@ use crate::requests::{ChatId, Request};
 use crate::requests::send_message::*;
 use crate::responses::Message;
 
-/// Represents [sendMessage](https://core.telegram.org/bots/api#sendMessage) request
+/// Use this method to send text messages. On success, the sent `Message` is returned.
 #[derive(Serialize, Debug, Clone)]
 pub struct SendTextMessageRequest<'a, 'b, 'c, 'd, 'e> {
     /// Identifier for the target chat
@@ -55,7 +55,6 @@ impl<'a, 'b, 'c, 'd, 'e> Request for SendTextMessageRequest<'a, 'b, 'c, 'd, 'e> 
 }
 
 impl<'a, 'b, 'c, 'd, 'e> SendTextMessageRequest<'a, 'b, 'c, 'd, 'e> {
-
     pub fn new(chat_id: ChatId<'a>, text: &'b str) -> Self {
         Self {
             chat_id,

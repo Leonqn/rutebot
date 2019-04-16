@@ -3,7 +3,7 @@ use serde::Serialize;
 use crate::requests::Request;
 use crate::responses::Update;
 
-/// Represents [getUpdates](https://core.telegram.org/bots/api#getUpdates) request
+/// Use this method to receive incoming updates using long polling. An Array of `Update` objects is returned.
 #[derive(Serialize, Debug, Clone)]
 pub struct GetUpdatesRequest<'a> {
     /// Identifier of the first update to be returned. Must be greater by one than the highest
