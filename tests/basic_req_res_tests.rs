@@ -1,8 +1,10 @@
-use pretty_assertions::{assert_eq, assert_ne};
+use pretty_assertions::assert_eq;
 
 use rutebot::requests::get_me::GetMe;
+use rutebot::requests::get_updates::GetUpdatesRequest;
+use rutebot::requests::send_chat_action::{ChatAction, SendChatAction};
 use rutebot::requests::send_message::send_text_message::{ParseMode, SendTextMessageRequest};
-use rutebot::responses::{Message, MessageEntityValue, User};
+use rutebot::responses::{Message, MessageEntityValue, Update, User};
 
 use crate::common::run_one;
 
@@ -25,6 +27,23 @@ pub fn send_text_message_works() {
     let response: Message = run_one(rutebot.prepare_api_request(&SendTextMessageRequest::new(chat_id, "Some text")).send());
 
     assert_eq!(response.text.unwrap(), "Some text");
+}
+
+#[test]
+pub fn send_chat_action_works() {
+    let rutebot = common::create_client();
+    let chat_id = common::get_chat_id();
+
+    let response: bool = run_one(rutebot.prepare_api_request(&SendChatAction::new(chat_id, ChatAction::Typing)).send());
+
+    assert_eq!(response, true);
+}
+
+#[test]
+pub fn get_updates_works() {
+    let rutebot = common::create_client();
+
+    let _response: Vec<Update> = run_one(rutebot.prepare_api_request(&GetUpdatesRequest::new()).send());
 }
 
 #[test]
