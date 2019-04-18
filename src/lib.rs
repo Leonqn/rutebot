@@ -10,7 +10,6 @@
 //! use rutebot::requests::get_updates::{GetUpdatesRequest, AllowedUpdate};
 //! use rutebot::requests::send_message::send_text_message::SendTextMessageRequest;
 //! use rutebot::responses::{Message, Update};
-//! use rutebot::requests::ChatId;
 //!
 //! fn main() {
 //!    let rutebot = Rutebot::new("token");

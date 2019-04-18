@@ -13,7 +13,6 @@ use rutebot::client::Rutebot;
 use rutebot::requests::get_updates::{GetUpdatesRequest, AllowedUpdate};
 use rutebot::requests::send_message::send_text_message::SendTextMessageRequest;
 use rutebot::responses::{Message, Update};
-use rutebot::requests::ChatId;
 
 fn main() {
    let rutebot = Rutebot::new("token");
@@ -31,11 +30,11 @@ fn main() {
                match x {
                    Ok(Update { message: Some(Message { message_id, ref chat, text: Some(ref text), .. }), .. }) => {
                        let request =
-                           SendTextMessageRequest::new_reply(ChatId::Id(chat.id), text, message_id);
+                           SendTextMessageRequest::new_reply(chat.id, text, message_id);
                        Some(request)
                    }
                    Ok(Update { message: Some(Message { message_id, ref chat, .. }), .. }) => {
-                       let request = SendTextMessageRequest::new_reply(ChatId::Id(chat.id), "I can echo only text message", message_id);
+                       let request = SendTextMessageRequest::new_reply(chat.id, "I can echo only text message", message_id);
                        Some(request)
                    }
                    Err(e) => {

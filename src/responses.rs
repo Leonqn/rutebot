@@ -235,6 +235,69 @@ pub struct MessageEntity {
     pub user: Option<User>,
 }
 
+#[derive(Clone, Debug)]
+pub enum MessageEntityValue {
+    Mention(String),
+    Hashtag(String),
+    Cashtag(String),
+    BotCommand(String),
+    Url(String),
+    Email(String),
+    PhoneNumber(String),
+    Bold(String),
+    Italic(String),
+    Code(String),
+    Pre(String),
+    TextLink { text: String, link: String },
+    TextMention { mention: String, user: User },
+}
+
+impl MessageEntity {
+    /// Try to extract value from text message. If fails returns original object in Err side
+    pub fn extract_value(self, text: &str) -> Result<MessageEntityValue, MessageEntity> {
+        let utf16_capture: Vec<u16> = text.encode_utf16().skip(self.offset as usize).take(self.offset as usize + self.length as usize).collect();
+        let captured = String::from_utf16_lossy(&utf16_capture);
+        match self.typ.as_ref() {
+            "mention" =>
+                Ok(MessageEntityValue::Mention(captured)),
+            "hashtag" =>
+                Ok(MessageEntityValue::Hashtag(captured)),
+            "cashtag" =>
+                Ok(MessageEntityValue::Cashtag(captured)),
+            "bot_command" =>
+                Ok(MessageEntityValue::BotCommand(captured)),
+            "url" =>
+                Ok(MessageEntityValue::Url(captured)),
+            "email" =>
+                Ok(MessageEntityValue::Email(captured)),
+            "phone_number" =>
+                Ok(MessageEntityValue::PhoneNumber(captured)),
+            "bold" =>
+                Ok(MessageEntityValue::Bold(captured)),
+            "italic" =>
+                Ok(MessageEntityValue::Italic(captured)),
+            "code" =>
+                Ok(MessageEntityValue::Code(captured)),
+            "pre" =>
+                Ok(MessageEntityValue::Pre(captured)),
+            "text_link" =>
+                if let Some(link) = self.url {
+                    Ok(MessageEntityValue::TextLink { text: captured, link })
+                } else {
+                    Err(self)
+                }
+            "text_mention" =>
+                if let Some(user) = self.user {
+                    Ok(MessageEntityValue::TextMention { mention: captured, user })
+                } else {
+                    Err(self)
+                }
+            _ =>
+                Err(self)
+        }
+    }
+}
+
 
 /// This object represents an audio file to be treated as music by the Telegram clients
 #[derive(Deserialize, Debug, Clone)]

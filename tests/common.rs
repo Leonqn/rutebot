@@ -2,7 +2,7 @@ use std;
 use std::env;
 use std::fmt::Debug;
 
-use futures::{Future, IntoFuture};
+use futures::IntoFuture;
 
 use rutebot::client::Rutebot;
 use str;
