@@ -3,8 +3,7 @@
 [![doc.rs](https://docs.rs/rutebot/badge.svg)](https://docs.rs/rutebot)
 
 # rutebot
-Telegram bot api bindings for rust programming language.
-
+Telegram bot api bindings for rust programming language. For details see [docs](https://docs.rs/rutebot)
 ## Example
 Simple echo bot. It listens all incoming messages and echos text messages, on other messages it replies with text "I can echo only text message".
 ```rust

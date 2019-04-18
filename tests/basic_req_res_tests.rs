@@ -1,10 +1,10 @@
-use futures::future::Future;
 use pretty_assertions::{assert_eq, assert_ne};
 
 use rutebot::requests::get_me::GetMe;
 use rutebot::responses::User;
 
 use crate::common::run_one;
+use rutebot::requests::send_message::send_text_message::SendTextMessageRequest;
 
 mod common;
 
@@ -16,3 +16,4 @@ pub fn get_me_works() {
 
     assert_eq!(response.is_bot, true);
 }
+

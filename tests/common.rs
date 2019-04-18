@@ -5,6 +5,7 @@ use std::fmt::Debug;
 use futures::{Future, IntoFuture};
 
 use rutebot::client::Rutebot;
+use str;
 
 pub fn create_client() -> Rutebot {
     let token = env::var_os("TEST_TOKEN")
@@ -13,6 +14,14 @@ pub fn create_client() -> Rutebot {
         .to_string_lossy();
 
     Rutebot::new(token)
+}
+
+pub fn get_chat_id() -> i64 {
+    let chat_id = env::var_os("TEST_CHAT_ID")
+        .expect("Chat id is missing. You should specify chat id in which bot will send messages for testing");
+
+    let chat_id = chat_id.to_string_lossy();
+    str::parse(&chat_id).unwrap()
 }
 
 pub fn run_one<F>(f: F) -> F::Item

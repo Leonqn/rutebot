@@ -55,9 +55,9 @@ impl<'a, 'b, 'c, 'd, 'e> Request for SendTextMessageRequest<'a, 'b, 'c, 'd, 'e> 
 }
 
 impl<'a, 'b, 'c, 'd, 'e> SendTextMessageRequest<'a, 'b, 'c, 'd, 'e> {
-    pub fn new(chat_id: ChatId<'a>, text: &'b str) -> Self {
+    pub fn new(chat_id: impl Into<ChatId<'a>>, text: &'b str) -> Self {
         Self {
-            chat_id,
+            chat_id: chat_id.into(),
             text,
             disable_notification: false,
             parse_mode: None,
@@ -67,9 +67,9 @@ impl<'a, 'b, 'c, 'd, 'e> SendTextMessageRequest<'a, 'b, 'c, 'd, 'e> {
         }
     }
 
-    pub fn new_reply(chat_id: ChatId<'a>, text: &'b str, reply_to_message_id: i64) -> Self {
+    pub fn new_reply(chat_id: impl Into<ChatId<'a>>, text: &'b str, reply_to_message_id: i64) -> Self {
         Self {
-            chat_id,
+            chat_id: chat_id.into(),
             text,
             disable_notification: false,
             parse_mode: None,

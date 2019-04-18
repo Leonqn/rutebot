@@ -29,9 +29,9 @@ pub enum ChatAction {
 
 
 impl<'a> SendChatAction<'a> {
-    pub fn new(chat_id: ChatId<'a>, action: ChatAction) -> Self {
+    pub fn new(chat_id: impl Into<ChatId<'a>>, action: ChatAction) -> Self {
         Self {
-            chat_id,
+            chat_id: chat_id.into(),
             action,
         }
     }

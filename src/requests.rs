@@ -30,5 +30,17 @@ pub trait Request: Serialize {
 #[serde(untagged)]
 pub enum ChatId<'a> {
     Id(i64),
-    Username(&'a str),
+    ChannelUsername(&'a str),
+}
+
+impl<'a> From<i64> for ChatId<'a> {
+    fn from(x: i64) -> Self {
+        ChatId::Id(x)
+    }
+}
+
+impl<'a> From<&'a str> for ChatId<'a> {
+    fn from(x: &'a str) -> Self {
+        ChatId::ChannelUsername(x)
+    }
 }

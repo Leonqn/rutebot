@@ -1,4 +1,5 @@
-//! Crate with bindings to telegram bot api.
+//! Crate with bindings to telegram bot api. For details see example below.
+//! You can find all implemented methods in `requests` module.
 //!
 //! # Example
 //! Simple echo bot. It listens all incoming messages and echos text messages, on other messages it replies with text "I can echo only text message".
@@ -27,11 +28,11 @@
 //!                match x {
 //!                    Ok(Update { message: Some(Message { message_id, ref chat, text: Some(ref text), .. }), .. }) => {
 //!                        let request =
-//!                            SendTextMessageRequest::new_reply(ChatId::Id(chat.id), text, message_id);
+//!                            SendTextMessageRequest::new_reply(chat.id, text, message_id);
 //!                        Some(request)
 //!                    }
 //!                    Ok(Update { message: Some(Message { message_id, ref chat, .. }), .. }) => {
-//!                        let request = SendTextMessageRequest::new_reply(ChatId::Id(chat.id), "I can echo only text message", message_id);
+//!                        let request = SendTextMessageRequest::new_reply(chat.id, "I can echo only text message", message_id);
 //!                        Some(request)
 //!                    }
 //!                    Err(e) => {
