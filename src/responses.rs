@@ -253,9 +253,9 @@ pub enum MessageEntityValue {
 }
 
 impl MessageEntity {
-    /// Try to extract value from text message. If fails returns original object in Err side
+    /// Try to extract correct messageEntity from text message. If it fails returns original object in Err side
     pub fn extract_value(self, text: &str) -> Result<MessageEntityValue, MessageEntity> {
-        let utf16_capture: Vec<u16> = text.encode_utf16().skip(self.offset as usize).take(self.offset as usize + self.length as usize).collect();
+        let utf16_capture: Vec<u16> = text.encode_utf16().skip(self.offset as usize).take(self.length as usize).collect();
         let captured = String::from_utf16_lossy(&utf16_capture);
         match self.typ.as_ref() {
             "mention" =>
