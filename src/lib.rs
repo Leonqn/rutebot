@@ -7,18 +7,18 @@
 //! use hyper::rt::{Future, Stream};
 //!
 //! use rutebot::client::Rutebot;
-//! use rutebot::requests::get_updates::{GetUpdatesRequest, AllowedUpdate};
-//! use rutebot::requests::send_message::send_text::SendTextRequest;
+//! use rutebot::requests::get_updates::{GetUpdates, AllowedUpdate};
+//! use rutebot::requests::send_message::send_text::SendText;
 //! use rutebot::responses::{Message, Update};
 //!
 //! fn main() {
 //!    let rutebot = Rutebot::new("token");
 //!    let allowed_updates = [AllowedUpdate::Message];
 //!    let get_updates =
-//!        GetUpdatesRequest {
+//!        GetUpdates {
 //!            timeout: Some(20),
 //!            allowed_updates: Some(&allowed_updates),
-//!            ..GetUpdatesRequest::new()
+//!            ..GetUpdates::new()
 //!        };
 //!    let updates = rutebot.incoming_updates(get_updates)
 //!        .then(Ok)
@@ -27,11 +27,11 @@
 //!                match x {
 //!                    Ok(Update { message: Some(Message { message_id, ref chat, text: Some(ref text), .. }), .. }) => {
 //!                        let request =
-//!                            SendTextRequest::new_reply(chat.id, text, message_id);
+//!                            SendText::new_reply(chat.id, text, message_id);
 //!                        Some(request)
 //!                    }
 //!                    Ok(Update { message: Some(Message { message_id, ref chat, .. }), .. }) => {
-//!                        let request = SendTextRequest::new_reply(chat.id, "I can echo only text message", message_id);
+//!                        let request = SendText::new_reply(chat.id, "I can echo only text message", message_id);
 //!                        Some(request)
 //!                    }
 //!                    Err(e) => {

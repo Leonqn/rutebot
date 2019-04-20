@@ -17,9 +17,11 @@ pub enum FileKind<'a> {
     /// Http url for the file to be sent. Telegram will download and send the file.
     /// 5 MB max size for photos and 20 MB max for other types of content
     Url(&'a str),
-    /// Content of the file to be uploaded
+    /// Arbitrary file to be uploaded
     InputFile {
+        /// Name of the file
         name: &'a str,
+        /// File content
         content: Vec<u8>,
     },
 }

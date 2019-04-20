@@ -8,7 +8,7 @@ use crate::responses::Message;
 
 /// Use this struct to send text messages. On success, the sent `Message` is returned.
 #[derive(Serialize, Debug, Clone)]
-pub struct SendTextRequest<'a, 'b, 'c, 'd, 'e> {
+pub struct SendText<'a, 'b, 'c, 'd, 'e> {
     /// Identifier for the target chat
     pub chat_id: ChatId<'a>,
 
@@ -39,7 +39,7 @@ pub struct SendTextRequest<'a, 'b, 'c, 'd, 'e> {
     pub reply_markup: Option<ReplyMarkup<'c, 'd, 'e>>,
 }
 
-impl<'a, 'b, 'c, 'd, 'e> Request for SendTextRequest<'a, 'b, 'c, 'd, 'e> {
+impl<'a, 'b, 'c, 'd, 'e> Request for SendText<'a, 'b, 'c, 'd, 'e> {
     type ResponseType = Message;
 
     fn method(&self) -> &'static str {
@@ -47,7 +47,7 @@ impl<'a, 'b, 'c, 'd, 'e> Request for SendTextRequest<'a, 'b, 'c, 'd, 'e> {
     }
 }
 
-impl<'a, 'b, 'c, 'd, 'e> SendTextRequest<'a, 'b, 'c, 'd, 'e> {
+impl<'a, 'b, 'c, 'd, 'e> SendText<'a, 'b, 'c, 'd, 'e> {
     pub fn new(chat_id: impl Into<ChatId<'a>>, text: &'b str) -> Self {
         Self {
             chat_id: chat_id.into(),

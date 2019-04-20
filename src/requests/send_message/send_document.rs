@@ -9,11 +9,13 @@ use serde::Serialize;
 use crate::requests::{add_fields_to_form, add_json_body, ChatId, Request};
 use crate::requests::send_message::*;
 use crate::responses::Message;
+use crate::error::Error;
+use std::error::Error as StdError;
 
 /// Use this method to send general files. On success, the sent `Message` is returned.
 /// Bots can currently send files of any type of up to 50 MB in size, this limit may be changed in the future
 #[derive(Serialize, Debug, Clone)]
-pub struct SendDocumentRequest<'a, 'b, 'c, 'd, 'e, 'f, 'g> {
+pub struct SendDocument<'a, 'b, 'c, 'd, 'e, 'f, 'g> {
     /// Identifier for the target chat
     pub chat_id: ChatId<'a>,
 
@@ -28,6 +30,7 @@ pub struct SendDocumentRequest<'a, 'b, 'c, 'd, 'e, 'f, 'g> {
     pub thumb: Option<FileKind<'f>>,
 
     /// Document caption (may also be used when resending documents by file_id), 0-1024 characters
+    #[serde(skip_serializing_if = "Option::is_none")]
     pub caption: Option<&'g str>,
 
     /// Sends the message [silently](https://telegram.org/blog/channels-2-0#silent-messages).
@@ -51,32 +54,33 @@ pub struct SendDocumentRequest<'a, 'b, 'c, 'd, 'e, 'f, 'g> {
 }
 
 
-impl<'a, 'b, 'c, 'd, 'e, 'f, 'g> Request for SendDocumentRequest<'a, 'b, 'c, 'd, 'e, 'f, 'g> {
+impl<'a, 'b, 'c, 'd, 'e, 'f, 'g> Request for SendDocument<'a, 'b, 'c, 'd, 'e, 'f, 'g> {
     type ResponseType = Message;
 
     fn method(&self) -> &'static str {
         "sendDocument"
     }
 
-    fn set_http_request_body(self, mut request_builder: hyper::http::request::Builder) -> hyper::http::request::Request<Body> {
+    fn set_http_request_body(self, mut request_builder: hyper::http::request::Builder) -> Result<hyper::http::request::Request<Body>, Error> {
         if self.document.is_input_file() || FileKind::is_option_input_file(&self.thumb) {
             let mut form = Form::default();
-            add_fields_to_form(&mut form, &self);
+            add_fields_to_form(&mut form, &self)?;
             if let FileKind::InputFile { name, content } = self.document {
-                form.add_reader_file("document", Cursor::new(content), name)
+                form.add_reader_file("document", Cursor::new(content), name);
             }
 
             if let Some(FileKind::InputFile { name, content }) = self.thumb {
-                form.add_reader_file("thumb", Cursor::new(content), name)
+                form.add_reader_file("document", Cursor::new(content), name);
             }
-            form.set_body_convert::<hyper::Body, multipart::Body>(&mut request_builder).unwrap()
+            form.set_body_convert::<hyper::Body, multipart::Body>(&mut request_builder)
+                .map_err(|x| Error::RequestBuild(x.description().to_string()))
         } else {
             add_json_body(request_builder, &self)
         }
     }
 }
 
-impl<'a, 'b, 'c, 'd, 'e, 'f, 'g> SendDocumentRequest<'a, 'b, 'c, 'd, 'e, 'f, 'g> {
+impl<'a, 'b, 'c, 'd, 'e, 'f, 'g> SendDocument<'a, 'b, 'c, 'd, 'e, 'f, 'g> {
     pub fn new(chat_id: impl Into<ChatId<'a>>, document: FileKind<'b>) -> Self {
         Self {
             chat_id: chat_id.into(),

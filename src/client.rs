@@ -2,7 +2,7 @@ use std::collections::VecDeque;
 use std::marker::PhantomData;
 use std::sync::Arc;
 
-use futures::future::Future;
+use futures::future::{Future, IntoFuture};
 use futures::stream::Stream;
 use hyper::{Body, Client, Request};
 use hyper::client::HttpConnector;
@@ -12,7 +12,7 @@ use serde_json;
 
 use crate::error::Error;
 use crate::requests;
-use crate::requests::get_updates::GetUpdatesRequest;
+use crate::requests::get_updates::GetUpdates;
 use crate::responses::{TgResponse, Update};
 use crate::updates_poll_stream::UpdatesPoolStream;
 
@@ -34,7 +34,7 @@ pub struct Rutebot {
 /// Represents ready request to telegram bot api.
 pub struct ApiRequest<TResponse: DeserializeOwned> {
     inner: Arc<Inner>,
-    http_request: Request<Body>,
+    http_request: Result<Request<Body>, Error>,
     _data: PhantomData<TResponse>,
 }
 
@@ -42,36 +42,40 @@ impl<TResponse: DeserializeOwned> ApiRequest<TResponse> {
     /// Send request to telegram bot api.
     /// ## Example
     /// ```
-    /// # use rutebot::requests::get_updates::{AllowedUpdate, GetUpdatesRequest};
+    /// # use rutebot::requests::get_updates::{AllowedUpdate, GetUpdates};
     /// # fn main() {
     /// # let bot = rutebot::client::Rutebot::new("token");
     /// # let allowed_updates = [AllowedUpdate::Message];
-    /// # let get_updates = GetUpdatesRequest {
+    /// # let get_updates = GetUpdates {
     /// #    allowed_updates: Some(&allowed_updates),
-    /// #    ..GetUpdatesRequest::new()
+    /// #    ..GetUpdates::new()
     /// # };
     /// # let request = bot.prepare_api_request(get_updates);
     /// let future = request.send();
     /// # }
     /// ```
     pub fn send(self) -> impl Future<Item=TResponse, Error=Error> {
+        let http_request = self.http_request;
+        let bot = self.inner;
+        http_request.into_future()
+            .and_then(move |http_request| {
+                bot.http_client.request(http_request)
+                    .and_then(|r| r.into_body().concat2())
+                    .then(move |body| {
+                        let body_ref = &body.map_err(Error::Hyper)?;
+                        let response: TgResponse<TResponse> = serde_json::from_slice(body_ref).map_err(Error::Serde)?;
+                        match response {
+                            TgResponse { ok: true, result: Some(res), .. } =>
+                                Ok(res),
 
-        self.inner.http_client.request(self.http_request)
-            .and_then(|r| r.into_body().concat2())
-            .then(move |body| {
-                let body_ref = &body.map_err(Error::Hyper)?;
-                let response: TgResponse<TResponse> = serde_json::from_slice(body_ref).map_err(Error::Serde)?;
-                match response {
-                    TgResponse { ok: true, result: Some(res), .. } =>
-                        Ok(res),
-
-                    TgResponse { description, error_code, parameters, .. } =>
-                        Err(Error::Api {
-                            error_code: error_code.unwrap_or(0),
-                            description: description.unwrap_or("Unknown error".to_string()),
-                            parameters,
-                        }),
-                }
+                            TgResponse { description, error_code, parameters, .. } =>
+                                Err(Error::Api {
+                                    error_code: error_code.unwrap_or(0),
+                                    description: description.unwrap_or("Unknown error".to_string()),
+                                    parameters,
+                                }),
+                        }
+                    })
             })
     }
 }
@@ -98,13 +102,13 @@ impl Rutebot {
     /// ## Example
     /// Prepare request to recieve all unconfirmed messages. After creating request you can send it by method `send()`
     /// ```
-    /// # use rutebot::requests::get_updates::{AllowedUpdate, GetUpdatesRequest};
+    /// # use rutebot::requests::get_updates::{AllowedUpdate, GetUpdates};
     /// # fn main() {
     /// let bot = rutebot::client::Rutebot::new("token");
     /// let allowed_updates = [AllowedUpdate::Message];
-    /// let get_updates = GetUpdatesRequest {
+    /// let get_updates = GetUpdates {
     ///     allowed_updates: Some(&allowed_updates),
-    ///     ..GetUpdatesRequest::new()
+    ///     ..GetUpdates::new()
     /// };
     /// let request = bot.prepare_api_request(get_updates);
     /// # }
@@ -130,10 +134,10 @@ impl Rutebot {
     /// ```
     /// # use futures::future::Future;
     ///
-    /// # use rutebot::requests::get_file::GetFileRequest;
+    /// # use rutebot::requests::get_file::GetFile;
     /// # fn main() {
     /// let bot = rutebot::client::Rutebot::new("token");
-    /// let get_file = GetFileRequest::new("file-id");
+    /// let get_file = GetFile::new("file-id");
     /// let file_fut = bot.prepare_api_request(get_file)
     ///     .send()
     ///     .and_then(move |file| bot.download_file(&file.file_path.as_ref().map_or("ru-RU", String::as_str)));
@@ -174,28 +178,28 @@ impl Rutebot {
     /// ```
     /// # use futures::future::Future;
     /// # use futures::stream::Stream;
-    /// # use rutebot::requests::get_updates::{AllowedUpdate, GetUpdatesRequest};
+    /// # use rutebot::requests::get_updates::{AllowedUpdate, GetUpdates};
     /// # fn main() {
     /// let bot = rutebot::client::Rutebot::new("token");
     /// let allowed_updates = [AllowedUpdate::Message];
-    /// let get_updates = GetUpdatesRequest {
+    /// let get_updates = GetUpdates {
     ///     allowed_updates: Some(&allowed_updates),
     ///     timeout: Some(30),
-    ///     ..GetUpdatesRequest::new()
+    ///     ..GetUpdates::new()
     /// };
     /// let incoming_updates_future =
     ///     bot.incoming_updates(get_updates)
     ///     .for_each(|update| Ok(()));
     /// # }
     /// ```
-    pub fn incoming_updates(&self, request: GetUpdatesRequest) -> impl Stream<Item=Update, Error=Error> {
+    pub fn incoming_updates(&self, request: GetUpdates) -> impl Stream<Item=Update, Error=Error> {
         let self_1 = self.clone();
         let allowed_updates = request.allowed_updates.map(|x| x.to_vec());
         let limit = request.limit;
         let timeout = request.timeout;
         let offset = request.offset;
         let send_request = move |x| {
-            let request = GetUpdatesRequest {
+            let request = GetUpdates {
                 offset: x,
                 limit,
                 timeout,

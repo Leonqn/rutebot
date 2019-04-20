@@ -10,6 +10,7 @@ use crate::responses::ResponseParameters;
 #[derive(Debug)]
 pub enum Error {
     Hyper(hyper::Error),
+    RequestBuild(String),
     Serde(serde_json::Error),
     /// Telegram bot api error
     Api {
@@ -46,6 +47,9 @@ impl fmt::Display for Error {
                 write!(f, "Serde error has occurred: {}", serde),
             Error::Api { error_code, description, parameters } =>
                 write!(f, "Error response from telegram bot api: error_code: {:?}, description: {:?}, parameters: {:?}", error_code, description, parameters),
+            Error::RequestBuild(x) => {
+                write!(f, "Request building was unsuccessful: {}", x)
+            }
         }
     }
 }

@@ -5,7 +5,7 @@ use crate::responses::Update;
 
 /// Use this struct to receive incoming updates using long polling. An Array of `Update` objects is returned.
 #[derive(Serialize, Debug, Clone)]
-pub struct GetUpdatesRequest<'a> {
+pub struct GetUpdates<'a> {
     /// Identifier of the first update to be returned. Must be greater by one than the highest
     /// among the identifiers of previously received updates.
     /// By default, updates starting with the earliest unconfirmed update are returned.
@@ -47,7 +47,7 @@ pub enum AllowedUpdate {
     PreCheckoutQuery,
 }
 
-impl<'a> Request for GetUpdatesRequest<'a> {
+impl<'a> Request for GetUpdates<'a> {
     type ResponseType = Vec<Update>;
 
     fn method(&self) -> &'static str {
@@ -55,7 +55,7 @@ impl<'a> Request for GetUpdatesRequest<'a> {
     }
 }
 
-impl<'a> GetUpdatesRequest<'a> {
+impl<'a> GetUpdates<'a> {
     pub fn new() -> Self {
         Self {
             offset: None,
