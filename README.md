@@ -15,7 +15,7 @@ use rutebot::requests::send_message::send_text::SendText;
 use rutebot::responses::{Message, Update};
 
 fn main() {
-    let rutebot = Rutebot::new("689791636:AAFYUZPb-h866CV5K6iXAR7d6cD2xJhIs3s");
+    let rutebot = Rutebot::new("your token");
     let get_updates =
         GetUpdates {
             timeout: Some(20),
