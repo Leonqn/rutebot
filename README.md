@@ -23,7 +23,7 @@ fn main() {
            allowed_updates: Some(&allowed_updates),
            ..GetUpdatesRequest::new()
        };
-   let updates = rutebot.incoming_updates(&get_updates)
+   let updates = rutebot.incoming_updates(get_updates)
        .then(Ok)
        .for_each(move |x| {
            let reply_msg_request =
@@ -44,7 +44,7 @@ fn main() {
                    _ => None
                };
            if let Some(reply) = reply_msg_request {
-               let send_future = rutebot.prepare_api_request(&reply)
+               let send_future = rutebot.prepare_api_request(reply)
                    .send()
                    .map(|_| ())
                    .map_err(|x| println!("Got error while sending message: {:?}", x));

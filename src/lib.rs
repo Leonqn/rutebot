@@ -8,7 +8,7 @@
 //!
 //! use rutebot::client::Rutebot;
 //! use rutebot::requests::get_updates::{GetUpdatesRequest, AllowedUpdate};
-//! use rutebot::requests::send_message::send_text_message::SendTextMessageRequest;
+//! use rutebot::requests::send_message::send_text::SendTextRequest;
 //! use rutebot::responses::{Message, Update};
 //!
 //! fn main() {
@@ -20,18 +20,18 @@
 //!            allowed_updates: Some(&allowed_updates),
 //!            ..GetUpdatesRequest::new()
 //!        };
-//!    let updates = rutebot.incoming_updates(&get_updates)
+//!    let updates = rutebot.incoming_updates(get_updates)
 //!        .then(Ok)
 //!        .for_each(move |x| {
 //!            let reply_msg_request =
 //!                match x {
 //!                    Ok(Update { message: Some(Message { message_id, ref chat, text: Some(ref text), .. }), .. }) => {
 //!                        let request =
-//!                            SendTextMessageRequest::new_reply(chat.id, text, message_id);
+//!                            SendTextRequest::new_reply(chat.id, text, message_id);
 //!                        Some(request)
 //!                    }
 //!                    Ok(Update { message: Some(Message { message_id, ref chat, .. }), .. }) => {
-//!                        let request = SendTextMessageRequest::new_reply(chat.id, "I can echo only text message", message_id);
+//!                        let request = SendTextRequest::new_reply(chat.id, "I can echo only text message", message_id);
 //!                        Some(request)
 //!                    }
 //!                    Err(e) => {
@@ -41,7 +41,7 @@
 //!                    _ => None
 //!                };
 //!            if let Some(reply) = reply_msg_request {
-//!                let send_future = rutebot.prepare_api_request(&reply)
+//!                let send_future = rutebot.prepare_api_request(reply)
 //!                    .send()
 //!                    .map(|_| ())
 //!                    .map_err(|x| println!("Got error while sending message: {:?}", x));

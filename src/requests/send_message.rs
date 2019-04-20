@@ -3,15 +3,51 @@ use std::ops::Not;
 use serde::Serialize;
 
 /// Contains types for sending [sendMessage](https://core.telegram.org/bots/api#sendMessage) request
-pub mod send_text_message;
+pub mod send_text;
 
-//#[derive(Serialize, Debug, Clone)]
-//#[serde(untagged)]
-//pub enum FileKind<'a> {
-//    FileId(&'a str),
-//    Url(&'a str),
-////    InputFile(Vec<u8>),
-//}
+/// Contains types for sending [sendDocument](https://core.telegram.org/bots/api#senddocument) request
+pub mod send_document;
+
+/// File to send
+#[derive(Serialize, Debug, Clone)]
+#[serde(untagged)]
+pub enum FileKind<'a> {
+    /// Identifier of file on the telegram servers
+    FileId(&'a str),
+    /// Http url for the file to be sent. Telegram will download and send the file.
+    /// 5 MB max size for photos and 20 MB max for other types of content
+    Url(&'a str),
+    /// Content of the file to be uploaded
+    InputFile {
+        name: &'a str,
+        content: Vec<u8>,
+    },
+}
+
+
+impl<'a> FileKind<'a> {
+    pub(crate) fn is_input_file(&self) -> bool {
+        if let FileKind::InputFile { .. } = &self {
+            true
+        } else {
+            false
+        }
+    }
+
+    pub(crate) fn is_input_file_or_none(option_self: &Option<Self>) -> bool {
+        match option_self {
+            Some(x) => x.is_input_file(),
+            None => true
+        }
+    }
+
+    pub(crate) fn is_option_input_file(option_self: &Option<Self>) -> bool {
+        match option_self {
+            Some(x) => x.is_input_file(),
+            None => false
+        }
+    }
+}
 
 /// Additional interface options
 #[derive(Serialize, Debug, Clone)]
@@ -122,4 +158,10 @@ pub enum InlineKeyboardButton<'a, 'b> {
 pub enum KeyboardButton<'a> {
     /// Text of the button. It will be sent as a message when the button is pressed
     Text(&'a str)
+}
+
+#[derive(Serialize, Debug, Clone, Copy)]
+pub enum ParseMode {
+    Html,
+    Markdown,
 }

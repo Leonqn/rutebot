@@ -3,10 +3,11 @@ use pretty_assertions::assert_eq;
 use rutebot::requests::get_me::GetMe;
 use rutebot::requests::get_updates::GetUpdatesRequest;
 use rutebot::requests::send_chat_action::{ChatAction, SendChatAction};
-use rutebot::requests::send_message::send_text_message::{ParseMode, SendTextMessageRequest};
+use rutebot::requests::send_message::send_text::SendTextRequest;
 use rutebot::responses::{Message, MessageEntityValue, Update, User};
 
 use crate::common::run_one;
+use rutebot::requests::send_message::ParseMode;
 
 mod common;
 
@@ -14,7 +15,7 @@ mod common;
 pub fn get_me_works() {
     let rutebot = common::create_client();
 
-    let response: User = run_one(rutebot.prepare_api_request(&GetMe).send());
+    let response: User = run_one(rutebot.prepare_api_request(GetMe).send());
 
     assert_eq!(response.is_bot, true);
 }
@@ -24,7 +25,7 @@ pub fn send_text_message_works() {
     let rutebot = common::create_client();
     let chat_id = common::get_chat_id();
 
-    let response: Message = run_one(rutebot.prepare_api_request(&SendTextMessageRequest::new(chat_id, "Some text")).send());
+    let response: Message = run_one(rutebot.prepare_api_request(SendTextRequest::new(chat_id, "Some text")).send());
 
     assert_eq!(response.text.unwrap(), "Some text");
 }
@@ -34,7 +35,7 @@ pub fn send_chat_action_works() {
     let rutebot = common::create_client();
     let chat_id = common::get_chat_id();
 
-    let response: bool = run_one(rutebot.prepare_api_request(&SendChatAction::new(chat_id, ChatAction::Typing)).send());
+    let response: bool = run_one(rutebot.prepare_api_request(SendChatAction::new(chat_id, ChatAction::Typing)).send());
 
     assert_eq!(response, true);
 }
@@ -43,7 +44,7 @@ pub fn send_chat_action_works() {
 pub fn get_updates_works() {
     let rutebot = common::create_client();
 
-    let _response: Vec<Update> = run_one(rutebot.prepare_api_request(&GetUpdatesRequest::new()).send());
+    let _response: Vec<Update> = run_one(rutebot.prepare_api_request(GetUpdatesRequest::new()).send());
 }
 
 #[test]
@@ -53,9 +54,9 @@ pub fn message_entity_values_extracted_correctly() {
     let weird_text = "великий и могучий: [экзамл.ком](http://example.com/) очень могучий и великий";
 
     let response: Message = run_one(rutebot.prepare_api_request(
-        &SendTextMessageRequest {
+        SendTextRequest {
             parse_mode: Some(ParseMode::Markdown),
-            ..SendTextMessageRequest::new(chat_id, weird_text)
+            ..SendTextRequest::new(chat_id, weird_text)
         }).send());
     let text = &response.text.unwrap();
     let values = response.entities.unwrap().into_iter().map(|x| x.extract_value(text).unwrap()).collect::<Vec<MessageEntityValue>>();

@@ -32,11 +32,9 @@ pub struct Rutebot {
 }
 
 /// Represents ready request to telegram bot api.
-#[derive(Clone)]
 pub struct ApiRequest<TResponse: DeserializeOwned> {
     inner: Arc<Inner>,
-    request_body: Vec<u8>,
-    method: &'static str,
+    http_request: Request<Body>,
     _data: PhantomData<TResponse>,
 }
 
@@ -52,19 +50,13 @@ impl<TResponse: DeserializeOwned> ApiRequest<TResponse> {
     /// #    allowed_updates: Some(&allowed_updates),
     /// #    ..GetUpdatesRequest::new()
     /// # };
-    /// # let request = bot.prepare_api_request(&get_updates);
+    /// # let request = bot.prepare_api_request(get_updates);
     /// let future = request.send();
     /// # }
     /// ```
     pub fn send(self) -> impl Future<Item=TResponse, Error=Error> {
-        let uri = format!("{}{}/{}", BASE_API_URI, self.inner.token, self.method);
-        let request =
-            Request::post(uri)
-                .header("content-type", "application/json")
-                .body(Body::from(self.request_body))
-                .expect("While creating request an error has occurred");
 
-        self.inner.http_client.request(request)
+        self.inner.http_client.request(self.http_request)
             .and_then(|r| r.into_body().concat2())
             .then(move |body| {
                 let body_ref = &body.map_err(Error::Hyper)?;
@@ -114,17 +106,19 @@ impl Rutebot {
     ///     allowed_updates: Some(&allowed_updates),
     ///     ..GetUpdatesRequest::new()
     /// };
-    /// let request = bot.prepare_api_request(&get_updates);
+    /// let request = bot.prepare_api_request(get_updates);
     /// # }
     /// ```
-    pub fn prepare_api_request<TRequest, TResponse>(&self, request: &TRequest) -> ApiRequest<TResponse>
+    pub fn prepare_api_request<TRequest, TResponse>(&self, request: TRequest) -> ApiRequest<TResponse>
         where TRequest: requests::Request<ResponseType=TResponse>,
               TResponse: DeserializeOwned,
     {
+        let uri = format!("{}{}/{}", BASE_API_URI, self.inner.token, request.method());
+        let http_request = request.set_http_request_body(Request::post(uri));
+
         ApiRequest {
             inner: self.inner.clone(),
-            request_body: serde_json::to_vec(request).expect("Error while serializing request"),
-            method: request.method(),
+            http_request,
             _data: PhantomData,
         }
     }
@@ -140,7 +134,7 @@ impl Rutebot {
     /// # fn main() {
     /// let bot = rutebot::client::Rutebot::new("token");
     /// let get_file = GetFileRequest::new("file-id");
-    /// let file_fut = bot.prepare_api_request(&get_file)
+    /// let file_fut = bot.prepare_api_request(get_file)
     ///     .send()
     ///     .and_then(move |file| bot.download_file(&file.file_path.as_ref().map_or("ru-RU", String::as_str)));
     ///
@@ -190,11 +184,11 @@ impl Rutebot {
     ///     ..GetUpdatesRequest::new()
     /// };
     /// let incoming_updates_future =
-    ///     bot.incoming_updates(&get_updates)
+    ///     bot.incoming_updates(get_updates)
     ///     .for_each(|update| Ok(()));
     /// # }
     /// ```
-    pub fn incoming_updates<'a>(&self, request: &GetUpdatesRequest<'a>) -> impl Stream<Item=Update, Error=Error> {
+    pub fn incoming_updates(&self, request: GetUpdatesRequest) -> impl Stream<Item=Update, Error=Error> {
         let self_1 = self.clone();
         let allowed_updates = request.allowed_updates.map(|x| x.to_vec());
         let limit = request.limit;
@@ -207,7 +201,7 @@ impl Rutebot {
                 timeout,
                 allowed_updates: allowed_updates.as_ref().map(|x| x.as_slice()),
             };
-            self_1.prepare_api_request(&request).send()
+            self_1.prepare_api_request(request).send()
         };
         let first_request = self.prepare_api_request(request).send();
 

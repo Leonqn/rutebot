@@ -1,4 +1,7 @@
+use hyper::Body;
+use hyper_multipart_rfc7578::client::multipart::Form;
 use serde::Serialize;
+use serde_json::Value;
 
 /// Contains types for sending [getUpdates](https://core.telegram.org/bots/api#getupdates) request
 pub mod get_updates;
@@ -19,10 +22,31 @@ pub mod answer_callback_query;
 pub mod send_chat_action;
 
 /// Basic request type.
-pub trait Request: Serialize {
+pub trait Request: Serialize + Sized {
     type ResponseType;
 
     fn method(&self) -> &'static str;
+
+    fn set_http_request_body(self, request_builder: hyper::http::request::Builder) -> hyper::http::request::Request<Body> {
+        add_json_body(request_builder, &self)
+    }
+}
+
+pub(crate) fn add_json_body<S: Serialize + Sized>(mut request_builder: hyper::http::request::Builder, serializable: &S) -> hyper::http::request::Request<Body> {
+    let json_bytes = serde_json::to_vec(serializable).expect("Error while serializing request");
+    request_builder
+        .header("content-type", "application/json")
+        .body(Body::from(json_bytes))
+        .expect("While creating request an error has occurred")
+}
+
+pub(crate) fn add_fields_to_form<S: Serialize + Sized>(form: &mut Form<'static>, serializable: &S) {
+    let json = serde_json::to_value(serializable).expect("Error while serializing request");
+    if let Value::Object(map) = json {
+        for (k, v) in map {
+            form.add_text(k, v.to_string())
+        }
+    }
 }
 
 ///Unique identifier for the target chat or username of the target channel (in the format `@channelusername`)
