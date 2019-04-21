@@ -236,7 +236,7 @@ pub struct MessageEntity {
 }
 
 #[derive(Clone, Debug)]
-pub enum MessageEntityValue {
+pub enum MessageEntityValue<'a> {
     Mention(String),
     Hashtag(String),
     Cashtag(String),
@@ -248,52 +248,44 @@ pub enum MessageEntityValue {
     Italic(String),
     Code(String),
     Pre(String),
-    TextLink { text: String, link: String },
-    TextMention { mention: String, user: User },
+    TextLink { text: String, link: &'a String },
+    TextMention { mention: String, user: &'a User },
 }
 
 impl MessageEntity {
-    /// Try to extract correct messageEntity from text message. If it fails returns original object in Err side
-    pub fn extract_value(self, text: &str) -> Result<MessageEntityValue, MessageEntity> {
+    /// Try to extract correct messageEntity from text message.
+    pub fn extract_value(&self, text: &str) -> Option<MessageEntityValue> {
         let utf16_capture: Vec<u16> = text.encode_utf16().skip(self.offset as usize).take(self.length as usize).collect();
         let captured = String::from_utf16_lossy(&utf16_capture);
         match self.typ.as_ref() {
             "mention" =>
-                Ok(MessageEntityValue::Mention(captured)),
+                Some(MessageEntityValue::Mention(captured)),
             "hashtag" =>
-                Ok(MessageEntityValue::Hashtag(captured)),
+                Some(MessageEntityValue::Hashtag(captured)),
             "cashtag" =>
-                Ok(MessageEntityValue::Cashtag(captured)),
+                Some(MessageEntityValue::Cashtag(captured)),
             "bot_command" =>
-                Ok(MessageEntityValue::BotCommand(captured)),
+                Some(MessageEntityValue::BotCommand(captured)),
             "url" =>
-                Ok(MessageEntityValue::Url(captured)),
+                Some(MessageEntityValue::Url(captured)),
             "email" =>
-                Ok(MessageEntityValue::Email(captured)),
+                Some(MessageEntityValue::Email(captured)),
             "phone_number" =>
-                Ok(MessageEntityValue::PhoneNumber(captured)),
+                Some(MessageEntityValue::PhoneNumber(captured)),
             "bold" =>
-                Ok(MessageEntityValue::Bold(captured)),
+                Some(MessageEntityValue::Bold(captured)),
             "italic" =>
-                Ok(MessageEntityValue::Italic(captured)),
+                Some(MessageEntityValue::Italic(captured)),
             "code" =>
-                Ok(MessageEntityValue::Code(captured)),
+                Some(MessageEntityValue::Code(captured)),
             "pre" =>
-                Ok(MessageEntityValue::Pre(captured)),
+                Some(MessageEntityValue::Pre(captured)),
             "text_link" =>
-                if let Some(link) = self.url {
-                    Ok(MessageEntityValue::TextLink { text: captured, link })
-                } else {
-                    Err(self)
-                }
+                self.url.as_ref().map(|link| MessageEntityValue::TextLink { text: captured, link }),
             "text_mention" =>
-                if let Some(user) = self.user {
-                    Ok(MessageEntityValue::TextMention { mention: captured, user })
-                } else {
-                    Err(self)
-                }
+                self.user.as_ref().map(|user| MessageEntityValue::TextMention { mention: captured, user }),
             _ =>
-                Err(self)
+                None
         }
     }
 }

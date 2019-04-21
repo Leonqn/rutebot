@@ -50,6 +50,7 @@ pub fn get_updates_works() {
     let _response: Vec<Update> = run_one(rutebot.prepare_api_request(GetUpdates::new()).send());
 }
 
+
 #[test]
 pub fn send_document_works() {
     let rutebot = common::create_client();
@@ -91,13 +92,14 @@ pub fn message_entity_values_extracted_correctly() {
             ..SendText::new(chat_id, weird_text)
         }).send());
     let text = &response.text.unwrap();
-    let values = response.entities.unwrap().into_iter().map(|x| x.extract_value(text).unwrap()).collect::<Vec<MessageEntityValue>>();
+    let entities = response.entities.unwrap();
+    let values = entities.iter().filter_map(|x| x.extract_value(text)).collect::<Vec<MessageEntityValue>>();
     let message_entity = values.first();
 
     match message_entity {
         Some(MessageEntityValue::TextLink { link, text }) => {
-            assert_eq!(link, "http://example.com/");
-            assert_eq!(text, "экзамл.ком");
+            assert_eq!(link.as_str(), "http://example.com/");
+            assert_eq!(text.as_str(), "экзамл.ком");
         }
         x => panic!("wrong message entity: {:?}", x)
     }
