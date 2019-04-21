@@ -486,7 +486,7 @@ pub struct Video {
     pub mime_type: Option<String>,
 
     /// File size
-    pub file_size: Option<String>,
+    pub file_size: Option<i64>,
 }
 
 

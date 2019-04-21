@@ -1,4 +1,4 @@
-//! Crate with bindings to telegram bot api. For details see example below or tests in `basic_req_res_tests.rs`.
+//! Crate with bindings to telegram bot api. For usage details see example below and tests in `basic_req_res_tests.rs`.
 //! You can find all implemented methods in `requests` module.
 //!
 //! # Example
