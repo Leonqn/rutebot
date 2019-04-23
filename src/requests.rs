@@ -24,6 +24,9 @@ pub mod answer_callback_query;
 /// Contains types for sending [sendChatAction](https://core.telegram.org/bots/api#sendchataction) request
 pub mod send_chat_action;
 
+/// Contains types for sending [forwardMessage](https://core.telegram.org/bots/api#forwardmessage) request
+pub mod forward_message;
+
 /// Basic request type.
 pub trait Request: Serialize + Sized {
     type ResponseType;

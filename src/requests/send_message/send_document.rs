@@ -12,7 +12,7 @@ use crate::responses::Message;
 use crate::error::Error;
 use std::error::Error as StdError;
 
-/// Use this method to send general files. On success, the sent `Message` is returned.
+/// Use this struct to send general files. On success, the sent `Message` is returned.
 /// Bots can currently send files of any type of up to 50 MB in size, this limit may be changed in the future
 #[derive(Serialize, Debug, Clone)]
 pub struct SendDocument<'a, 'b, 'c, 'd, 'e, 'f, 'g> {
