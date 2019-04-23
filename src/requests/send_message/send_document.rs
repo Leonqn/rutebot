@@ -20,6 +20,7 @@ pub struct SendDocument<'a, 'b, 'c, 'd, 'e, 'f, 'g> {
     /// File to send.
     #[serde(skip_serializing_if = "FileKind::is_input_file")]
     pub document: FileKind<'b>,
+
     /// Thumbnail of the file sent; can be ignored if thumbnail generation for the file is supported server-side.
     /// The thumbnail should be in JPEG format and less than 200 kB in size.
     /// A thumbnail‘s width and height should not exceed 320. Ignored if the file is not uploaded using
@@ -38,7 +39,7 @@ pub struct SendDocument<'a, 'b, 'c, 'd, 'e, 'f, 'g> {
 
     /// Send `ParseMode::Markdown` or `ParseMode::Html`,
     /// if you want Telegram apps to show
-    /// [bold, italic, fixed-width text or inline URLs](https://core.telegram.org/bots/api#formatting-options) in the media caption..
+    /// [bold, italic, fixed-width text or inline URLs](https://core.telegram.org/bots/api#formatting-options) in the media caption.
     #[serde(skip_serializing_if = "Option::is_none")]
     pub parse_mode: Option<ParseMode>,
 
@@ -68,7 +69,7 @@ impl<'a, 'b, 'c, 'd, 'e, 'f, 'g> Request for SendDocument<'a, 'b, 'c, 'd, 'e, 'f
             }
 
             if let Some(FileKind::InputFile { name, content }) = self.thumb {
-                form.add_reader_file("document", Cursor::new(content), name);
+                form.add_reader_file("thumb", Cursor::new(content), name);
             }
             add_form_body(request_builder, form)
         } else {

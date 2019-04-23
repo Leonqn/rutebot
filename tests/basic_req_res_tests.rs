@@ -1,3 +1,6 @@
+use std::fs::File;
+use std::io::Read;
+
 use futures::future::Future;
 use pretty_assertions::assert_eq;
 
@@ -7,14 +10,13 @@ use rutebot::requests::get_me::GetMe;
 use rutebot::requests::get_updates::GetUpdates;
 use rutebot::requests::send_chat_action::{ChatAction, SendChatAction};
 use rutebot::requests::send_message::{FileKind, InlineKeyboard, InlineKeyboardButton, ParseMode, ReplyMarkup};
+use rutebot::requests::send_message::send_audio::SendAudio;
 use rutebot::requests::send_message::send_document::SendDocument;
 use rutebot::requests::send_message::send_photo::SendPhoto;
 use rutebot::requests::send_message::send_text::SendText;
-use rutebot::responses::{Document, Message, MessageEntityValue, Update, User, PhotoSize};
+use rutebot::responses::{Audio, Document, Message, MessageEntityValue, PhotoSize, Update, User};
 
 use crate::common::run_one;
-use std::fs::File;
-use std::io::Read;
 
 mod common;
 
@@ -95,14 +97,37 @@ pub fn send_photo_works() {
         SendPhoto::new(chat_id,
                        FileKind::InputFile {
                            name: "superphoto",
-                           content: photo_content.clone(),
+                           content: photo_content,
                        });
 
     let response: Vec<PhotoSize> = run_one(rutebot.prepare_api_request(request).send()).photo.unwrap();
-    let first_photo = response.last().unwrap();
+    let last_photo = response.last().unwrap();
 
-    let downloaded_photo = run_one(rutebot.prepare_api_request(GetFile::new(first_photo.file_id.as_str())).send().and_then(move |x| rutebot.download_file(&x.file_path.unwrap())));
+    let downloaded_photo = run_one(rutebot.prepare_api_request(GetFile::new(&last_photo.file_id)).send().and_then(move |x| rutebot.download_file(&x.file_path.unwrap())));
     assert_eq!(downloaded_photo.len(), photo_size);
+}
+
+#[test]
+pub fn send_audio_works() {
+    let rutebot = common::create_client();
+    let chat_id = common::get_chat_id();
+    let mut audio_content = Vec::new();
+    File::open("./tests/Dark_Tranquility.mp3").unwrap().read_to_end(&mut audio_content).unwrap();
+    let audio_size = audio_content.len();
+    let request =
+        SendAudio {
+            performer: Some("Dark_Tranquility"),
+            ..SendAudio::new(chat_id,
+                             FileKind::InputFile {
+                                 name: "superaudio",
+                                 content: audio_content,
+                             })
+        };
+
+    let response: Audio = run_one(rutebot.prepare_api_request(request).send()).audio.unwrap();
+
+    let downloaded_audio = run_one(rutebot.prepare_api_request(GetFile::new(&response.file_id)).send().and_then(move |x| rutebot.download_file(&x.file_path.unwrap())));
+    assert_eq!(downloaded_audio.len(), audio_size);
 }
 
 #[test]
