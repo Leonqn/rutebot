@@ -10,7 +10,7 @@ use crate::requests::{add_fields_to_form, add_form_body, add_json_body, ChatId, 
 use crate::requests::send_message::*;
 use crate::responses::Message;
 
-/// Use this method to send photos. On success, the sent `Message` is returned.
+/// Use this struct to send photos. On success, the sent `Message` is returned.
 #[derive(Serialize, Debug, Clone)]
 pub struct SendPhoto<'a, 'b, 'c, 'd, 'e, 'f> {
     /// Identifier for the target chat
