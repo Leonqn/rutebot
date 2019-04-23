@@ -14,6 +14,9 @@ pub mod send_photo;
 /// Contains types for sending [sendAudio](https://core.telegram.org/bots/api#sendaudio) request
 pub mod send_audio;
 
+/// Contains types for sending [sendVideo](https://core.telegram.org/bots/api#sendvideo) request
+pub mod send_video;
+
 /// File to send
 #[derive(Serialize, Debug, Clone)]
 #[serde(untagged)]
