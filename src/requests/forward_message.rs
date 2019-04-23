@@ -3,8 +3,9 @@ use std::ops::Not;
 use serde::Serialize;
 
 use crate::requests::{ChatId, Request};
+use crate::responses::Message;
 
-/// Use this struct to forward messages of any kind. On success, the sent Message is returned.
+/// Use this struct to forward messages of any kind. On success, the sent `Message` is returned.
 #[derive(Serialize, Debug, Clone)]
 pub struct ForwardMessage<'a, 'b> {
     /// Unique identifier for the target chat
@@ -23,7 +24,7 @@ pub struct ForwardMessage<'a, 'b> {
 }
 
 impl<'a, 'b> Request for ForwardMessage<'a, 'b> {
-    type ResponseType = ();
+    type ResponseType = Message;
 
     fn method(&self) -> &'static str {
         "forwardMessage"
@@ -31,10 +32,10 @@ impl<'a, 'b> Request for ForwardMessage<'a, 'b> {
 }
 
 impl<'a, 'b> ForwardMessage<'a, 'b> {
-    pub fn new(from: ChatId<'b>, to: ChatId<'a>, message_id: i64) -> Self {
+    pub fn new(from: impl Into<ChatId<'b>>, to: impl Into<ChatId<'a>>, message_id: i64) -> Self {
         Self {
-            chat_id: to,
-            from_chat_id: from,
+            chat_id: to.into(),
+            from_chat_id: from.into(),
             disable_notification: false,
             message_id,
         }

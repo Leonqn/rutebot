@@ -1,10 +1,12 @@
+use std::error::Error as StdError;
+
 use hyper::Body;
+use hyper_multipart_rfc7578::client::multipart;
 use hyper_multipart_rfc7578::client::multipart::Form;
 use serde::Serialize;
 use serde_json::Value;
 
 use crate::error::Error;
-use std::error::Error as StdError;
 
 /// Contains types for sending [getUpdates](https://core.telegram.org/bots/api#getupdates) request
 pub mod get_updates;
@@ -43,6 +45,11 @@ pub(crate) fn add_json_body<S: Serialize + Sized>(mut request_builder: hyper::ht
     request_builder
         .header("content-type", "application/json")
         .body(Body::from(json_bytes))
+        .map_err(|x| Error::RequestBuild(x.description().to_string()))
+}
+
+pub(crate) fn add_form_body(mut request_builder: hyper::http::request::Builder, form: Form<'static>) -> Result<hyper::http::request::Request<Body>, Error> {
+    form.set_body_convert::<hyper::Body, multipart::Body>(&mut request_builder)
         .map_err(|x| Error::RequestBuild(x.description().to_string()))
 }
 

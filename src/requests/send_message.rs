@@ -5,8 +5,11 @@ use serde::Serialize;
 /// Contains types for sending [sendMessage](https://core.telegram.org/bots/api#sendMessage) request
 pub mod send_text;
 
-/// Contains types for sending [sendDocument](https://core.telegram.org/bots/api#senddocument) request
+/// Contains types for sending [sendPhoto](https://core.telegram.org/bots/api#sendphoto) request
 pub mod send_document;
+
+/// Contains types for sending [sendDocument](https://core.telegram.org/bots/api#senddocument) request
+pub mod send_photo;
 
 /// File to send
 #[derive(Serialize, Debug, Clone)]

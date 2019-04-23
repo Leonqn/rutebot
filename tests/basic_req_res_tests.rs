@@ -1,16 +1,20 @@
 use futures::future::Future;
 use pretty_assertions::assert_eq;
 
+use rutebot::requests::forward_message::ForwardMessage;
 use rutebot::requests::get_file::GetFile;
 use rutebot::requests::get_me::GetMe;
 use rutebot::requests::get_updates::GetUpdates;
 use rutebot::requests::send_chat_action::{ChatAction, SendChatAction};
 use rutebot::requests::send_message::{FileKind, InlineKeyboard, InlineKeyboardButton, ParseMode, ReplyMarkup};
 use rutebot::requests::send_message::send_document::SendDocument;
+use rutebot::requests::send_message::send_photo::SendPhoto;
 use rutebot::requests::send_message::send_text::SendText;
-use rutebot::responses::{Document, Message, MessageEntityValue, Update, User};
+use rutebot::responses::{Document, Message, MessageEntityValue, Update, User, PhotoSize};
 
 use crate::common::run_one;
+use std::fs::File;
+use std::io::Read;
 
 mod common;
 
@@ -72,13 +76,46 @@ pub fn send_document_works() {
                                 })
         };
 
-    let response_document: Document = run_one(rutebot.prepare_api_request(request).send()).document.unwrap();
-    let downloaded = run_one(rutebot.prepare_api_request(GetFile::new(&response_document.file_id)).send().and_then(move |x| rutebot.download_file(&x.file_path.unwrap())));
+    let response: Document = run_one(rutebot.prepare_api_request(request).send()).document.unwrap();
 
-    assert_eq!(response_document.file_size, Some(5));
-    assert_eq!(response_document.file_name, Some("superfile".to_owned()));
-    assert_eq!(downloaded, vec![1, 2, 3, 4, 5]);
+    let downloaded_document = run_one(rutebot.prepare_api_request(GetFile::new(&response.file_id)).send().and_then(move |x| rutebot.download_file(&x.file_path.unwrap())));
+    assert_eq!(response.file_size, Some(5));
+    assert_eq!(response.file_name, Some("superfile".to_owned()));
+    assert_eq!(downloaded_document, vec![1, 2, 3, 4, 5]);
 }
+
+#[test]
+pub fn send_photo_works() {
+    let rutebot = common::create_client();
+    let chat_id = common::get_chat_id();
+    let mut photo_content = Vec::new();
+    File::open("./tests/photo_test.jpg").unwrap().read_to_end(&mut photo_content).unwrap();
+    let photo_size = photo_content.len();
+    let request =
+        SendPhoto::new(chat_id,
+                       FileKind::InputFile {
+                           name: "superphoto",
+                           content: photo_content.clone(),
+                       });
+
+    let response: Vec<PhotoSize> = run_one(rutebot.prepare_api_request(request).send()).photo.unwrap();
+    let first_photo = response.last().unwrap();
+
+    let downloaded_photo = run_one(rutebot.prepare_api_request(GetFile::new(first_photo.file_id.as_str())).send().and_then(move |x| rutebot.download_file(&x.file_path.unwrap())));
+    assert_eq!(downloaded_photo.len(), photo_size);
+}
+
+#[test]
+pub fn forward_message_works() {
+    let rutebot = common::create_client();
+    let chat_id = common::get_chat_id();
+    let sent_msg: Message = run_one(rutebot.prepare_api_request(SendText::new(chat_id, "test")).send());
+
+    let response: Message = run_one(rutebot.prepare_api_request(ForwardMessage::new(chat_id, chat_id, sent_msg.message_id)).send());
+
+    assert_eq!(sent_msg.text, response.text);
+}
+
 
 #[test]
 pub fn message_entity_values_extracted_correctly() {

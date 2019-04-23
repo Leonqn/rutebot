@@ -10,26 +10,19 @@ use crate::requests::{add_fields_to_form, add_form_body, add_json_body, ChatId, 
 use crate::requests::send_message::*;
 use crate::responses::Message;
 
-/// Use this struct to send general files. On success, the sent `Message` is returned.
-/// Bots can currently send files of any type of up to 50 MB in size, this limit may be changed in the future
+/// Use this method to send photos. On success, the sent `Message` is returned.
 #[derive(Serialize, Debug, Clone)]
-pub struct SendDocument<'a, 'b, 'c, 'd, 'e, 'f, 'g> {
+pub struct SendPhoto<'a, 'b, 'c, 'd, 'e, 'f> {
     /// Identifier for the target chat
     pub chat_id: ChatId<'a>,
 
-    /// File to send.
+    /// Photo to send.
     #[serde(skip_serializing_if = "FileKind::is_input_file")]
-    pub document: FileKind<'b>,
-    /// Thumbnail of the file sent; can be ignored if thumbnail generation for the file is supported server-side.
-    /// The thumbnail should be in JPEG format and less than 200 kB in size.
-    /// A thumbnail‘s width and height should not exceed 320. Ignored if the file is not uploaded using
-    /// FileKind::InputFile
-    #[serde(skip_serializing_if = "FileKind::is_input_file_or_none")]
-    pub thumb: Option<FileKind<'f>>,
+    pub photo: FileKind<'b>,
 
-    /// Document caption (may also be used when resending documents by file_id), 0-1024 characters
+    /// Photo caption (may also be used when resending photos by file_id), 0-1024 characters
     #[serde(skip_serializing_if = "Option::is_none")]
-    pub caption: Option<&'g str>,
+    pub caption: Option<&'c str>,
 
     /// Sends the message [silently](https://telegram.org/blog/channels-2-0#silent-messages).
     /// Users will receive a notification with no sound.
@@ -48,27 +41,23 @@ pub struct SendDocument<'a, 'b, 'c, 'd, 'e, 'f, 'g> {
 
     /// Additional interface options.
     #[serde(skip_serializing_if = "Option::is_none")]
-    pub reply_markup: Option<ReplyMarkup<'c, 'd, 'e>>,
+    pub reply_markup: Option<ReplyMarkup<'d, 'e, 'f>>,
 }
 
 
-impl<'a, 'b, 'c, 'd, 'e, 'f, 'g> Request for SendDocument<'a, 'b, 'c, 'd, 'e, 'f, 'g> {
+impl<'a, 'b, 'c, 'd, 'e, 'f> Request for SendPhoto<'a, 'b, 'c, 'd, 'e, 'f> {
     type ResponseType = Message;
 
     fn method(&self) -> &'static str {
-        "sendDocument"
+        "sendPhoto"
     }
 
     fn set_http_request_body(self, request_builder: hyper::http::request::Builder) -> Result<hyper::http::request::Request<Body>, Error> {
-        if self.document.is_input_file() || FileKind::is_option_input_file(&self.thumb) {
+        if self.photo.is_input_file() {
             let mut form = Form::default();
             add_fields_to_form(&mut form, &self)?;
-            if let FileKind::InputFile { name, content } = self.document {
-                form.add_reader_file("document", Cursor::new(content), name);
-            }
-
-            if let Some(FileKind::InputFile { name, content }) = self.thumb {
-                form.add_reader_file("document", Cursor::new(content), name);
+            if let FileKind::InputFile { name, content } = self.photo {
+                form.add_reader_file("photo", Cursor::new(content), name);
             }
             add_form_body(request_builder, form)
         } else {
@@ -77,12 +66,11 @@ impl<'a, 'b, 'c, 'd, 'e, 'f, 'g> Request for SendDocument<'a, 'b, 'c, 'd, 'e, 'f
     }
 }
 
-impl<'a, 'b, 'c, 'd, 'e, 'f, 'g> SendDocument<'a, 'b, 'c, 'd, 'e, 'f, 'g> {
-    pub fn new(chat_id: impl Into<ChatId<'a>>, document: FileKind<'b>) -> Self {
+impl<'a, 'b, 'c, 'd, 'e, 'f, 'g> SendPhoto<'a, 'b, 'c, 'd, 'e, 'f> {
+    pub fn new(chat_id: impl Into<ChatId<'a>>, photo: FileKind<'b>) -> Self {
         Self {
             chat_id: chat_id.into(),
-            document,
-            thumb: None,
+            photo,
             caption: None,
             disable_notification: false,
             parse_mode: None,
@@ -91,11 +79,10 @@ impl<'a, 'b, 'c, 'd, 'e, 'f, 'g> SendDocument<'a, 'b, 'c, 'd, 'e, 'f, 'g> {
         }
     }
 
-    pub fn new_reply(chat_id: impl Into<ChatId<'a>>, document: FileKind<'b>, reply_to_message_id: i64) -> Self {
+    pub fn new_reply(chat_id: impl Into<ChatId<'a>>, photo: FileKind<'b>, reply_to_message_id: i64) -> Self {
         Self {
             chat_id: chat_id.into(),
-            document,
-            thumb: None,
+            photo,
             caption: None,
             disable_notification: false,
             parse_mode: None,
