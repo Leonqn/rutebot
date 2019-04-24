@@ -10,12 +10,13 @@ use rutebot::requests::get_me::GetMe;
 use rutebot::requests::get_updates::GetUpdates;
 use rutebot::requests::send_chat_action::{ChatAction, SendChatAction};
 use rutebot::requests::send_message::{FileKind, InlineKeyboard, InlineKeyboardButton, ParseMode, ReplyMarkup};
+use rutebot::requests::send_message::send_animation::SendAnimation;
 use rutebot::requests::send_message::send_audio::SendAudio;
 use rutebot::requests::send_message::send_document::SendDocument;
 use rutebot::requests::send_message::send_photo::SendPhoto;
 use rutebot::requests::send_message::send_text::SendText;
 use rutebot::requests::send_message::send_video::SendVideo;
-use rutebot::responses::{Audio, Document, Message, MessageEntityValue, PhotoSize, Update, User, Video};
+use rutebot::responses::{Animation, Audio, Document, Message, MessageEntityValue, PhotoSize, Update, User, Video};
 
 use crate::common::run_one;
 
@@ -149,6 +150,29 @@ pub fn send_video_works() {
 
     let downloaded_video = run_one(rutebot.prepare_api_request(GetFile::new(&response.file_id)).send().and_then(move |x| rutebot.download_file(&x.file_path.unwrap())));
     assert_eq!(downloaded_video.len(), video_size);
+}
+
+#[test]
+pub fn send_animation_works() {
+    let rutebot = common::create_client();
+    let chat_id = common::get_chat_id();
+    let mut gif_content = Vec::new();
+    File::open("./tests/sample_gif.gif").unwrap().read_to_end(&mut gif_content).unwrap();
+    let gif_size = gif_content.len();
+    let request = SendAnimation {
+        width: Some(808),
+        height: Some(538),
+        ..SendAnimation::new(chat_id,
+                             FileKind::InputFile {
+                                 name: "supergif",
+                                 content: gif_content,
+                             })
+    };
+
+    let response: Animation = run_one(rutebot.prepare_api_request(request).send()).animation.unwrap();
+
+    let downloaded_animation = run_one(rutebot.prepare_api_request(GetFile::new(&response.file_id)).send().and_then(move |x| rutebot.download_file(&x.file_path.unwrap())));
+    assert_eq!(downloaded_animation.len(), gif_size);
 }
 
 #[test]
