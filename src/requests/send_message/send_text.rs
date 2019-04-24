@@ -2,8 +2,7 @@ use std::ops::Not;
 
 use serde::Serialize;
 
-use crate::requests::{ChatId, Request};
-use crate::requests::send_message::*;
+use crate::requests::{ChatId, ParseMode, ReplyMarkup, Request};
 use crate::responses::Message;
 
 /// Use this struct to send text messages. On success, the sent `Message` is returned.

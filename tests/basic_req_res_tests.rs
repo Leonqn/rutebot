@@ -4,23 +4,24 @@ use std::io::Read;
 use futures::future::Future;
 use pretty_assertions::assert_eq;
 
+use rutebot::requests::{FileKind, InlineKeyboard, InlineKeyboardButton, InputMediaPhoto, InputMediaVideo, ReplyMarkup, ParseMode};
 use rutebot::requests::forward_message::ForwardMessage;
 use rutebot::requests::get_file::GetFile;
 use rutebot::requests::get_me::GetMe;
 use rutebot::requests::get_updates::GetUpdates;
 use rutebot::requests::send_chat_action::{ChatAction, SendChatAction};
-use rutebot::requests::send_message::{FileKind, InlineKeyboard, InlineKeyboardButton, ParseMode, ReplyMarkup};
 use rutebot::requests::send_message::send_animation::SendAnimation;
 use rutebot::requests::send_message::send_audio::SendAudio;
 use rutebot::requests::send_message::send_document::SendDocument;
+use rutebot::requests::send_message::send_media_group::{InputMediaPhotoOrVideo, SendMediaGroup};
 use rutebot::requests::send_message::send_photo::SendPhoto;
 use rutebot::requests::send_message::send_text::SendText;
 use rutebot::requests::send_message::send_video::SendVideo;
+use rutebot::requests::send_message::send_video_note::SendVideoNote;
 use rutebot::requests::send_message::send_voice::SendVoice;
 use rutebot::responses::{Audio, Document, Message, MessageEntityValue, Update, User, Video, VideoNote, Voice};
 
 use crate::common::run_one;
-use rutebot::requests::send_message::send_video_note::SendVideoNote;
 
 mod common;
 
@@ -201,15 +202,41 @@ pub fn send_video_note_works() {
     let video_note_size = video_note_content.len();
     let request =
         SendVideoNote::new(chat_id,
-                       FileKind::InputFile {
-                           name: "supervideonote",
-                           content: video_note_content,
-                       });
+                           FileKind::InputFile {
+                               name: "supervideonote",
+                               content: video_note_content,
+                           });
 
     let response: VideoNote = run_one(rutebot.prepare_api_request(request).send()).video_note.unwrap();
 
     let downloaded_video_note = run_one(rutebot.prepare_api_request(GetFile::new(&response.file_id)).send().and_then(move |x| rutebot.download_file(&x.file_path.unwrap())));
     assert_eq!(downloaded_video_note.len(), video_note_size);
+}
+
+#[test]
+pub fn send_media_group_works() {
+    let rutebot = common::create_client();
+    let chat_id = common::get_chat_id();
+    let mut video_note_content = Vec::new();
+    let mut photo_content = Vec::new();
+    File::open("./tests/photo_test.jpg").unwrap().read_to_end(&mut photo_content).unwrap();
+    File::open("./tests/sample_video_note.mp4").unwrap().read_to_end(&mut video_note_content).unwrap();
+    let request = SendMediaGroup::new(
+        chat_id,
+        vec![
+            InputMediaPhotoOrVideo::Video(InputMediaVideo::new(FileKind::InputFile {
+                name: "video",
+                content: video_note_content,
+            })),
+            InputMediaPhotoOrVideo::Photo(InputMediaPhoto::new(FileKind::InputFile {
+                name: "photo",
+                content: photo_content,
+            }))
+        ]);
+
+    let response: Vec<Message> = run_one(rutebot.prepare_api_request(request).send());
+
+    assert_eq!(response.len(), 2);
 }
 
 #[test]

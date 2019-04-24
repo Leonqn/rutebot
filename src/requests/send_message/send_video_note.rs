@@ -6,12 +6,11 @@ use hyper_multipart_rfc7578::client::multipart::Form;
 use serde::Serialize;
 
 use crate::error::Error;
-use crate::requests::{add_fields_to_form, add_form_body, add_json_body, ChatId, Request};
-use crate::requests::send_message::*;
+use crate::requests::{add_fields_to_form, add_form_body, add_json_body, ChatId, FileKind, ParseMode, ReplyMarkup, Request};
 use crate::responses::Message;
 
 /// As of [v.4.0](https://telegram.org/blog/video-messages-and-telescope), Telegram clients support rounded square mp4 videos of up to 1 minute long.
-/// Use this method to send video messages. On success, the sent `Message` is returned
+/// Use this struct to send video messages. On success, the sent `Message` is returned
 #[derive(Serialize, Debug, Clone)]
 pub struct SendVideoNote<'a, 'b, 'c, 'd, 'e, 'f> {
     /// Identifier for the target chat

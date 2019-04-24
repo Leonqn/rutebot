@@ -6,8 +6,7 @@ use hyper_multipart_rfc7578::client::multipart::Form;
 use serde::Serialize;
 
 use crate::error::Error;
-use crate::requests::{add_fields_to_form, add_form_body, add_json_body, ChatId, Request};
-use crate::requests::send_message::*;
+use crate::requests::{add_fields_to_form, add_form_body, add_json_body, ChatId, FileKind, ParseMode, ReplyMarkup, Request};
 use crate::responses::Message;
 
 /// Use this struct to send video files, Telegram clients support mp4 videos (other formats may be sent by `SendDocument`).
