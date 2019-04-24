@@ -38,13 +38,6 @@ pub struct SendVideo<'a, 'b, 'c, 'd, 'e, 'f> {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub height: Option<i64>,
 
-    /// Thumbnail of the file sent; can be ignored if thumbnail generation for the file is supported server-side.
-    /// The thumbnail should be in JPEG format and less than 200 kB in size.
-    /// A thumbnail‘s width and height should not exceed 320. Ignored if the file is not uploaded using
-    /// FileKind::InputFile
-    #[serde(skip_serializing_if = "FileKind::is_input_file_or_none")]
-    pub thumb: Option<FileKind<'f>>,
-
     /// Sends the message [silently](https://telegram.org/blog/channels-2-0#silent-messages).
     /// Users will receive a notification with no sound.
     #[serde(skip_serializing_if = "Not::not")]
@@ -77,16 +70,13 @@ impl<'a, 'b, 'c, 'd, 'e, 'f> Request for SendVideo<'a, 'b, 'c, 'd, 'e, 'f> {
     }
 
     fn set_http_request_body(self, request_builder: hyper::http::request::Builder) -> Result<hyper::http::request::Request<Body>, Error> {
-        if self.video.is_input_file() || FileKind::is_option_input_file(&self.thumb) {
+        if self.video.is_input_file() {
             let mut form = Form::default();
             add_fields_to_form(&mut form, &self)?;
             if let FileKind::InputFile { name, content } = self.video {
                 form.add_reader_file("video", Cursor::new(content), name);
             }
 
-            if let Some(FileKind::InputFile { name, content }) = self.thumb {
-                form.add_reader_file("thumb", Cursor::new(content), name);
-            }
             add_form_body(request_builder, form)
         } else {
             add_json_body(request_builder, &self)
@@ -99,7 +89,6 @@ impl<'a, 'b, 'c, 'd, 'e, 'f> SendVideo<'a, 'b, 'c, 'd, 'e, 'f> {
         Self {
             chat_id: chat_id.into(),
             video,
-            thumb: None,
             caption: None,
             duration: None,
             width: None,
@@ -108,7 +97,7 @@ impl<'a, 'b, 'c, 'd, 'e, 'f> SendVideo<'a, 'b, 'c, 'd, 'e, 'f> {
             parse_mode: None,
             reply_to_message_id: None,
             reply_markup: None,
-            height: None
+            height: None,
         }
     }
 
@@ -116,7 +105,6 @@ impl<'a, 'b, 'c, 'd, 'e, 'f> SendVideo<'a, 'b, 'c, 'd, 'e, 'f> {
         Self {
             chat_id: chat_id.into(),
             video,
-            thumb: None,
             caption: None,
             duration: None,
             width: None,
@@ -125,7 +113,7 @@ impl<'a, 'b, 'c, 'd, 'e, 'f> SendVideo<'a, 'b, 'c, 'd, 'e, 'f> {
             parse_mode: None,
             reply_to_message_id: Some(reply_to_message_id),
             reply_markup: None,
-            height: None
+            height: None,
         }
     }
 }

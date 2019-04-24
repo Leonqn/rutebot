@@ -20,6 +20,12 @@ pub mod send_video;
 /// Contains types for sending [sendAnimation](https://core.telegram.org/bots/api#sendanimation) request
 pub mod send_animation;
 
+/// Contains types for sending [sendVoice](https://core.telegram.org/bots/api#sendvoice) request
+pub mod send_voice;
+
+/// Contains types for sending [sendVideoNote](https://core.telegram.org/bots/api#sendvideonote) request
+pub mod send_video_note;
+
 /// File to send
 #[derive(Serialize, Debug, Clone)]
 #[serde(untagged)]
@@ -38,27 +44,12 @@ pub enum FileKind<'a> {
     },
 }
 
-
 impl<'a> FileKind<'a> {
     pub(crate) fn is_input_file(&self) -> bool {
         if let FileKind::InputFile { .. } = &self {
             true
         } else {
             false
-        }
-    }
-
-    pub(crate) fn is_input_file_or_none(option_self: &Option<Self>) -> bool {
-        match option_self {
-            Some(x) => x.is_input_file(),
-            None => true
-        }
-    }
-
-    pub(crate) fn is_option_input_file(option_self: &Option<Self>) -> bool {
-        match option_self {
-            Some(x) => x.is_input_file(),
-            None => false
         }
     }
 }

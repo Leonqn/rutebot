@@ -16,9 +16,11 @@ use rutebot::requests::send_message::send_document::SendDocument;
 use rutebot::requests::send_message::send_photo::SendPhoto;
 use rutebot::requests::send_message::send_text::SendText;
 use rutebot::requests::send_message::send_video::SendVideo;
-use rutebot::responses::{Animation, Audio, Document, Message, MessageEntityValue, PhotoSize, Update, User, Video};
+use rutebot::requests::send_message::send_voice::SendVoice;
+use rutebot::responses::{Audio, Document, Message, MessageEntityValue, Update, User, Video, VideoNote, Voice};
 
 use crate::common::run_one;
+use rutebot::requests::send_message::send_video_note::SendVideoNote;
 
 mod common;
 
@@ -94,7 +96,6 @@ pub fn send_photo_works() {
     let chat_id = common::get_chat_id();
     let mut photo_content = Vec::new();
     File::open("./tests/photo_test.jpg").unwrap().read_to_end(&mut photo_content).unwrap();
-    let photo_size = photo_content.len();
     let request =
         SendPhoto::new(chat_id,
                        FileKind::InputFile {
@@ -102,11 +103,9 @@ pub fn send_photo_works() {
                            content: photo_content,
                        });
 
-    let response: Vec<PhotoSize> = run_one(rutebot.prepare_api_request(request).send()).photo.unwrap();
-    let last_photo = response.last().unwrap();
+    let response: Message = run_one(rutebot.prepare_api_request(request).send());
 
-    let downloaded_photo = run_one(rutebot.prepare_api_request(GetFile::new(&last_photo.file_id)).send().and_then(move |x| rutebot.download_file(&x.file_path.unwrap())));
-    assert_eq!(downloaded_photo.len(), photo_size);
+    assert_eq!(response.photo.is_some(), true);
 }
 
 #[test]
@@ -158,7 +157,6 @@ pub fn send_animation_works() {
     let chat_id = common::get_chat_id();
     let mut gif_content = Vec::new();
     File::open("./tests/sample_gif.gif").unwrap().read_to_end(&mut gif_content).unwrap();
-    let gif_size = gif_content.len();
     let request = SendAnimation {
         width: Some(808),
         height: Some(538),
@@ -169,10 +167,49 @@ pub fn send_animation_works() {
                              })
     };
 
-    let response: Animation = run_one(rutebot.prepare_api_request(request).send()).animation.unwrap();
+    let response: Message = run_one(rutebot.prepare_api_request(request).send());
 
-    let downloaded_animation = run_one(rutebot.prepare_api_request(GetFile::new(&response.file_id)).send().and_then(move |x| rutebot.download_file(&x.file_path.unwrap())));
-    assert_eq!(downloaded_animation.len(), gif_size);
+    assert_eq!(response.animation.is_some(), true);
+}
+
+#[test]
+pub fn send_voice_works() {
+    let rutebot = common::create_client();
+    let chat_id = common::get_chat_id();
+    let mut voice_content = Vec::new();
+    File::open("./tests/sample_voice.ogg").unwrap().read_to_end(&mut voice_content).unwrap();
+    let voice_size = voice_content.len();
+    let request =
+        SendVoice::new(chat_id,
+                       FileKind::InputFile {
+                           name: "supervoice",
+                           content: voice_content,
+                       });
+
+    let response: Voice = run_one(rutebot.prepare_api_request(request).send()).voice.unwrap();
+
+    let downloaded_voice = run_one(rutebot.prepare_api_request(GetFile::new(&response.file_id)).send().and_then(move |x| rutebot.download_file(&x.file_path.unwrap())));
+    assert_eq!(downloaded_voice.len(), voice_size);
+}
+
+#[test]
+pub fn send_video_note_works() {
+    let rutebot = common::create_client();
+    let chat_id = common::get_chat_id();
+    let mut video_note_content = Vec::new();
+    File::open("./tests/sample_video_note.mp4").unwrap().read_to_end(&mut video_note_content).unwrap();
+    let video_note_size = video_note_content.len();
+    let request =
+        SendVideoNote::new(chat_id,
+                       FileKind::InputFile {
+                           name: "supervideonote",
+                           content: video_note_content,
+                       });
+
+    let response: VideoNote = run_one(rutebot.prepare_api_request(request).send()).video_note.unwrap();
+
+    let downloaded_video_note = run_one(rutebot.prepare_api_request(GetFile::new(&response.file_id)).send().and_then(move |x| rutebot.download_file(&x.file_path.unwrap())));
+    assert_eq!(downloaded_video_note.len(), video_note_size);
 }
 
 #[test]

@@ -13,20 +13,13 @@ use crate::responses::Message;
 /// Use this struct to send general files. On success, the sent `Message` is returned.
 /// Bots can currently send files of any type of up to 50 MB in size, this limit may be changed in the future
 #[derive(Serialize, Debug, Clone)]
-pub struct SendDocument<'a, 'b, 'c, 'd, 'e, 'f, 'g> {
+pub struct SendDocument<'a, 'b, 'c, 'd, 'e, 'g> {
     /// Identifier for the target chat
     pub chat_id: ChatId<'a>,
 
     /// File to send.
     #[serde(skip_serializing_if = "FileKind::is_input_file")]
     pub document: FileKind<'b>,
-
-    /// Thumbnail of the file sent; can be ignored if thumbnail generation for the file is supported server-side.
-    /// The thumbnail should be in JPEG format and less than 200 kB in size.
-    /// A thumbnail‘s width and height should not exceed 320. Ignored if the file is not uploaded using
-    /// FileKind::InputFile
-    #[serde(skip_serializing_if = "FileKind::is_input_file_or_none")]
-    pub thumb: Option<FileKind<'f>>,
 
     /// Document caption (may also be used when resending documents by file_id), 0-1024 characters
     #[serde(skip_serializing_if = "Option::is_none")]
@@ -53,7 +46,7 @@ pub struct SendDocument<'a, 'b, 'c, 'd, 'e, 'f, 'g> {
 }
 
 
-impl<'a, 'b, 'c, 'd, 'e, 'f, 'g> Request for SendDocument<'a, 'b, 'c, 'd, 'e, 'f, 'g> {
+impl<'a, 'b, 'c, 'd, 'e, 'g> Request for SendDocument<'a, 'b, 'c, 'd, 'e, 'g> {
     type ResponseType = Message;
 
     fn method(&self) -> &'static str {
@@ -61,16 +54,13 @@ impl<'a, 'b, 'c, 'd, 'e, 'f, 'g> Request for SendDocument<'a, 'b, 'c, 'd, 'e, 'f
     }
 
     fn set_http_request_body(self, request_builder: hyper::http::request::Builder) -> Result<hyper::http::request::Request<Body>, Error> {
-        if self.document.is_input_file() || FileKind::is_option_input_file(&self.thumb) {
+        if self.document.is_input_file() {
             let mut form = Form::default();
             add_fields_to_form(&mut form, &self)?;
             if let FileKind::InputFile { name, content } = self.document {
                 form.add_reader_file("document", Cursor::new(content), name);
             }
 
-            if let Some(FileKind::InputFile { name, content }) = self.thumb {
-                form.add_reader_file("thumb", Cursor::new(content), name);
-            }
             add_form_body(request_builder, form)
         } else {
             add_json_body(request_builder, &self)
@@ -78,12 +68,11 @@ impl<'a, 'b, 'c, 'd, 'e, 'f, 'g> Request for SendDocument<'a, 'b, 'c, 'd, 'e, 'f
     }
 }
 
-impl<'a, 'b, 'c, 'd, 'e, 'f, 'g> SendDocument<'a, 'b, 'c, 'd, 'e, 'f, 'g> {
+impl<'a, 'b, 'c, 'd, 'e, 'g> SendDocument<'a, 'b, 'c, 'd, 'e, 'g> {
     pub fn new(chat_id: impl Into<ChatId<'a>>, document: FileKind<'b>) -> Self {
         Self {
             chat_id: chat_id.into(),
             document,
-            thumb: None,
             caption: None,
             disable_notification: false,
             parse_mode: None,
@@ -96,7 +85,6 @@ impl<'a, 'b, 'c, 'd, 'e, 'f, 'g> SendDocument<'a, 'b, 'c, 'd, 'e, 'f, 'g> {
         Self {
             chat_id: chat_id.into(),
             document,
-            thumb: None,
             caption: None,
             disable_notification: false,
             parse_mode: None,
