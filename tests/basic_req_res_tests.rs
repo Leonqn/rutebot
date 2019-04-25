@@ -13,17 +13,19 @@ use rutebot::requests::send_chat_action::{ChatAction, SendChatAction};
 use rutebot::requests::send_message::edit_live_location::EditLiveLocation;
 use rutebot::requests::send_message::send_animation::SendAnimation;
 use rutebot::requests::send_message::send_audio::SendAudio;
+use rutebot::requests::send_message::send_contact::SendContact;
 use rutebot::requests::send_message::send_document::SendDocument;
 use rutebot::requests::send_message::send_location::SendLocation;
 use rutebot::requests::send_message::send_media_group::{InputMediaPhotoOrVideo, SendMediaGroup};
 use rutebot::requests::send_message::send_photo::SendPhoto;
+use rutebot::requests::send_message::send_poll::SendPoll;
 use rutebot::requests::send_message::send_text::SendText;
 use rutebot::requests::send_message::send_venue::SendVenue;
 use rutebot::requests::send_message::send_video::SendVideo;
 use rutebot::requests::send_message::send_video_note::SendVideoNote;
 use rutebot::requests::send_message::send_voice::SendVoice;
 use rutebot::requests::send_message::stop_live_location::StopLiveLocation;
-use rutebot::responses::{Audio, Document, EditedLiveLocation, Message, MessageEntityValue, Update, User, Venue, Video, VideoNote, Voice};
+use rutebot::responses::{Audio, Contact, Document, EditedLiveLocation, Message, MessageEntityValue, Update, User, Venue, Video, VideoNote, Voice};
 
 use crate::common::run_one;
 
@@ -300,6 +302,30 @@ pub fn send_venue_works() {
 
     assert_eq!(venue.address, "test_address");
     assert_eq!(venue.title, "test_title");
+}
+
+#[test]
+pub fn send_contact_works() {
+    let rutebot = common::create_client();
+    let chat_id = common::get_chat_id();
+    let request = SendContact::new(chat_id, "+79506470372", "imya");
+
+    let venue: Contact = run_one(rutebot.prepare_api_request(request).send()).contact.unwrap();
+
+    assert_eq!(venue.phone_number, "+79506470372");
+    assert_eq!(venue.first_name, "imya");
+}
+
+#[test]
+pub fn send_poll_works() {
+    let rutebot = common::create_client();
+    let chat_id = common::get_chat_id();
+    let request = SendPoll::new(chat_id, "to be or not to be", &["to be", "do not to be", "see results"]);
+
+    let venue: Contact = run_one(rutebot.prepare_api_request(request).send()).contact.unwrap();
+
+    assert_eq!(venue.phone_number, "+79506470372");
+    assert_eq!(venue.first_name, "imya");
 }
 
 #[test]

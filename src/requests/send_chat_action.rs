@@ -22,9 +22,19 @@ impl<'a> Request for SendChatAction<'a> {
     }
 }
 
+#[serde(rename_all = "snake_case")]
 #[derive(Serialize, Debug, Clone)]
 pub enum ChatAction {
-    Typing
+    Typing,
+    UploadPhoto,
+    RecordVideo,
+    UploadVideo,
+    RecordAudio,
+    UploadAudio,
+    UploadDocument,
+    FindLocation,
+    RecordVideoNote,
+    UploadVideoNote,
 }
 
 

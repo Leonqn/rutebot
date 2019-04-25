@@ -5,7 +5,7 @@ use serde::Serialize;
 use crate::requests::{ChatId, ReplyMarkup, Request};
 use crate::responses::Message;
 
-/// Use this method to send information about a venue. On success, the sent `Message`    is returned.
+/// Use this struct to send information about a venue. On success, the sent `Message` is returned.
 #[derive(Serialize, Debug, Clone)]
 pub struct SendVenue<'a, 'b, 'c, 'd, 'e, 'f, 'g, 'h> {
     /// Identifier for the target chat

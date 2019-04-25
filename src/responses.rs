@@ -155,6 +155,9 @@ pub struct Message {
     /// Message is a venue, information about the venue
     pub venue: Option<Venue>,
 
+    /// Message is a native poll, information about the poll
+    pub poll: Option<Poll>,
+
     /// New members that were added to the group or supergroup and information about them
     /// (the bot itself may be one of these members)
     pub new_chat_members: Option<Vec<User>>,
@@ -290,6 +293,31 @@ impl MessageEntity {
     }
 }
 
+/// This object contains information about a poll.
+#[derive(Deserialize, Debug, Clone)]
+pub struct Poll {
+    /// Unique poll identifier
+    pub id: String,
+
+    /// Poll question, 1-255 characters
+    pub questing: String,
+
+    /// List of poll options
+    pub options: Vec<PollOption>,
+
+    /// True, if the poll is closed
+    pub is_closed: bool,
+}
+
+/// This object contains information about one answer option in a poll.
+#[derive(Deserialize, Debug, Clone)]
+pub struct PollOption {
+    /// Option text, 1-100 characters
+    pub text: String,
+
+    /// Number of users that voted for this option
+    pub voter_count: String,
+}
 
 /// This object represents an audio file to be treated as music by the Telegram clients
 #[derive(Deserialize, Debug, Clone)]

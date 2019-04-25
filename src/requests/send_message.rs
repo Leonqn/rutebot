@@ -36,3 +36,9 @@ pub mod stop_live_location;
 
 /// Contains types for sending [sendVenue](https://core.telegram.org/bots/api#sendvenue) request
 pub mod send_venue;
+
+/// Contains types for sending [sendContact](https://core.telegram.org/bots/api#sendcontact) request
+pub mod send_contact;
+
+/// Contains types for sending [sendPoll](https://core.telegram.org/bots/api#sendpoll) request
+pub mod send_poll;
