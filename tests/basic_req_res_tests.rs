@@ -11,7 +11,6 @@ use rutebot::requests::get_file::GetFile;
 use rutebot::requests::get_me::GetMe;
 use rutebot::requests::get_updates::GetUpdates;
 use rutebot::requests::get_user_profile_photos::GetUserProfilePhotos;
-use rutebot::requests::send_chat_action::{ChatAction, SendChatAction};
 use rutebot::requests::send_message::edit_live_location::EditLiveLocation;
 use rutebot::requests::send_message::send_animation::SendAnimation;
 use rutebot::requests::send_message::send_audio::SendAudio;
@@ -27,9 +26,11 @@ use rutebot::requests::send_message::send_video::SendVideo;
 use rutebot::requests::send_message::send_video_note::SendVideoNote;
 use rutebot::requests::send_message::send_voice::SendVoice;
 use rutebot::requests::send_message::stop_live_location::StopLiveLocation;
+use rutebot::requests::set_chat_photo::SetChatPhoto;
 use rutebot::responses::{Audio, Contact, Document, EditedLiveLocation, Message, MessageEntityValue, Poll, Update, User, UserProfilePhotos, Venue, Video, VideoNote, Voice};
 
 use crate::common::run_one;
+use rutebot::requests::send_message::send_chat_action::{SendChatAction, ChatAction};
 
 mod common;
 
@@ -341,12 +342,25 @@ pub fn get_user_profile_photos_works() {
 }
 
 #[test]
-pub fn export_chat_invite_link() {
+pub fn export_chat_invite_link_works() {
     let rutebot = common::create_client();
     let chat_id = common::get_chat_id();
     let request = ExportChatInviteLink::new(chat_id);
 
     let _photos: String = run_one(rutebot.prepare_api_request(request).send());
+}
+
+#[test]
+pub fn set_chat_photo_works() {
+    let rutebot = common::create_client();
+    let chat_id = common::get_chat_id();
+    let mut photo_content = Vec::new();
+    File::open("./tests/photo_test.jpg").unwrap().read_to_end(&mut photo_content).unwrap();
+    let request = SetChatPhoto::new(chat_id, photo_content);
+
+    let is_changed: bool = run_one(rutebot.prepare_api_request(request).send());
+
+    assert_eq!(is_changed, true);
 }
 
 #[test]

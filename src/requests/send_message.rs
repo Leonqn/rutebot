@@ -42,3 +42,6 @@ pub mod send_contact;
 
 /// Contains types for sending [sendPoll](https://core.telegram.org/bots/api#sendpoll) request
 pub mod send_poll;
+
+/// Contains types for sending [sendChatAction](https://core.telegram.org/bots/api#sendchataction) request
+pub mod send_chat_action;

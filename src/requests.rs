@@ -24,9 +24,6 @@ pub mod send_message;
 /// Contains types for sending [answerCallbackQuery](https://core.telegram.org/bots/api#answercallbackquery) request
 pub mod answer_callback_query;
 
-/// Contains types for sending [sendChatAction](https://core.telegram.org/bots/api#sendchataction) request
-pub mod send_chat_action;
-
 /// Contains types for sending [forwardMessage](https://core.telegram.org/bots/api#forwardmessage) request
 pub mod forward_message;
 
@@ -47,6 +44,9 @@ pub mod promote_chat_member;
 
 /// Contains types for sending [exportChatInviteLink](https://core.telegram.org/bots/api#exportchatinvitelink) request
 pub mod export_chat_invite_link;
+
+/// Contains types for sending [setChatPhoto](https://core.telegram.org/bots/api#setchatphoto) request
+pub mod set_chat_photo;
 
 /// Basic request type.
 pub trait Request: Serialize + Sized {
