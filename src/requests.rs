@@ -33,6 +33,21 @@ pub mod forward_message;
 /// Contains types for sending [getUserProfilePhotos](https://core.telegram.org/bots/api#getuserprofilephotos)
 pub mod get_user_profile_photos;
 
+/// Contains types for sending [restrictChatMember](https://core.telegram.org/bots/api#restrictchatmember) request
+pub mod restrict_chat_member;
+
+/// Contains types for sending [unbanChatMember](https://core.telegram.org/bots/api#unbanchatmember) request
+pub mod unban_chat_member;
+
+/// Contains types for sending [kickChatMember](https://core.telegram.org/bots/api#kickchatmember) request
+pub mod kick_chat_member;
+
+/// Contains types for sending [promoteChatMember](https://core.telegram.org/bots/api#promotechatmember) request
+pub mod promote_chat_member;
+
+/// Contains types for sending [exportChatInviteLink](https://core.telegram.org/bots/api#exportchatinvitelink) request
+pub mod export_chat_invite_link;
+
 /// Basic request type.
 pub trait Request: Serialize + Sized {
     type ResponseType;
@@ -105,12 +120,14 @@ impl<'a> FileKind<'a> {
     }
 }
 
-///Unique identifier for the target chat or username of the target channel (in the format `@channelusername`)
+/// Unique identifier for the target group or username of the target supergroup or channel (in the format @channelusername)
 #[derive(Serialize, Debug, Clone)]
 #[serde(untagged)]
 pub enum ChatId<'a> {
+    /// Unique identifier for the target group
     Id(i64),
-    ChannelUsername(&'a str),
+    /// Username of the target supergroup or channel (in the format @channelusername)
+    Username(&'a str),
 }
 
 impl<'a> From<i64> for ChatId<'a> {
@@ -121,7 +138,7 @@ impl<'a> From<i64> for ChatId<'a> {
 
 impl<'a> From<&'a str> for ChatId<'a> {
     fn from(x: &'a str) -> Self {
-        ChatId::ChannelUsername(x)
+        ChatId::Username(x)
     }
 }
 

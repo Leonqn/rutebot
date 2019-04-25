@@ -5,6 +5,7 @@ use futures::future::Future;
 use pretty_assertions::assert_eq;
 
 use rutebot::requests::{FileKind, InlineKeyboard, InlineKeyboardButton, InputMediaPhoto, InputMediaVideo, ParseMode, ReplyMarkup};
+use rutebot::requests::export_chat_invite_link::ExportChatInviteLink;
 use rutebot::requests::forward_message::ForwardMessage;
 use rutebot::requests::get_file::GetFile;
 use rutebot::requests::get_me::GetMe;
@@ -337,6 +338,15 @@ pub fn get_user_profile_photos_works() {
     let photos: UserProfilePhotos = run_one(rutebot.prepare_api_request(request).send());
 
     assert_eq!(photos.total_count, photos.photos.len() as i64)
+}
+
+#[test]
+pub fn export_chat_invite_link() {
+    let rutebot = common::create_client();
+    let chat_id = common::get_chat_id();
+    let request = ExportChatInviteLink::new(chat_id);
+
+    let _photos: String = run_one(rutebot.prepare_api_request(request).send());
 }
 
 #[test]
