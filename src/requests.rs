@@ -321,3 +321,10 @@ pub enum ParseMode {
     Html,
     Markdown,
 }
+
+#[serde(untagged)]
+#[derive(Serialize, Debug, Clone)]
+pub enum EditLocationIn<'a> {
+    Inline { inline_message_id: &'a str },
+    Chat { chat_id: ChatId<'a>, message_id: i64 },
+}

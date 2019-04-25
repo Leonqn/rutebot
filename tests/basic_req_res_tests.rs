@@ -4,25 +4,27 @@ use std::io::Read;
 use futures::future::Future;
 use pretty_assertions::assert_eq;
 
-use rutebot::requests::{FileKind, InlineKeyboard, InlineKeyboardButton, InputMediaPhoto, InputMediaVideo, ReplyMarkup, ParseMode};
+use rutebot::requests::{FileKind, InlineKeyboard, InlineKeyboardButton, InputMediaPhoto, InputMediaVideo, ParseMode, ReplyMarkup};
 use rutebot::requests::forward_message::ForwardMessage;
 use rutebot::requests::get_file::GetFile;
 use rutebot::requests::get_me::GetMe;
 use rutebot::requests::get_updates::GetUpdates;
 use rutebot::requests::send_chat_action::{ChatAction, SendChatAction};
+use rutebot::requests::send_message::edit_live_location::EditLiveLocation;
 use rutebot::requests::send_message::send_animation::SendAnimation;
 use rutebot::requests::send_message::send_audio::SendAudio;
 use rutebot::requests::send_message::send_document::SendDocument;
+use rutebot::requests::send_message::send_location::SendLocation;
 use rutebot::requests::send_message::send_media_group::{InputMediaPhotoOrVideo, SendMediaGroup};
 use rutebot::requests::send_message::send_photo::SendPhoto;
 use rutebot::requests::send_message::send_text::SendText;
 use rutebot::requests::send_message::send_video::SendVideo;
 use rutebot::requests::send_message::send_video_note::SendVideoNote;
 use rutebot::requests::send_message::send_voice::SendVoice;
-use rutebot::responses::{Audio, Document, Message, MessageEntityValue, Update, User, Video, VideoNote, Voice, Location};
+use rutebot::requests::send_message::stop_live_location::StopLiveLocation;
+use rutebot::responses::{Audio, Document, EditedLiveLocation, Message, MessageEntityValue, Update, User, Video, VideoNote, Voice};
 
 use crate::common::run_one;
-use rutebot::requests::send_message::send_location::SendLocation;
 
 mod common;
 
@@ -246,10 +248,45 @@ pub fn send_location_works() {
     let chat_id = common::get_chat_id();
     let request = SendLocation::new(chat_id, 63.4, 32.2);
 
-    let response: Location = run_one(rutebot.prepare_api_request(request).send()).location.unwrap();
+    let response: Message = run_one(rutebot.prepare_api_request(request).send());
 
-    assert_eq!(response.latitude, 63.4);
-    assert_eq!(response.longitude, 32.2);
+    assert_eq!(response.location.is_some(), true);
+}
+
+#[test]
+pub fn edit_location_works() {
+    let rutebot = common::create_client();
+    let chat_id = common::get_chat_id();
+    let request = SendLocation {
+        live_period: Some(60),
+        ..SendLocation::new(chat_id, 63.4, 32.2)
+    };
+    let location: Message = run_one(rutebot.prepare_api_request(request).send());
+    let edit_request = EditLiveLocation::new_chat(chat_id, location.message_id, 63.2, 32.1);
+
+    if let EditedLiveLocation::Message(message) = run_one(rutebot.prepare_api_request(edit_request).send()) {
+        assert_eq!(message.location.is_some(), true);
+    } else {
+        panic!("Returned true.");
+    }
+}
+
+#[test]
+pub fn stop_location_works() {
+    let rutebot = common::create_client();
+    let chat_id = common::get_chat_id();
+    let request = SendLocation {
+        live_period: Some(60),
+        ..SendLocation::new(chat_id, 63.4, 32.2)
+    };
+    let location: Message = run_one(rutebot.prepare_api_request(request).send());
+    let stop_request = StopLiveLocation::new_chat(chat_id, location.message_id);
+
+    if let EditedLiveLocation::Message(message) = run_one(rutebot.prepare_api_request(stop_request).send()) {
+        assert_eq!(message.location.is_some(), true);
+    } else {
+        panic!("Returned true.");
+    }
 }
 
 #[test]

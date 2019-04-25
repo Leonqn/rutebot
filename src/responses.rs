@@ -759,3 +759,12 @@ pub struct CallbackQuery {
     /// Short name of a Game to be returned, serves as the unique identifier for the game
     pub game_short_name: Option<String>,
 }
+
+#[derive(Deserialize, Debug, Clone)]
+#[serde(untagged)]
+pub enum EditedLiveLocation {
+    /// Returns if edited was not sent by the bot
+    True(bool),
+    /// Returns if edited message sent by the bot
+    Message(Message),
+}

@@ -27,3 +27,10 @@ pub mod send_media_group;
 
 /// Contains types for sending [sendLocation](https://core.telegram.org/bots/api#sendlocation) request
 pub mod send_location;
+
+/// Contains types for sending [editMessageLiveLocation](https://core.telegram.org/bots/api#editmessagelivelocation) request
+pub mod edit_live_location;
+
+
+/// Contains types for sending [stopMessageLiveLocation](https://core.telegram.org/bots/api#stopmessagelivelocation) request
+pub mod stop_live_location;
