@@ -19,9 +19,10 @@ use rutebot::requests::send_message::send_text::SendText;
 use rutebot::requests::send_message::send_video::SendVideo;
 use rutebot::requests::send_message::send_video_note::SendVideoNote;
 use rutebot::requests::send_message::send_voice::SendVoice;
-use rutebot::responses::{Audio, Document, Message, MessageEntityValue, Update, User, Video, VideoNote, Voice};
+use rutebot::responses::{Audio, Document, Message, MessageEntityValue, Update, User, Video, VideoNote, Voice, Location};
 
 use crate::common::run_one;
+use rutebot::requests::send_message::send_location::SendLocation;
 
 mod common;
 
@@ -237,6 +238,18 @@ pub fn send_media_group_works() {
     let response: Vec<Message> = run_one(rutebot.prepare_api_request(request).send());
 
     assert_eq!(response.len(), 2);
+}
+
+#[test]
+pub fn send_location_works() {
+    let rutebot = common::create_client();
+    let chat_id = common::get_chat_id();
+    let request = SendLocation::new(chat_id, 63.4, 32.2);
+
+    let response: Location = run_one(rutebot.prepare_api_request(request).send()).location.unwrap();
+
+    assert_eq!(response.latitude, 63.4);
+    assert_eq!(response.longitude, 32.2);
 }
 
 #[test]

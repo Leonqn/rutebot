@@ -24,3 +24,6 @@ pub mod send_video_note;
 
 /// Contains types for sending [sendMediaGroup](https://core.telegram.org/bots/api#sendmediagroup) request
 pub mod send_media_group;
+
+/// Contains types for sending [sendLocation](https://core.telegram.org/bots/api#sendlocation) request
+pub mod send_location;
