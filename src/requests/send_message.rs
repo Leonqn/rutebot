@@ -31,6 +31,8 @@ pub mod send_location;
 /// Contains types for sending [editMessageLiveLocation](https://core.telegram.org/bots/api#editmessagelivelocation) request
 pub mod edit_live_location;
 
-
 /// Contains types for sending [stopMessageLiveLocation](https://core.telegram.org/bots/api#stopmessagelivelocation) request
 pub mod stop_live_location;
+
+/// Contains types for sending [sendVenue](https://core.telegram.org/bots/api#sendvenue) request
+pub mod send_venue;

@@ -18,11 +18,12 @@ use rutebot::requests::send_message::send_location::SendLocation;
 use rutebot::requests::send_message::send_media_group::{InputMediaPhotoOrVideo, SendMediaGroup};
 use rutebot::requests::send_message::send_photo::SendPhoto;
 use rutebot::requests::send_message::send_text::SendText;
+use rutebot::requests::send_message::send_venue::SendVenue;
 use rutebot::requests::send_message::send_video::SendVideo;
 use rutebot::requests::send_message::send_video_note::SendVideoNote;
 use rutebot::requests::send_message::send_voice::SendVoice;
 use rutebot::requests::send_message::stop_live_location::StopLiveLocation;
-use rutebot::responses::{Audio, Document, EditedLiveLocation, Message, MessageEntityValue, Update, User, Video, VideoNote, Voice};
+use rutebot::responses::{Audio, Document, EditedLiveLocation, Message, MessageEntityValue, Update, User, Venue, Video, VideoNote, Voice};
 
 use crate::common::run_one;
 
@@ -287,6 +288,18 @@ pub fn stop_location_works() {
     } else {
         panic!("Returned true.");
     }
+}
+
+#[test]
+pub fn send_venue_works() {
+    let rutebot = common::create_client();
+    let chat_id = common::get_chat_id();
+    let request = SendVenue::new(chat_id, 63.4, 32.2, "test_title", "test_address");
+
+    let venue: Venue = run_one(rutebot.prepare_api_request(request).send()).venue.unwrap();
+
+    assert_eq!(venue.address, "test_address");
+    assert_eq!(venue.title, "test_title");
 }
 
 #[test]
