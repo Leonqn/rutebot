@@ -9,6 +9,7 @@ use rutebot::requests::forward_message::ForwardMessage;
 use rutebot::requests::get_file::GetFile;
 use rutebot::requests::get_me::GetMe;
 use rutebot::requests::get_updates::GetUpdates;
+use rutebot::requests::get_user_profile_photos::GetUserProfilePhotos;
 use rutebot::requests::send_chat_action::{ChatAction, SendChatAction};
 use rutebot::requests::send_message::edit_live_location::EditLiveLocation;
 use rutebot::requests::send_message::send_animation::SendAnimation;
@@ -25,7 +26,7 @@ use rutebot::requests::send_message::send_video::SendVideo;
 use rutebot::requests::send_message::send_video_note::SendVideoNote;
 use rutebot::requests::send_message::send_voice::SendVoice;
 use rutebot::requests::send_message::stop_live_location::StopLiveLocation;
-use rutebot::responses::{Audio, Contact, Document, EditedLiveLocation, Message, MessageEntityValue, Update, User, Venue, Video, VideoNote, Voice};
+use rutebot::responses::{Audio, Contact, Document, EditedLiveLocation, Message, MessageEntityValue, Poll, Update, User, UserProfilePhotos, Venue, Video, VideoNote, Voice};
 
 use crate::common::run_one;
 
@@ -310,10 +311,10 @@ pub fn send_contact_works() {
     let chat_id = common::get_chat_id();
     let request = SendContact::new(chat_id, "+79506470372", "imya");
 
-    let venue: Contact = run_one(rutebot.prepare_api_request(request).send()).contact.unwrap();
+    let contact: Contact = run_one(rutebot.prepare_api_request(request).send()).contact.unwrap();
 
-    assert_eq!(venue.phone_number, "+79506470372");
-    assert_eq!(venue.first_name, "imya");
+    assert_eq!(contact.phone_number, "+79506470372");
+    assert_eq!(contact.first_name, "imya");
 }
 
 #[test]
@@ -322,10 +323,20 @@ pub fn send_poll_works() {
     let chat_id = common::get_chat_id();
     let request = SendPoll::new(chat_id, "to be or not to be", &["to be", "do not to be", "see results"]);
 
-    let venue: Contact = run_one(rutebot.prepare_api_request(request).send()).contact.unwrap();
+    let poll: Poll = run_one(rutebot.prepare_api_request(request).send()).poll.unwrap();
 
-    assert_eq!(venue.phone_number, "+79506470372");
-    assert_eq!(venue.first_name, "imya");
+    assert_eq!(&poll.question, "to be or not to be");
+}
+
+#[test]
+pub fn get_user_profile_photos_works() {
+    let rutebot = common::create_client();
+    let user_id = common::get_user_id();
+    let request = GetUserProfilePhotos::new(user_id);
+
+    let photos: UserProfilePhotos = run_one(rutebot.prepare_api_request(request).send());
+
+    assert_eq!(photos.total_count, photos.photos.len() as i64)
 }
 
 #[test]

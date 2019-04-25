@@ -293,6 +293,16 @@ impl MessageEntity {
     }
 }
 
+/// This object represent a user's profile pictures.
+#[derive(Deserialize, Debug, Clone)]
+pub struct UserProfilePhotos {
+    /// Total number of profile pictures the target user has
+    pub total_count: i64,
+
+    /// Requested profile pictures (in up to 4 sizes each)
+    pub photos: Vec<Vec<PhotoSize>>,
+}
+
 /// This object contains information about a poll.
 #[derive(Deserialize, Debug, Clone)]
 pub struct Poll {
@@ -300,7 +310,7 @@ pub struct Poll {
     pub id: String,
 
     /// Poll question, 1-255 characters
-    pub questing: String,
+    pub question: String,
 
     /// List of poll options
     pub options: Vec<PollOption>,
@@ -316,7 +326,7 @@ pub struct PollOption {
     pub text: String,
 
     /// Number of users that voted for this option
-    pub voter_count: String,
+    pub voter_count: i64,
 }
 
 /// This object represents an audio file to be treated as music by the Telegram clients

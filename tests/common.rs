@@ -24,6 +24,14 @@ pub fn get_chat_id() -> i64 {
     str::parse(&chat_id).unwrap()
 }
 
+pub fn get_user_id() -> i64 {
+    let user_id = env::var_os("TEST_USER_ID")
+        .expect("Chat id is missing. You should specify chat id in which bot will send messages for testing");
+
+    let user_id = user_id.to_string_lossy();
+    str::parse(&user_id).unwrap()
+}
+
 pub fn run_one<F>(f: F) -> F::Item
     where
         F: IntoFuture,

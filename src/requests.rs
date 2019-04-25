@@ -30,6 +30,9 @@ pub mod send_chat_action;
 /// Contains types for sending [forwardMessage](https://core.telegram.org/bots/api#forwardmessage) request
 pub mod forward_message;
 
+/// Contains types for sending [getUserProfilePhotos](https://core.telegram.org/bots/api#getuserprofilephotos)
+pub mod get_user_profile_photos;
+
 /// Basic request type.
 pub trait Request: Serialize + Sized {
     type ResponseType;
