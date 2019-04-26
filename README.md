@@ -11,7 +11,7 @@ use hyper::rt::{Future, Stream};
 
 use rutebot::client::Rutebot;
 use rutebot::requests::get_updates::GetUpdates;
-use rutebot::requests::send_message::send_text::SendText;
+use rutebot::requests::send_text::SendText;
 use rutebot::responses::{Message, Update};
 
 fn main() {

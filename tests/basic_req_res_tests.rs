@@ -5,32 +5,32 @@ use futures::future::Future;
 use pretty_assertions::assert_eq;
 
 use rutebot::requests::{FileKind, InlineKeyboard, InlineKeyboardButton, InputMediaPhoto, InputMediaVideo, ParseMode, ReplyMarkup};
+use rutebot::requests::edit_live_location::EditLiveLocation;
 use rutebot::requests::export_chat_invite_link::ExportChatInviteLink;
 use rutebot::requests::forward_message::ForwardMessage;
 use rutebot::requests::get_file::GetFile;
 use rutebot::requests::get_me::GetMe;
 use rutebot::requests::get_updates::GetUpdates;
 use rutebot::requests::get_user_profile_photos::GetUserProfilePhotos;
-use rutebot::requests::send_message::edit_live_location::EditLiveLocation;
-use rutebot::requests::send_message::send_animation::SendAnimation;
-use rutebot::requests::send_message::send_audio::SendAudio;
-use rutebot::requests::send_message::send_contact::SendContact;
-use rutebot::requests::send_message::send_document::SendDocument;
-use rutebot::requests::send_message::send_location::SendLocation;
-use rutebot::requests::send_message::send_media_group::{InputMediaPhotoOrVideo, SendMediaGroup};
-use rutebot::requests::send_message::send_photo::SendPhoto;
-use rutebot::requests::send_message::send_poll::SendPoll;
-use rutebot::requests::send_message::send_text::SendText;
-use rutebot::requests::send_message::send_venue::SendVenue;
-use rutebot::requests::send_message::send_video::SendVideo;
-use rutebot::requests::send_message::send_video_note::SendVideoNote;
-use rutebot::requests::send_message::send_voice::SendVoice;
-use rutebot::requests::send_message::stop_live_location::StopLiveLocation;
+use rutebot::requests::send_animation::SendAnimation;
+use rutebot::requests::send_audio::SendAudio;
+use rutebot::requests::send_chat_action::{ChatAction, SendChatAction};
+use rutebot::requests::send_contact::SendContact;
+use rutebot::requests::send_document::SendDocument;
+use rutebot::requests::send_location::SendLocation;
+use rutebot::requests::send_media_group::{InputMediaPhotoOrVideo, SendMediaGroup};
+use rutebot::requests::send_photo::SendPhoto;
+use rutebot::requests::send_poll::SendPoll;
+use rutebot::requests::send_text::SendText;
+use rutebot::requests::send_venue::SendVenue;
+use rutebot::requests::send_video::SendVideo;
+use rutebot::requests::send_video_note::SendVideoNote;
+use rutebot::requests::send_voice::SendVoice;
 use rutebot::requests::set_chat_photo::SetChatPhoto;
+use rutebot::requests::stop_live_location::StopLiveLocation;
 use rutebot::responses::{Audio, Contact, Document, EditedLiveLocation, Message, MessageEntityValue, Poll, Update, User, UserProfilePhotos, Venue, Video, VideoNote, Voice};
 
 use crate::common::run_one;
-use rutebot::requests::send_message::send_chat_action::{SendChatAction, ChatAction};
 
 mod common;
 
