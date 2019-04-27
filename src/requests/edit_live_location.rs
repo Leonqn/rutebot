@@ -1,7 +1,7 @@
 use serde::Serialize;
 
-use crate::requests::{ChatId, EditLocationIn, ReplyMarkup, Request};
-use crate::responses::EditedLiveLocation;
+use crate::requests::{ChatId, MessageOrInlineMessageId, ReplyMarkup, Request};
+use crate::responses::EditedMessage;
 
 /// Use this struct to edit live location messages.
 /// A location can be edited until its live_period expires or editing is explicitly disabled by a
@@ -9,9 +9,9 @@ use crate::responses::EditedLiveLocation;
 /// the edited `EditLiveLocationResponse::Message` is returned, otherwise `EditLiveLocationResponse::True` is returned
 #[derive(Serialize, Debug, Clone)]
 pub struct EditLiveLocation<'a, 'd, 'e, 'f> {
-    /// Identifier where to edit live location
+    /// Identifier of message in chat or identifier of inline message
     #[serde(flatten)]
-    pub edit_location_in: EditLocationIn<'a>,
+    pub message_or_inline_message_id: MessageOrInlineMessageId<'a>,
 
     /// Latitude of the location
     pub latitude: f64,
@@ -25,7 +25,7 @@ pub struct EditLiveLocation<'a, 'd, 'e, 'f> {
 }
 
 impl<'a, 'd, 'e, 'f> Request for EditLiveLocation<'a, 'd, 'e, 'f> {
-    type ResponseType = EditedLiveLocation;
+    type ResponseType = EditedMessage;
 
     fn method(&self) -> &'static str {
         "editMessageLiveLocation"
@@ -33,18 +33,18 @@ impl<'a, 'd, 'e, 'f> Request for EditLiveLocation<'a, 'd, 'e, 'f> {
 }
 
 impl<'a, 'd, 'e, 'f> EditLiveLocation<'a, 'd, 'e, 'f> {
-    pub fn new_inline(inline_message_id: &'a str, latitude: f64, longitude: f64) -> Self {
+    pub fn new_inline_message(inline_message_id: &'a str, latitude: f64, longitude: f64) -> Self {
         Self {
-            edit_location_in: EditLocationIn::Inline { inline_message_id },
+            message_or_inline_message_id: MessageOrInlineMessageId::Inline { inline_message_id },
             latitude,
             longitude,
             reply_markup: None,
         }
     }
 
-    pub fn new_chat(chat_id: impl Into<ChatId<'a>>, message_id: i64, latitude: f64, longitude: f64) -> Self {
+    pub fn new_message(chat_id: impl Into<ChatId<'a>>, message_id: i64, latitude: f64, longitude: f64) -> Self {
         Self {
-            edit_location_in: EditLocationIn::Chat { chat_id: chat_id.into(), message_id },
+            message_or_inline_message_id: MessageOrInlineMessageId::Chat { chat_id: chat_id.into(), message_id },
             latitude,
             longitude,
             reply_markup: None,

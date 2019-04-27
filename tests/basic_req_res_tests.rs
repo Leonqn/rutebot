@@ -4,14 +4,21 @@ use std::io::Read;
 use futures::future::Future;
 use pretty_assertions::assert_eq;
 
-use rutebot::requests::{FileKind, InlineKeyboard, InlineKeyboardButton, InputMediaPhoto, InputMediaVideo, ParseMode, ReplyMarkup};
+use rutebot::requests::{FileKind, InlineKeyboard, InlineKeyboardButton, InputMedia, InputMediaPhoto, InputMediaVideo, ParseMode, ReplyMarkup};
+use rutebot::requests::delete_chat_photo::DeleteChatPhoto;
 use rutebot::requests::edit_live_location::EditLiveLocation;
+use rutebot::requests::edit_message_caption::EditMessageCaption;
+use rutebot::requests::edit_message_media::EditMessageMedia;
+use rutebot::requests::edit_message_text::EditMessageText;
 use rutebot::requests::export_chat_invite_link::ExportChatInviteLink;
 use rutebot::requests::forward_message::ForwardMessage;
+use rutebot::requests::get_chat::GetChat;
+use rutebot::requests::get_chat_administrators::GetChatAdministrators;
 use rutebot::requests::get_file::GetFile;
 use rutebot::requests::get_me::GetMe;
 use rutebot::requests::get_updates::GetUpdates;
 use rutebot::requests::get_user_profile_photos::GetUserProfilePhotos;
+use rutebot::requests::pin_chat_message::PinChatMessage;
 use rutebot::requests::send_animation::SendAnimation;
 use rutebot::requests::send_audio::SendAudio;
 use rutebot::requests::send_chat_action::{ChatAction, SendChatAction};
@@ -26,11 +33,17 @@ use rutebot::requests::send_venue::SendVenue;
 use rutebot::requests::send_video::SendVideo;
 use rutebot::requests::send_video_note::SendVideoNote;
 use rutebot::requests::send_voice::SendVoice;
+use rutebot::requests::set_chat_description::SetChatDescription;
 use rutebot::requests::set_chat_photo::SetChatPhoto;
+use rutebot::requests::set_chat_title::SetChatTitle;
 use rutebot::requests::stop_live_location::StopLiveLocation;
-use rutebot::responses::{Audio, Contact, Document, EditedLiveLocation, Message, MessageEntityValue, Poll, Update, User, UserProfilePhotos, Venue, Video, VideoNote, Voice};
+use rutebot::requests::unpin_chat_message::UnpinChatMessage;
+use rutebot::responses::{Audio, Chat, ChatMember, Contact, Document, EditedMessage, Message, MessageEntityValue, Poll, Update, User, UserProfilePhotos, Venue, Video, VideoNote, Voice};
 
 use crate::common::run_one;
+use rutebot::requests::stop_poll::StopPoll;
+use rutebot::requests::delete_message::DeleteMessage;
+use rutebot::requests::get_chat_members_count::GetChatMembersCount;
 
 mod common;
 
@@ -44,13 +57,24 @@ pub fn get_me_works() {
 }
 
 #[test]
-pub fn send_text_message_works() {
+pub fn send_text_works() {
     let rutebot = common::create_client();
     let chat_id = common::get_chat_id();
 
     let response: Message = run_one(rutebot.prepare_api_request(SendText::new(chat_id, "Some text")).send());
 
     assert_eq!(response.text.unwrap(), "Some text");
+}
+
+#[test]
+pub fn forward_message_works() {
+    let rutebot = common::create_client();
+    let chat_id = common::get_chat_id();
+    let sent_msg: Message = run_one(rutebot.prepare_api_request(SendText::new(chat_id, "test")).send());
+
+    let response: Message = run_one(rutebot.prepare_api_request(ForwardMessage::new(chat_id, chat_id, sent_msg.message_id)).send());
+
+    assert_eq!(sent_msg.text, response.text);
 }
 
 #[test]
@@ -268,9 +292,9 @@ pub fn edit_location_works() {
         ..SendLocation::new(chat_id, 63.4, 32.2)
     };
     let location: Message = run_one(rutebot.prepare_api_request(request).send());
-    let edit_request = EditLiveLocation::new_chat(chat_id, location.message_id, 63.2, 32.1);
+    let edit_request = EditLiveLocation::new_message(chat_id, location.message_id, 63.2, 32.1);
 
-    if let EditedLiveLocation::Message(message) = run_one(rutebot.prepare_api_request(edit_request).send()) {
+    if let EditedMessage::Message(message) = run_one(rutebot.prepare_api_request(edit_request).send()) {
         assert_eq!(message.location.is_some(), true);
     } else {
         panic!("Returned true.");
@@ -288,7 +312,7 @@ pub fn stop_location_works() {
     let location: Message = run_one(rutebot.prepare_api_request(request).send());
     let stop_request = StopLiveLocation::new_chat(chat_id, location.message_id);
 
-    if let EditedLiveLocation::Message(message) = run_one(rutebot.prepare_api_request(stop_request).send()) {
+    if let EditedMessage::Message(message) = run_one(rutebot.prepare_api_request(stop_request).send()) {
         assert_eq!(message.location.is_some(), true);
     } else {
         panic!("Returned true.");
@@ -364,16 +388,195 @@ pub fn set_chat_photo_works() {
 }
 
 #[test]
-pub fn forward_message_works() {
+pub fn delete_chat_photo_works() {
     let rutebot = common::create_client();
     let chat_id = common::get_chat_id();
-    let sent_msg: Message = run_one(rutebot.prepare_api_request(SendText::new(chat_id, "test")).send());
+    let mut photo_content = Vec::new();
+    File::open("./tests/photo_test.jpg").unwrap().read_to_end(&mut photo_content).unwrap();
+    let set_request = SetChatPhoto::new(chat_id, photo_content);
+    run_one(rutebot.prepare_api_request(set_request).send());
+    let request = DeleteChatPhoto::new(chat_id);
 
-    let response: Message = run_one(rutebot.prepare_api_request(ForwardMessage::new(chat_id, chat_id, sent_msg.message_id)).send());
+    let is_deleted = run_one(rutebot.prepare_api_request(request).send());
 
-    assert_eq!(sent_msg.text, response.text);
+    assert_eq!(is_deleted, true);
 }
 
+#[test]
+pub fn set_chat_title_works() {
+    let rutebot = common::create_client();
+    let chat_id = common::get_chat_id();
+    let request = SetChatTitle::new(chat_id, "new_title");
+
+    let title_set = run_one(rutebot.prepare_api_request(request).send());
+
+    assert_eq!(title_set, true);
+}
+
+#[test]
+pub fn set_chat_description_works() {
+    let rutebot = common::create_client();
+    let chat_id = common::get_chat_id();
+    let request = SetChatDescription::new_description(chat_id, "new description");
+
+    let description_set = run_one(rutebot.prepare_api_request(request).send());
+
+    assert_eq!(description_set, true);
+}
+
+#[test]
+pub fn pin_chat_message_works() {
+    let rutebot = common::create_client();
+    let chat_id = common::get_chat_id();
+    let new_message: Message = run_one(rutebot.prepare_api_request(SendText::new(chat_id, "Some text")).send());
+    let request =
+        PinChatMessage {
+            disable_notification: true,
+            ..PinChatMessage::new(chat_id, new_message.message_id)
+        };
+
+    let pinned = run_one(rutebot.prepare_api_request(request).send());
+
+    assert_eq!(pinned, true);
+}
+
+#[test]
+pub fn unpin_chat_message_works() {
+    let rutebot = common::create_client();
+    let chat_id = common::get_chat_id();
+    let request = UnpinChatMessage::new(chat_id);
+
+    let pinned = run_one(rutebot.prepare_api_request(request).send());
+
+    assert_eq!(pinned, true);
+}
+
+#[test]
+pub fn get_chat_works() {
+    let rutebot = common::create_client();
+    let chat_id = common::get_chat_id();
+    let request = GetChat::new(chat_id);
+
+    let chat: Chat = run_one(rutebot.prepare_api_request(request).send());
+
+    assert_eq!(chat.id, chat_id);
+}
+
+#[test]
+pub fn get_chat_administrators_works() {
+    let rutebot = common::create_client();
+    let chat_id = common::get_chat_id();
+    let request = GetChatAdministrators::new(chat_id);
+
+    let chat: Vec<ChatMember> = run_one(rutebot.prepare_api_request(request).send());
+
+    assert_eq!(chat.len() > 0, true);
+}
+
+#[test]
+pub fn get_chat_members_count_works() {
+    let rutebot = common::create_client();
+    let chat_id = common::get_chat_id();
+    let request = GetChatMembersCount::new(chat_id);
+
+    let members_count: i64 = run_one(rutebot.prepare_api_request(request).send());
+
+    assert_eq!(members_count > 0, true);
+}
+
+#[test]
+pub fn edit_message_text_works() {
+    let rutebot = common::create_client();
+    let chat_id = common::get_chat_id();
+    let text_message: Message = run_one(rutebot.prepare_api_request(SendText::new(chat_id, "Some text")).send());
+    let edit_request = EditMessageText::new_message(chat_id, text_message.message_id, "new text");
+
+    if let EditedMessage::Message(message) = run_one(rutebot.prepare_api_request(edit_request).send()) {
+        assert_eq!(message.text.unwrap(), "new text");
+    } else {
+        panic!("Returned true.");
+    }
+}
+
+#[test]
+pub fn edit_message_caption_works() {
+    let rutebot = common::create_client();
+    let chat_id = common::get_chat_id();
+    let mut gif_content = Vec::new();
+    File::open("./tests/sample_gif.gif").unwrap().read_to_end(&mut gif_content).unwrap();
+    let request = SendAnimation {
+        width: Some(808),
+        height: Some(538),
+        caption: Some("old caption"),
+        ..SendAnimation::new(chat_id,
+                             FileKind::InputFile {
+                                 name: "supergif",
+                                 content: gif_content,
+                             })
+    };
+
+    let animation: Message = run_one(rutebot.prepare_api_request(request).send());
+    let edit_request = EditMessageCaption::new_message(chat_id, animation.message_id, "new caption");
+
+    if let EditedMessage::Message(message) = run_one(rutebot.prepare_api_request(edit_request).send()) {
+        assert_eq!(&message.caption.unwrap(), "new caption");
+    } else {
+        panic!("Returned true.");
+    }
+}
+
+#[test]
+pub fn edit_message_media_works() {
+    let rutebot = common::create_client();
+    let chat_id = common::get_chat_id();
+    let mut old_video = Vec::new();
+    let mut new_video = Vec::new();
+    File::open("./tests/sample_video_note.mp4").unwrap().read_to_end(&mut old_video).unwrap();
+    File::open("./tests/sample_video.mp4").unwrap().read_to_end(&mut new_video).unwrap();
+    let request =
+        SendVideo::new(chat_id,
+                       FileKind::InputFile {
+                           name: "supervideo",
+                           content: old_video,
+                       });
+    let response: Message = run_one(rutebot.prepare_api_request(request).send());
+    let edit_video = EditMessageMedia::new_message(chat_id, response.message_id, InputMedia::Video(InputMediaVideo::new(FileKind::InputFile {
+        name: "supervideo",
+        content: new_video,
+    })));
+
+    if let EditedMessage::Message(message) = run_one(rutebot.prepare_api_request(edit_video).send()) {
+        assert_eq!(message.video.is_some(), true);
+    } else {
+        panic!("Returned true.");
+    }
+}
+
+#[test]
+pub fn stop_poll_works() {
+    let rutebot = common::create_client();
+    let chat_id = common::get_chat_id();
+    let request = SendPoll::new(chat_id, "to be or not to be", &["to be", "do not to be", "see results"]);
+    let msg_with_poll: Message = run_one(rutebot.prepare_api_request(request).send());
+    let stop_poll_request = StopPoll::new(chat_id, msg_with_poll.message_id);
+
+    let response: Poll = run_one(rutebot.prepare_api_request(stop_poll_request).send());
+
+    assert_eq!(&response.question, "to be or not to be");
+}
+
+
+#[test]
+pub fn delete_message_works() {
+    let rutebot = common::create_client();
+    let chat_id = common::get_chat_id();
+    let response: Message = run_one(rutebot.prepare_api_request(SendText::new(chat_id, "Some text")).send());
+    let delete_message_request = DeleteMessage::new(chat_id, response.message_id);
+
+    let response: bool = run_one(rutebot.prepare_api_request(delete_message_request).send());
+
+    assert_eq!(response, true);
+}
 
 #[test]
 pub fn message_entity_values_extracted_correctly() {

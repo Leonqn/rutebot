@@ -21,7 +21,7 @@ pub enum InputMediaPhotoOrVideo<'a, 'b> {
 impl<'a, 'b> InputMediaPhotoOrVideo<'a, 'b> {
     fn contains_input_file(&self) -> bool {
         match &self {
-            InputMediaPhotoOrVideo::Video(_) => false,
+            InputMediaPhotoOrVideo::Video(x) => x.media.is_input_file(),
             InputMediaPhotoOrVideo::Photo(x) => x.media.is_input_file()
         }
     }
@@ -34,7 +34,7 @@ impl<'a, 'b> InputMediaPhotoOrVideo<'a, 'b> {
     }
 }
 
-/// Use this method to send a group of photos or videos as an album.
+/// Use this struct to send a group of photos or videos as an album.
 /// On success, an array of the sent `Messages` is returned.
 #[derive(Serialize, Debug, Clone)]
 pub struct SendMediaGroup<'a, 'b, 'c> {

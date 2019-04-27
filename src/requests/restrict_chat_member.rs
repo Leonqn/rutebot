@@ -4,7 +4,7 @@ use crate::requests::{ChatId, Request};
 
 /// Use this struct to restrict a user in a supergroup. The bot must be an administrator in
 /// the supergroup for this to work and must have the appropriate admin rights.
-/// Pass True for all boolean parameters to lift restrictions from a user. Returns True on success
+/// Pass True for all boolean parameters to lift restrictions from a user. Returns `True` on success
 #[derive(Serialize, Debug, Clone)]
 pub struct RestrictChatMember<'a> {
     /// Unique identifier for the target group or username of the target supergroup or channel

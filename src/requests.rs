@@ -93,6 +93,59 @@ pub mod export_chat_invite_link;
 /// Contains types for sending [setChatPhoto](https://core.telegram.org/bots/api#setchatphoto) request
 pub mod set_chat_photo;
 
+/// Contains types for sending [deleteChatPhoto](https://core.telegram.org/bots/api#deletechatphoto) request
+pub mod delete_chat_photo;
+
+/// Contains types for sending [setChatTitle](https://core.telegram.org/bots/api#setchattitle) request
+pub mod set_chat_title;
+
+/// Contains types for sending [setChatDescription](https://core.telegram.org/bots/api#setchatdescription) request
+pub mod set_chat_description;
+
+/// Contains types for sending [pinChatMessage](https://core.telegram.org/bots/api#pinchatmessage) request
+pub mod pin_chat_message;
+
+/// Contains types for sending [unpinChatMessage](https://core.telegram.org/bots/api#unpinchatmessage) request
+pub mod unpin_chat_message;
+
+/// Contains types for sending [leaveChat](https://core.telegram.org/bots/api#leavechat) request
+pub mod leave_chat;
+
+/// Contains types for sending [getChat](https://core.telegram.org/bots/api#getchat) request
+pub mod get_chat;
+
+/// Contains types for sending [getChatAdministrators](https://core.telegram.org/bots/api#getchatadministrators) request
+pub mod get_chat_administrators;
+
+/// Contains types for sending [getChatMembersCount](https://core.telegram.org/bots/api#getchatmemberscount) request
+pub mod get_chat_members_count;
+
+/// Contains types for sending [getChatMember](https://core.telegram.org/bots/api#getchatmember) request
+pub mod get_chat_member;
+
+/// Contains types for sending for [setChatStickerSet](https://core.telegram.org/bots/api#setchatstickerset) request
+pub mod set_chat_sticker_set;
+
+/// Contains types for sending [deleteChatStickerSet](https://core.telegram.org/bots/api#deletechatstickerset) request
+pub mod delete_chat_sticker_set;
+
+/// Contains types for sending [editMessageText](https://core.telegram.org/bots/api#editmessagetext) request
+pub mod edit_message_text;
+
+/// Contains types for sending [editMessageCaption](https://core.telegram.org/bots/api#editmessagecaption) request
+pub mod edit_message_caption;
+
+/// Contains types for sending [editMessageMedia](https://core.telegram.org/bots/api#editmessagemedia) request
+pub mod edit_message_media;
+
+/// Contains types for sending [editMessageReplyMarkup](https://core.telegram.org/bots/api#editmessagereplymarkup) request
+pub mod edit_message_reply_markup;
+
+/// Contains types for sending [stopPoll](https://core.telegram.org/bots/api#stoppoll) request
+pub mod stop_poll;
+
+/// Contains types for sending [deleteMessage](https://core.telegram.org/bots/api#deletemessage) request
+pub mod delete_message;
 
 /// Basic request type.
 pub trait Request: Serialize + Sized {
@@ -261,15 +314,158 @@ impl<'a, 'b> InputMediaVideo<'a, 'b> {
     }
 }
 
+/// Represents an animation file (GIF or H.264/MPEG-4 AVC video without sound) to be sent.
 #[derive(Serialize, Debug, Clone)]
-pub struct InputMediaAnimation {}
+pub struct InputMediaAnimation<'a, 'b> {
+    /// File to send
+    pub media: FileKind<'a>,
+
+    /// Caption of the animation to be sent, 0-1024 characters
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub caption: Option<&'b str>,
+
+    /// Send `ParseMode::Markdown` or `ParseMode::Html`,
+    /// if you want Telegram apps to show
+    /// [bold, italic, fixed-width text or inline URLs](https://core.telegram.org/bots/api#formatting-options) in the media caption.
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub parse_mode: Option<ParseMode>,
+
+    /// Animation duration
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub duration: Option<i64>,
+
+    /// Animation width
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub width: Option<i64>,
+
+    /// Animation height
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub height: Option<i64>,
+}
+
+impl<'a, 'b> InputMediaAnimation<'a, 'b> {
+    pub fn new(media: FileKind<'a>) -> Self {
+        Self {
+            media,
+            caption: None,
+            parse_mode: None,
+            duration: None,
+            width: None,
+            height: None,
+        }
+    }
+}
+
+/// Represents a general file to be sent.
+#[derive(Serialize, Debug, Clone)]
+pub struct InputMediaDocument<'a, 'b> {
+    /// File to send
+    pub media: FileKind<'a>,
+
+    /// Caption of the document to be sent, 0-1024 characters
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub caption: Option<&'b str>,
+
+    /// Send `ParseMode::Markdown` or `ParseMode::Html`,
+    /// if you want Telegram apps to show
+    /// [bold, italic, fixed-width text or inline URLs](https://core.telegram.org/bots/api#formatting-options) in the media caption.
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub parse_mode: Option<ParseMode>,
+}
+
+impl<'a, 'b> InputMediaDocument<'a, 'b> {
+    pub fn new(media: FileKind<'a>) -> Self {
+        Self {
+            media,
+            caption: None,
+            parse_mode: None,
+        }
+    }
+}
+
+/// Represents an audio file to be treated as music to be sent.
+#[derive(Serialize, Debug, Clone)]
+pub struct InputMediaAudio<'a, 'b, 'c, 'd> {
+    /// File to send
+    pub media: FileKind<'a>,
+
+    /// Caption of the audio to be sent, 0-1024 characters
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub caption: Option<&'b str>,
+
+    /// Send `ParseMode::Markdown` or `ParseMode::Html`,
+    /// if you want Telegram apps to show
+    /// [bold, italic, fixed-width text or inline URLs](https://core.telegram.org/bots/api#formatting-options) in the media caption.
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub parse_mode: Option<ParseMode>,
+
+    /// Duration of the audio in seconds
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub duration: Option<i64>,
+
+    /// Performer of the audio
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub performer: Option<&'c str>,
+
+    /// Title of the audio
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub title: Option<&'d str>,
+}
+
+impl<'a, 'b, 'c, 'd> InputMediaAudio<'a, 'b, 'c, 'd> {
+    pub fn new(media: FileKind<'a>) -> Self {
+        Self {
+            media,
+            caption: None,
+            parse_mode: None,
+            duration: None,
+            performer: None,
+            title: None,
+        }
+    }
+}
+
 
 #[derive(Serialize, Debug, Clone)]
-pub struct InputMediaDocument {}
+#[serde(tag = "type")]
+pub enum InputMedia<'a, 'b, 'c, 'd> {
+    #[serde(rename = "video")]
+    Video(InputMediaVideo<'a, 'b>),
 
-#[derive(Serialize, Debug, Clone)]
-pub struct InputMediaAudio {}
+    #[serde(rename = "photo")]
+    Photo(InputMediaPhoto<'a, 'b>),
 
+    #[serde(rename = "animation")]
+    Animation(InputMediaAnimation<'a, 'b>),
+
+    #[serde(rename = "document")]
+    Document(InputMediaDocument<'a, 'b>),
+
+    #[serde(rename = "audio")]
+    Audio(InputMediaAudio<'a, 'b, 'c, 'd>),
+}
+
+impl<'a, 'b, 'c, 'd> InputMedia<'a, 'b, 'c, 'd> {
+    fn get_file(self) -> FileKind<'a> {
+        match self {
+            InputMedia::Photo(x) => x.media,
+            InputMedia::Video(x) => x.media,
+            InputMedia::Animation(x) => x.media,
+            InputMedia::Document(x) => x.media,
+            InputMedia::Audio(x) => x.media,
+        }
+    }
+
+    fn contains_input_file(&self) -> bool {
+        match &self {
+            InputMedia::Video(x) => x.media.is_input_file(),
+            InputMedia::Photo(x) => x.media.is_input_file(),
+            InputMedia::Animation(x) => x.media.is_input_file(),
+            InputMedia::Document(x) => x.media.is_input_file(),
+            InputMedia::Audio(x) => x.media.is_input_file(),
+        }
+    }
+}
 
 /// Additional interface options
 #[derive(Serialize, Debug, Clone)]
@@ -390,7 +586,7 @@ pub enum ParseMode {
 
 #[serde(untagged)]
 #[derive(Serialize, Debug, Clone)]
-pub enum EditLocationIn<'a> {
+pub enum MessageOrInlineMessageId<'a> {
     Inline { inline_message_id: &'a str },
     Chat { chat_id: ChatId<'a>, message_id: i64 },
 }
