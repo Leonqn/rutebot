@@ -7,6 +7,9 @@
 Telegram bot api bindings for rust programming language. For details see [docs](https://docs.rs/rutebot)
 ## Example
 Simple echo bot. It listens all incoming messages and echos text messages, on other messages it replies with text "I can echo only text message".
+
+You can run the following example with `cargo run --example echobot`.
+
 ```rust
 use std::env;
 use hyper::rt::{Future, Stream};
