@@ -4,7 +4,7 @@
 [![Build Status](https://travis-ci.org/Leonqn/rutebot.svg?branch=master)](https://travis-ci.org/Leonqn/rutebot)
 
 # rutebot
-Ru~st~ Te~legram~ Bot. A framework offering [Telegram Bot API](https://core.telegram.org/bots/api) bindings for the Rust programming language.
+**Ru**st **Te**legram **Bot**. A framework offering [Telegram Bot API](https://core.telegram.org/bots/api) bindings for the Rust programming language.
 
 For details see the [docs](https://docs.rs/rutebot).
 
