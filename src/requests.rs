@@ -19,7 +19,7 @@ pub mod get_file;
 pub mod get_me;
 
 /// Contains types for sending [sendMessage](https://core.telegram.org/bots/api#sendMessage) request
-pub mod send_text;
+pub mod send_message;
 
 /// Contains types for sending [sendPhoto](https://core.telegram.org/bots/api#sendphoto) request
 pub mod send_document;

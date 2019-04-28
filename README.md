@@ -12,7 +12,7 @@ use hyper::rt::{Future, Stream};
 
 use rutebot::client::Rutebot;
 use rutebot::requests::get_updates::GetUpdates;
-use rutebot::requests::send_text::SendText;
+use rutebot::requests::send_message::SendMessage;
 use rutebot::responses::{Message, Update};
 
 fn main() {
@@ -29,11 +29,11 @@ fn main() {
                 match x {
                     Ok(Update { message: Some(Message { message_id, ref chat, text: Some(ref text), .. }), .. }) => {
                         let request =
-                            SendText::new_reply(chat.id, text, message_id);
+                            SendMessage::new_reply(chat.id, text, message_id);
                         Some(request)
                     }
                     Ok(Update { message: Some(Message { message_id, ref chat, .. }), .. }) => {
-                        let request = SendText::new_reply(chat.id, "This is not text...", message_id);
+                        let request = SendMessage::new_reply(chat.id, "This is not text...", message_id);
                         Some(request)
                     }
                     Err(e) => {
