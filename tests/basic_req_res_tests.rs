@@ -1,11 +1,9 @@
-use std::fs::File;
-use std::io::Read;
-
 use futures::future::Future;
 use pretty_assertions::assert_eq;
 
 use rutebot::requests::{FileKind, InlineKeyboard, InlineKeyboardButton, InputMedia, InputMediaPhoto, InputMediaVideo, ParseMode, ReplyMarkup};
 use rutebot::requests::delete_chat_photo::DeleteChatPhoto;
+use rutebot::requests::delete_message::DeleteMessage;
 use rutebot::requests::edit_live_location::EditLiveLocation;
 use rutebot::requests::edit_message_caption::EditMessageCaption;
 use rutebot::requests::edit_message_media::EditMessageMedia;
@@ -14,6 +12,7 @@ use rutebot::requests::export_chat_invite_link::ExportChatInviteLink;
 use rutebot::requests::forward_message::ForwardMessage;
 use rutebot::requests::get_chat::GetChat;
 use rutebot::requests::get_chat_administrators::GetChatAdministrators;
+use rutebot::requests::get_chat_members_count::GetChatMembersCount;
 use rutebot::requests::get_file::GetFile;
 use rutebot::requests::get_me::GetMe;
 use rutebot::requests::get_updates::GetUpdates;
@@ -37,13 +36,14 @@ use rutebot::requests::set_chat_description::SetChatDescription;
 use rutebot::requests::set_chat_photo::SetChatPhoto;
 use rutebot::requests::set_chat_title::SetChatTitle;
 use rutebot::requests::stop_live_location::StopLiveLocation;
+use rutebot::requests::stop_poll::StopPoll;
 use rutebot::requests::unpin_chat_message::UnpinChatMessage;
 use rutebot::responses::{Audio, Chat, ChatMember, Contact, Document, EditedMessage, Message, MessageEntityValue, Poll, Update, User, UserProfilePhotos, Venue, Video, VideoNote, Voice};
+use std::fs::File;
+use std::io::Read;
+use std::time::Instant;
 
 use crate::common::run_one;
-use rutebot::requests::stop_poll::StopPoll;
-use rutebot::requests::delete_message::DeleteMessage;
-use rutebot::requests::get_chat_members_count::GetChatMembersCount;
 
 mod common;
 
@@ -417,7 +417,8 @@ pub fn set_chat_title_works() {
 pub fn set_chat_description_works() {
     let rutebot = common::create_client();
     let chat_id = common::get_chat_id();
-    let request = SetChatDescription::new_description(chat_id, "new description");
+    let new_description = format!("new description. {:?}", Instant::now());
+    let request = SetChatDescription::new_description(chat_id, &new_description);
 
     let description_set = run_one(rutebot.prepare_api_request(request).send());
 
