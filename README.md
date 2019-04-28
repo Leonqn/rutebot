@@ -4,9 +4,13 @@
 [![Build Status](https://travis-ci.org/Leonqn/rutebot.svg?branch=master)](https://travis-ci.org/Leonqn/rutebot)
 
 # rutebot
-Telegram bot api bindings for rust programming language. For details see [docs](https://docs.rs/rutebot)
+Ru~st~ Te~legram~ Bot. A framework offering [Telegram Bot API](https://core.telegram.org/bots/api) bindings for the Rust programming language.
+
+For details see the [docs](https://docs.rs/rutebot).
+
 ## Example
-Simple echo bot. It listens all incoming messages and echos text messages, on other messages it replies with text "I can echo only text message".
+A simple echo bot. Replies to text messages by echoing the message. Responds to other types of messages with "This is not text...".
+
 ```rust
 use hyper::rt::{Future, Stream};
 
