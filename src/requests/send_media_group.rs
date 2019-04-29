@@ -68,7 +68,7 @@ impl<'a, 'b, 'c> Request for SendMediaGroup<'a, 'b, 'c> {
         self,
         request_builder: hyper::http::request::Builder,
     ) -> Result<hyper::http::request::Request<Body>, Error> {
-        if self.media.iter().any(|x| x.contains_input_file()) {
+        if self.media.iter().any(InputMediaPhotoOrVideo::contains_input_file) {
             let mut form = Form::default();
             add_fields_to_form(&mut form, &self)?;
             for media in self.media.into_iter() {

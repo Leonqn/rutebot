@@ -16,8 +16,8 @@ use crate::requests::GetUpdates;
 use crate::responses::{TgResponse, Update};
 use crate::updates_pool_stream::UpdatesPoolStream;
 
-const BASE_API_URI: &'static str = "https://api.telegram.org/bot";
-const GET_FILE_URI: &'static str = "https://api.telegram.org/file/bot";
+const BASE_API_URI: &str = "https://api.telegram.org/bot";
+const GET_FILE_URI: &str = "https://api.telegram.org/file/bot";
 
 #[derive(Clone)]
 struct Inner {
@@ -79,7 +79,7 @@ impl<TResponse: DeserializeOwned> ApiRequest<TResponse> {
                             ..
                         } => Err(Error::Api {
                             error_code: error_code.unwrap_or(0),
-                            description: description.unwrap_or("Unknown error".to_string()),
+                            description: description.unwrap_or_else(|| "Unknown error".to_string()),
                             parameters,
                         }),
                     }
@@ -177,7 +177,7 @@ impl Rutebot {
                                 error_code: response.error_code.unwrap_or(0),
                                 description: response
                                     .description
-                                    .unwrap_or("Unknown error".to_string()),
+                                    .unwrap_or_else(|| "Unknown error".to_string()),
                                 parameters: response.parameters,
                             })
                         }
@@ -219,7 +219,7 @@ impl Rutebot {
                 offset: x,
                 limit,
                 timeout,
-                allowed_updates: allowed_updates.as_ref().map(|x| x.as_slice()),
+                allowed_updates: allowed_updates.as_ref().map(Vec::as_slice),
             };
             self_1.prepare_api_request(request).send()
         };

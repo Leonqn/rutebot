@@ -5,7 +5,7 @@ use crate::responses::User;
 
 /// A simple struct for testing your bot's auth token. Requires no parameters.
 /// Returns basic information about the bot in form of a `User` object.
-#[derive(Serialize, Debug, Clone, Copy)]
+#[derive(Serialize, Debug, Clone, Copy, Default)]
 pub struct GetMe;
 
 impl Request for GetMe {

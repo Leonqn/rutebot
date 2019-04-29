@@ -4,7 +4,7 @@ use crate::requests::Request;
 use crate::responses::Update;
 
 /// Use this struct to receive incoming updates using long polling. An Array of `Update` objects is returned.
-#[derive(Serialize, Debug, Clone)]
+#[derive(Serialize, Debug, Clone, Default)]
 pub struct GetUpdates<'a> {
     /// Identifier of the first update to be returned. Must be greater by one than the highest
     /// among the identifiers of previously received updates.
