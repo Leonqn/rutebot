@@ -85,7 +85,7 @@ pub mod requests;
 /// Errors definitions
 pub mod error;
 
-mod updates_poll_stream;
+mod updates_pool_stream;
 
 #[cfg(test)]
 mod tests {}
