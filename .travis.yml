@@ -1,3 +1,7 @@
 language: rust
 rust:
   - stable
+
+script:
+  - cargo fmt -- --check
+  - cargo test --verbose
