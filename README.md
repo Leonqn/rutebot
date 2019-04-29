@@ -1,12 +1,16 @@
-[![License MIT](https://img.shields.io/badge/license-MIT-blue.svg)](https://github.com/Leonqn/rutebot/LICENSE)
+# rutebot
+[![Build Status](https://travis-ci.org/Leonqn/rutebot.svg?branch=master)](https://travis-ci.org/Leonqn/rutebot)
 [![Crates.io](https://img.shields.io/crates/v/rutebot.svg)](https://crates.io/crates/rutebot)
 [![doc.rs](https://docs.rs/rutebot/badge.svg)](https://docs.rs/rutebot)
-[![Build Status](https://travis-ci.org/Leonqn/rutebot.svg?branch=master)](https://travis-ci.org/Leonqn/rutebot)
+[![License MIT](https://img.shields.io/badge/license-MIT-blue.svg)](https://github.com/Leonqn/rutebot/LICENSE)
 
-# rutebot
-Telegram bot api bindings for rust programming language. For details see [docs](https://docs.rs/rutebot)
+**Ru**st **Te**legram **Bot**. A framework offering [Telegram Bot API](https://core.telegram.org/bots/api) bindings for the Rust programming language.
+
+For details see the [docs](https://docs.rs/rutebot).
+
 ## Example
-Simple echo bot. It listens all incoming messages and echos text messages, on other messages it replies with text "I can echo only text message".
+A simple echo bot. Replies to text messages by echoing the message. Responds to other types of messages with "This is not text...".
+
 ```rust
 use hyper::rt::{Future, Stream};
 
