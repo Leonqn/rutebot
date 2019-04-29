@@ -42,7 +42,7 @@ impl<TResponse: DeserializeOwned> ApiRequest<TResponse> {
     /// Send request to telegram bot api.
     /// ## Example
     /// ```
-    /// # use rutebot::requests::get_updates::{AllowedUpdate, GetUpdates};
+    /// # use rutebot::requests::{AllowedUpdate, GetUpdates};
     /// # fn main() {
     /// # let bot = rutebot::client::Rutebot::new("token");
     /// # let allowed_updates = [AllowedUpdate::Message];
@@ -102,7 +102,7 @@ impl Rutebot {
     /// ## Example
     /// Prepare request to recieve all unconfirmed messages. After creating request you can send it by method `send()`
     /// ```
-    /// # use rutebot::requests::get_updates::{AllowedUpdate, GetUpdates};
+    /// # use rutebot::requests::{AllowedUpdate, GetUpdates};
     /// # fn main() {
     /// let bot = rutebot::client::Rutebot::new("token");
     /// let allowed_updates = [AllowedUpdate::Message];
@@ -134,7 +134,7 @@ impl Rutebot {
     /// ```
     /// # use futures::future::Future;
     ///
-    /// # use rutebot::requests::get_file::GetFile;
+    /// # use rutebot::requests::GetFile;
     /// # fn main() {
     /// let bot = rutebot::client::Rutebot::new("token");
     /// let get_file = GetFile::new("file-id");
@@ -178,7 +178,7 @@ impl Rutebot {
     /// ```
     /// # use futures::future::Future;
     /// # use futures::stream::Stream;
-    /// # use rutebot::requests::get_updates::{AllowedUpdate, GetUpdates};
+    /// # use rutebot::requests::{AllowedUpdate, GetUpdates};
     /// # fn main() {
     /// let bot = rutebot::client::Rutebot::new("token");
     /// let allowed_updates = [AllowedUpdate::Message];
