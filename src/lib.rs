@@ -4,19 +4,18 @@
 //! # Example
 //! Simple echo bot. It listens all incoming messages and echos text messages, on other messages it replies with text "I can echo only text message".
 //! ```no_run
-//! use std::env;
 //! use hyper::rt::{Future, Stream};
+//! use std::env;
 //! 
 //! use rutebot::client::Rutebot;
-//! use rutebot::requests::get_updates::GetUpdates;
-//! use rutebot::requests::send_text::SendText;
+//! use rutebot::requests::{GetUpdates, SendText};
 //! use rutebot::responses::{Message, Update};
 //! 
 //! fn main() {
 //!     let token_env = env::var_os("TELEGRAM_TOKEN")
 //!         .expect("Please specify your bot's token in the TELEGRAM_TOKEN environment variable.");
 //!     let token = token_env.to_string_lossy();
-//!     
+//! 
 //!     let rutebot = Rutebot::new(token);
 //!     let get_updates = GetUpdates {
 //!         timeout: Some(20),
