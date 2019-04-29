@@ -9,7 +9,7 @@
 For details see the [docs](https://docs.rs/rutebot).
 
 ## Example
-A simple echo bot. Replies to text messages by echoing the message. Responds to other types of messages with "This is not text...".
+A simple echo bot. Replies to text messages by echoing the message. Responds to other types of messages with "This is not text..."
 
 You can run the following example with `cargo run --example echobot`.
 
