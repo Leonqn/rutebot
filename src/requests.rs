@@ -18,8 +18,8 @@ pub use get_file::*;
 mod get_me;
 pub use get_me::*;
 
-mod send_text;
-pub use send_text::*;
+mod send_message;
+pub use send_message::*;
 
 mod send_document;
 pub use send_document::*;
