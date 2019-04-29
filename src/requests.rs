@@ -21,10 +21,10 @@ pub mod get_me;
 /// Contains types for sending [sendMessage](https://core.telegram.org/bots/api#sendMessage) request
 pub mod send_text;
 
-/// Contains types for sending [sendPhoto](https://core.telegram.org/bots/api#sendphoto) request
+/// Contains types for sending [sendDocument](https://core.telegram.org/bots/api#senddocument) request
 pub mod send_document;
 
-/// Contains types for sending [sendDocument](https://core.telegram.org/bots/api#senddocument) request
+/// Contains types for sending [sendPhoto](https://core.telegram.org/bots/api#sendphoto) request
 pub mod send_photo;
 
 /// Contains types for sending [sendAudio](https://core.telegram.org/bots/api#sendaudio) request
@@ -153,12 +153,18 @@ pub trait Request: Serialize + Sized {
 
     fn method(&self) -> &'static str;
 
-    fn set_http_request_body(self, request_builder: hyper::http::request::Builder) -> Result<hyper::http::request::Request<Body>, Error> {
+    fn set_http_request_body(
+        self,
+        request_builder: hyper::http::request::Builder,
+    ) -> Result<hyper::http::request::Request<Body>, Error> {
         add_json_body(request_builder, &self)
     }
 }
 
-pub(crate) fn add_json_body<S: Serialize + Sized>(mut request_builder: hyper::http::request::Builder, serializable: &S) -> Result<hyper::http::request::Request<Body>, Error> {
+pub(crate) fn add_json_body<S: Serialize + Sized>(
+    mut request_builder: hyper::http::request::Builder,
+    serializable: &S,
+) -> Result<hyper::http::request::Request<Body>, Error> {
     let json_bytes = serde_json::to_vec(serializable).map_err(Error::Serde)?;
     request_builder
         .header("content-type", "application/json")
@@ -166,18 +172,24 @@ pub(crate) fn add_json_body<S: Serialize + Sized>(mut request_builder: hyper::ht
         .map_err(|x| Error::RequestBuild(x.description().to_string()))
 }
 
-pub(crate) fn add_form_body(mut request_builder: hyper::http::request::Builder, form: Form<'static>) -> Result<hyper::http::request::Request<Body>, Error> {
+pub(crate) fn add_form_body(
+    mut request_builder: hyper::http::request::Builder,
+    form: Form<'static>,
+) -> Result<hyper::http::request::Request<Body>, Error> {
     form.set_body_convert::<hyper::Body, multipart::Body>(&mut request_builder)
         .map_err(|x| Error::RequestBuild(x.description().to_string()))
 }
 
-pub(crate) fn add_fields_to_form<S: Serialize + Sized>(form: &mut Form<'static>, serializable: &S) -> Result<(), Error> {
+pub(crate) fn add_fields_to_form<S: Serialize + Sized>(
+    form: &mut Form<'static>,
+    serializable: &S,
+) -> Result<(), Error> {
     let json = serde_json::to_value(serializable).map_err(Error::Serde)?;
     if let Value::Object(map) = json {
         for (k, v) in map {
             match v {
                 Value::String(s) => form.add_text(k, s),
-                other => form.add_text(k, other.to_string())
+                other => form.add_text(k, other.to_string()),
             }
         }
     }
@@ -214,7 +226,11 @@ impl<'a> FileKind<'a> {
         }
     }
 
-    pub(crate) fn serialize_attach<S: Serializer>(field0: &str, _: &[u8], s: S) -> Result<S::Ok, S::Error> {
+    pub(crate) fn serialize_attach<S: Serializer>(
+        field0: &str,
+        _: &[u8],
+        s: S,
+    ) -> Result<S::Ok, S::Error> {
         s.serialize_str(&format!("attach://{}", field0))
     }
 }
@@ -425,7 +441,6 @@ impl<'a, 'b, 'c, 'd> InputMediaAudio<'a, 'b, 'c, 'd> {
     }
 }
 
-
 #[derive(Serialize, Debug, Clone)]
 #[serde(tag = "type")]
 pub enum InputMedia<'a, 'b, 'c, 'd> {
@@ -482,7 +497,7 @@ pub enum ReplyMarkup<'a, 'b, 'c> {
 #[derive(Serialize, Debug, Clone)]
 pub struct InlineKeyboard<'a, 'b, 'c> {
     /// Array of button rows, each represented by an Array of `InlineKeyboardButton` objects
-    pub inline_keyboard: &'c [Vec<InlineKeyboardButton<'a, 'b>>]
+    pub inline_keyboard: &'c [Vec<InlineKeyboardButton<'a, 'b>>],
 }
 
 /// This object represents a custom keyboard with reply options.
@@ -575,7 +590,7 @@ pub enum InlineKeyboardButton<'a, 'b> {
 #[serde(untagged)]
 pub enum KeyboardButton<'a> {
     /// Text of the button. It will be sent as a message when the button is pressed
-    Text(&'a str)
+    Text(&'a str),
 }
 
 #[derive(Serialize, Debug, Clone, Copy)]
@@ -587,6 +602,11 @@ pub enum ParseMode {
 #[serde(untagged)]
 #[derive(Serialize, Debug, Clone)]
 pub enum MessageOrInlineMessageId<'a> {
-    Inline { inline_message_id: &'a str },
-    Chat { chat_id: ChatId<'a>, message_id: i64 },
+    Inline {
+        inline_message_id: &'a str,
+    },
+    Chat {
+        chat_id: ChatId<'a>,
+        message_id: i64,
+    },
 }

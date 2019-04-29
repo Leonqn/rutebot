@@ -14,7 +14,7 @@ use crate::error::Error;
 use crate::requests;
 use crate::requests::get_updates::GetUpdates;
 use crate::responses::{TgResponse, Update};
-use crate::updates_poll_stream::UpdatesPoolStream;
+use crate::updates_pool_stream::UpdatesPoolStream;
 
 const BASE_API_URI: &'static str = "https://api.telegram.org/bot";
 const GET_FILE_URI: &'static str = "https://api.telegram.org/file/bot";
