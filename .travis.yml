@@ -3,10 +3,10 @@ rust:
   - stable
 
 # For why not to use `cache: cargo`, see https://levans.fr/rust_travis_cache.html.
-# Added target/debug/ subfolders, since for now they are not too big.
+# Added .cargo/bin and target/debug/'s subfolders, since for now they are not too big.
 cache:
   directories:
-    - $HOME/.cargo
+    - $HOME/.cargo/bin
     - $TRAVIS_BUILD_DIR/target/debug/.fingerprint
     - $TRAVIS_BUILD_DIR/target/debug/build
     - $TRAVIS_BUILD_DIR/target/debug/deps
