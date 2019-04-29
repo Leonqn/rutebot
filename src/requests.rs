@@ -4,7 +4,7 @@ use std::ops::Not;
 use hyper::Body;
 use hyper_multipart_rfc7578::client::multipart;
 use hyper_multipart_rfc7578::client::multipart::Form;
-use serde::{Serialize, Serializer};
+use serde::{Serialize, Serializer, Deserialize};
 use serde_json::Value;
 
 use crate::error::Error;
@@ -146,10 +146,11 @@ pub use stop_poll::*;
 
 mod delete_message;
 pub use delete_message::*;
+use serde::de::DeserializeOwned;
 
 /// Basic request type.
 pub trait Request: Serialize + Sized {
-    type ResponseType;
+    type ResponseType: DeserializeOwned + Send + Sync;
 
     fn method(&self) -> &'static str;
 

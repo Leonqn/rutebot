@@ -32,13 +32,13 @@ pub struct Rutebot {
 }
 
 /// Represents ready request to telegram bot api.
-pub struct ApiRequest<TResponse: DeserializeOwned> {
+pub struct ApiRequest<TResponse: DeserializeOwned + Send + Sync> {
     inner: Arc<Inner>,
     http_request: Result<Request<Body>, Error>,
     _data: PhantomData<TResponse>,
 }
 
-impl<TResponse: DeserializeOwned> ApiRequest<TResponse> {
+impl<TResponse: DeserializeOwned + Send + Sync> ApiRequest<TResponse> {
     /// Send request to telegram bot api.
     /// ## Example
     /// ```
@@ -123,7 +123,7 @@ impl Rutebot {
     ) -> ApiRequest<TResponse>
     where
         TRequest: requests::Request<ResponseType = TResponse>,
-        TResponse: DeserializeOwned,
+        TResponse: DeserializeOwned + Send + Sync,
     {
         let uri = format!("{}{}/{}", BASE_API_URI, self.inner.token, request.method());
         let http_request = request.set_http_request_body(Request::post(uri));
