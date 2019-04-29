@@ -2,6 +2,10 @@ language: rust
 rust:
   - stable
 
+install:
+  - cargo build --verbose
+  - rustup component add rustfmt
+
 script:
   - cargo fmt -- --check
   - cargo test --verbose
