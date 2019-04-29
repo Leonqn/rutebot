@@ -9,187 +9,141 @@ use serde_json::Value;
 
 use crate::error::Error;
 
-/// Contains types for sending [getUpdates](https://core.telegram.org/bots/api#getupdates) request
 mod get_updates;
 pub use get_updates::*;
 
-/// Contains types for sending [getFile](https://core.telegram.org/bots/api#getfile) request
 mod get_file;
 pub use get_file::*;
 
-/// Contains types for sending [getMe](https://core.telegram.org/bots/api#getMe) request
 mod get_me;
 pub use get_me::*;
 
-/// Contains types for sending [sendMessage](https://core.telegram.org/bots/api#sendMessage) request
 mod send_text;
 pub use send_text::*;
 
-/// Contains types for sending [sendDocument](https://core.telegram.org/bots/api#senddocument) request
 mod send_document;
 pub use send_document::*;
 
-/// Contains types for sending [sendPhoto](https://core.telegram.org/bots/api#sendphoto) request
 mod send_photo;
 pub use send_photo::*;
 
-/// Contains types for sending [sendAudio](https://core.telegram.org/bots/api#sendaudio) request
 mod send_audio;
 pub use send_audio::*;
 
-/// Contains types for sending [sendVideo](https://core.telegram.org/bots/api#sendvideo) request
 mod send_video;
 pub use send_video::*;
 
-/// Contains types for sending [sendAnimation](https://core.telegram.org/bots/api#sendanimation) request
 mod send_animation;
 pub use send_animation::*;
 
-/// Contains types for sending [sendVoice](https://core.telegram.org/bots/api#sendvoice) request
 mod send_voice;
 pub use send_voice::*;
 
-/// Contains types for sending [sendVideoNote](https://core.telegram.org/bots/api#sendvideonote) request
 mod send_video_note;
 pub use send_video_note::*;
 
-/// Contains types for sending [sendMediaGroup](https://core.telegram.org/bots/api#sendmediagroup) request
 mod send_media_group;
 pub use send_media_group::*;
 
-/// Contains types for sending [sendLocation](https://core.telegram.org/bots/api#sendlocation) request
 mod send_location;
 pub use send_location::*;
 
-/// Contains types for sending [editMessageLiveLocation](https://core.telegram.org/bots/api#editmessagelivelocation) request
 mod edit_live_location;
 pub use edit_live_location::*;
 
-/// Contains types for sending [stopMessageLiveLocation](https://core.telegram.org/bots/api#stopmessagelivelocation) request
 mod stop_live_location;
 pub use stop_live_location::*;
 
-/// Contains types for sending [sendVenue](https://core.telegram.org/bots/api#sendvenue) request
 mod send_venue;
 pub use send_venue::*;
 
-/// Contains types for sending [sendContact](https://core.telegram.org/bots/api#sendcontact) request
 mod send_contact;
 pub use send_contact::*;
 
-/// Contains types for sending [sendPoll](https://core.telegram.org/bots/api#sendpoll) request
 mod send_poll;
 pub use send_poll::*;
 
-/// Contains types for sending [sendChatAction](https://core.telegram.org/bots/api#sendchataction) request
 mod send_chat_action;
 pub use send_chat_action::*;
 
-/// Contains types for sending [answerCallbackQuery](https://core.telegram.org/bots/api#answercallbackquery) request
 mod answer_callback_query;
 pub use answer_callback_query::*;
 
-/// Contains types for sending [forwardMessage](https://core.telegram.org/bots/api#forwardmessage) request
 mod forward_message;
 pub use forward_message::*;
 
-/// Contains types for sending [getUserProfilePhotos](https://core.telegram.org/bots/api#getuserprofilephotos)
 mod get_user_profile_photos;
 pub use get_user_profile_photos::*;
 
-/// Contains types for sending [restrictChatMember](https://core.telegram.org/bots/api#restrictchatmember) request
 mod restrict_chat_member;
 pub use restrict_chat_member::*;
 
-/// Contains types for sending [unbanChatMember](https://core.telegram.org/bots/api#unbanchatmember) request
 mod unban_chat_member;
 pub use unban_chat_member::*;
 
-/// Contains types for sending [kickChatMember](https://core.telegram.org/bots/api#kickchatmember) request
 mod kick_chat_member;
 pub use kick_chat_member::*;
 
-/// Contains types for sending [promoteChatMember](https://core.telegram.org/bots/api#promotechatmember) request
 mod promote_chat_member;
 pub use promote_chat_member::*;
 
-/// Contains types for sending [exportChatInviteLink](https://core.telegram.org/bots/api#exportchatinvitelink) request
 mod export_chat_invite_link;
 pub use export_chat_invite_link::*;
 
-/// Contains types for sending [setChatPhoto](https://core.telegram.org/bots/api#setchatphoto) request
 mod set_chat_photo;
 pub use set_chat_photo::*;
 
-/// Contains types for sending [deleteChatPhoto](https://core.telegram.org/bots/api#deletechatphoto) request
 mod delete_chat_photo;
 pub use delete_chat_photo::*;
 
-/// Contains types for sending [setChatTitle](https://core.telegram.org/bots/api#setchattitle) request
 mod set_chat_title;
 pub use set_chat_title::*;
 
-/// Contains types for sending [setChatDescription](https://core.telegram.org/bots/api#setchatdescription) request
 mod set_chat_description;
 pub use set_chat_description::*;
 
-/// Contains types for sending [pinChatMessage](https://core.telegram.org/bots/api#pinchatmessage) request
 mod pin_chat_message;
 pub use pin_chat_message::*;
 
-/// Contains types for sending [unpinChatMessage](https://core.telegram.org/bots/api#unpinchatmessage) request
 mod unpin_chat_message;
 pub use unpin_chat_message::*;
 
-/// Contains types for sending [leaveChat](https://core.telegram.org/bots/api#leavechat) request
 mod leave_chat;
 pub use leave_chat::*;
 
-/// Contains types for sending [getChat](https://core.telegram.org/bots/api#getchat) request
 mod get_chat;
 pub use get_chat::*;
 
-/// Contains types for sending [getChatAdministrators](https://core.telegram.org/bots/api#getchatadministrators) request
 mod get_chat_administrators;
 pub use get_chat_administrators::*;
 
-/// Contains types for sending [getChatMembersCount](https://core.telegram.org/bots/api#getchatmemberscount) request
 mod get_chat_members_count;
 pub use get_chat_members_count::*;
 
-/// Contains types for sending [getChatMember](https://core.telegram.org/bots/api#getchatmember) request
 mod get_chat_member;
 pub use get_chat_member::*;
 
-/// Contains types for sending for [setChatStickerSet](https://core.telegram.org/bots/api#setchatstickerset) request
 mod set_chat_sticker_set;
 pub use set_chat_sticker_set::*;
 
-/// Contains types for sending [deleteChatStickerSet](https://core.telegram.org/bots/api#deletechatstickerset) request
 mod delete_chat_sticker_set;
 pub use delete_chat_sticker_set::*;
 
-/// Contains types for sending [editMessageText](https://core.telegram.org/bots/api#editmessagetext) request
 mod edit_message_text;
 pub use edit_message_text::*;
 
-/// Contains types for sending [editMessageCaption](https://core.telegram.org/bots/api#editmessagecaption) request
 mod edit_message_caption;
 pub use edit_message_caption::*;
 
-/// Contains types for sending [editMessageMedia](https://core.telegram.org/bots/api#editmessagemedia) request
 mod edit_message_media;
 pub use edit_message_media::*;
 
-/// Contains types for sending [editMessageReplyMarkup](https://core.telegram.org/bots/api#editmessagereplymarkup) request
 mod edit_message_reply_markup;
 pub use edit_message_reply_markup::*;
 
-/// Contains types for sending [stopPoll](https://core.telegram.org/bots/api#stoppoll) request
 mod stop_poll;
 pub use stop_poll::*;
 
-/// Contains types for sending [deleteMessage](https://core.telegram.org/bots/api#deletemessage) request
 mod delete_message;
 pub use delete_message::*;
 
