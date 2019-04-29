@@ -67,7 +67,7 @@ impl<'a> PromoteChatMember<'a> {
             can_invite_users: None,
             can_restrict_members: None,
             can_pin_messages: None,
-            can_promote_members: None
+            can_promote_members: None,
         }
     }
 }

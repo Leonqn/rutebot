@@ -5,9 +5,9 @@ use futures::Async;
 use futures::Future;
 use futures::Stream;
 
-use std::i64;
 use crate::error::Error;
 use crate::responses::Update;
+use std::i64;
 
 pub struct UpdatesPoolStream<Fut, Sender> {
     pub send_request: Sender,
@@ -19,8 +19,10 @@ pub struct UpdatesPoolStream<Fut, Sender> {
 }
 
 impl<Fut, Sender> Stream for UpdatesPoolStream<Fut, Sender>
-    where Fut: Future<Item=Vec<Update>, Error=Error>,
-          Sender: Fn(Option<i64>) -> Fut {
+where
+    Fut: Future<Item = Vec<Update>, Error = Error>,
+    Sender: Fn(Option<i64>) -> Fut,
+{
     type Item = Update;
     type Error = Error;
 
@@ -36,8 +38,7 @@ impl<Fut, Sender> Stream for UpdatesPoolStream<Fut, Sender>
             self.executing_request = (self.send_request)(self.last_id)
         }
         match self.executing_request.poll() {
-            Ok(Async::NotReady) =>
-                Ok(Async::NotReady),
+            Ok(Async::NotReady) => Ok(Async::NotReady),
 
             Ok(Async::Ready(updates)) => {
                 let last_id = self.last_id.unwrap_or(-1);

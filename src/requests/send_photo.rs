@@ -6,7 +6,10 @@ use hyper_multipart_rfc7578::client::multipart::Form;
 use serde::Serialize;
 
 use crate::error::Error;
-use crate::requests::{add_fields_to_form, add_form_body, add_json_body, ChatId, FileKind, ParseMode, ReplyMarkup, Request};
+use crate::requests::{
+    add_fields_to_form, add_form_body, add_json_body, ChatId, FileKind, ParseMode, ReplyMarkup,
+    Request,
+};
 use crate::responses::Message;
 
 /// Use this struct to send photos. On success, the sent `Message` is returned.
@@ -43,7 +46,6 @@ pub struct SendPhoto<'a, 'b, 'c, 'd, 'e, 'f> {
     pub reply_markup: Option<ReplyMarkup<'d, 'e, 'f>>,
 }
 
-
 impl<'a, 'b, 'c, 'd, 'e, 'f> Request for SendPhoto<'a, 'b, 'c, 'd, 'e, 'f> {
     type ResponseType = Message;
 
@@ -51,7 +53,10 @@ impl<'a, 'b, 'c, 'd, 'e, 'f> Request for SendPhoto<'a, 'b, 'c, 'd, 'e, 'f> {
         "sendPhoto"
     }
 
-    fn set_http_request_body(self, request_builder: hyper::http::request::Builder) -> Result<hyper::http::request::Request<Body>, Error> {
+    fn set_http_request_body(
+        self,
+        request_builder: hyper::http::request::Builder,
+    ) -> Result<hyper::http::request::Request<Body>, Error> {
         if self.photo.is_input_file() {
             let mut form = Form::default();
             add_fields_to_form(&mut form, &self)?;
@@ -78,7 +83,11 @@ impl<'a, 'b, 'c, 'd, 'e, 'f, 'g> SendPhoto<'a, 'b, 'c, 'd, 'e, 'f> {
         }
     }
 
-    pub fn new_reply(chat_id: impl Into<ChatId<'a>>, photo: FileKind<'b>, reply_to_message_id: i64) -> Self {
+    pub fn new_reply(
+        chat_id: impl Into<ChatId<'a>>,
+        photo: FileKind<'b>,
+        reply_to_message_id: i64,
+    ) -> Self {
         Self {
             chat_id: chat_id.into(),
             photo,

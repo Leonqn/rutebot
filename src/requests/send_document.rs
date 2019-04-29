@@ -6,7 +6,10 @@ use hyper_multipart_rfc7578::client::multipart::Form;
 use serde::Serialize;
 
 use crate::error::Error;
-use crate::requests::{add_fields_to_form, add_form_body, add_json_body, ChatId, FileKind, ParseMode, ReplyMarkup, Request};
+use crate::requests::{
+    add_fields_to_form, add_form_body, add_json_body, ChatId, FileKind, ParseMode, ReplyMarkup,
+    Request,
+};
 use crate::responses::Message;
 
 /// Use this struct to send general files. On success, the sent `Message` is returned.
@@ -44,7 +47,6 @@ pub struct SendDocument<'a, 'b, 'c, 'd, 'e, 'g> {
     pub reply_markup: Option<ReplyMarkup<'c, 'd, 'e>>,
 }
 
-
 impl<'a, 'b, 'c, 'd, 'e, 'g> Request for SendDocument<'a, 'b, 'c, 'd, 'e, 'g> {
     type ResponseType = Message;
 
@@ -52,7 +54,10 @@ impl<'a, 'b, 'c, 'd, 'e, 'g> Request for SendDocument<'a, 'b, 'c, 'd, 'e, 'g> {
         "sendDocument"
     }
 
-    fn set_http_request_body(self, request_builder: hyper::http::request::Builder) -> Result<hyper::http::request::Request<Body>, Error> {
+    fn set_http_request_body(
+        self,
+        request_builder: hyper::http::request::Builder,
+    ) -> Result<hyper::http::request::Request<Body>, Error> {
         if self.document.is_input_file() {
             let mut form = Form::default();
             add_fields_to_form(&mut form, &self)?;
@@ -80,7 +85,11 @@ impl<'a, 'b, 'c, 'd, 'e, 'g> SendDocument<'a, 'b, 'c, 'd, 'e, 'g> {
         }
     }
 
-    pub fn new_reply(chat_id: impl Into<ChatId<'a>>, document: FileKind<'b>, reply_to_message_id: i64) -> Self {
+    pub fn new_reply(
+        chat_id: impl Into<ChatId<'a>>,
+        document: FileKind<'b>,
+        reply_to_message_id: i64,
+    ) -> Self {
         Self {
             chat_id: chat_id.into(),
             document,

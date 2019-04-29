@@ -36,7 +36,10 @@ impl<'a, 'd, 'e, 'f> StopLiveLocation<'a, 'd, 'e, 'f> {
 
     pub fn new_chat(chat_id: impl Into<ChatId<'a>>, message_id: i64) -> Self {
         Self {
-            edit_location_in: MessageOrInlineMessageId::Chat { chat_id: chat_id.into(), message_id },
+            edit_location_in: MessageOrInlineMessageId::Chat {
+                chat_id: chat_id.into(),
+                message_id,
+            },
             reply_markup: None,
         }
     }

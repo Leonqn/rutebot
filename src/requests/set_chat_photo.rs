@@ -28,7 +28,10 @@ impl<'a> Request for SetChatPhoto<'a> {
         "setChatPhoto"
     }
 
-    fn set_http_request_body(self, request_builder: hyper::http::request::Builder) -> Result<hyper::http::request::Request<Body>, Error> {
+    fn set_http_request_body(
+        self,
+        request_builder: hyper::http::request::Builder,
+    ) -> Result<hyper::http::request::Request<Body>, Error> {
         let mut form = Form::default();
         add_fields_to_form(&mut form, &self)?;
         form.add_reader_file("photo", Cursor::new(self.photo), "photo");

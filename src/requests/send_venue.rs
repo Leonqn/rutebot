@@ -54,7 +54,13 @@ impl<'a, 'b, 'c, 'd, 'e, 'f, 'g, 'h> Request for SendVenue<'a, 'b, 'c, 'd, 'e, '
 }
 
 impl<'a, 'b, 'c, 'd, 'e, 'f, 'g, 'h> SendVenue<'a, 'b, 'c, 'd, 'e, 'f, 'g, 'h> {
-    pub fn new(chat_id: impl Into<ChatId<'a>>, latitude: f64, longitude: f64, title: &'b str, address: &'c str) -> Self {
+    pub fn new(
+        chat_id: impl Into<ChatId<'a>>,
+        latitude: f64,
+        longitude: f64,
+        title: &'b str,
+        address: &'c str,
+    ) -> Self {
         Self {
             chat_id: chat_id.into(),
             latitude,
@@ -69,7 +75,14 @@ impl<'a, 'b, 'c, 'd, 'e, 'f, 'g, 'h> SendVenue<'a, 'b, 'c, 'd, 'e, 'f, 'g, 'h> {
         }
     }
 
-    pub fn new_reply(chat_id: impl Into<ChatId<'a>>, latitude: f64, longitude: f64, title: &'b str, address: &'c str, reply_to_message_id: i64) -> Self {
+    pub fn new_reply(
+        chat_id: impl Into<ChatId<'a>>,
+        latitude: f64,
+        longitude: f64,
+        title: &'b str,
+        address: &'c str,
+        reply_to_message_id: i64,
+    ) -> Self {
         Self {
             chat_id: chat_id.into(),
             latitude,

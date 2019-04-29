@@ -58,11 +58,16 @@ impl<'a, 'b, 'c, 'd, 'e, 'f, 'g, 'h> SendContact<'a, 'b, 'c, 'd, 'e, 'f, 'g, 'h>
             vcard: None,
             disable_notification: false,
             reply_to_message_id: None,
-            reply_markup: None
+            reply_markup: None,
         }
     }
 
-    pub fn new_reply(chat_id: impl Into<ChatId<'a>>, phone_number: &'b str, first_name: &'c str, reply_to_message_id: i64) -> Self {
+    pub fn new_reply(
+        chat_id: impl Into<ChatId<'a>>,
+        phone_number: &'b str,
+        first_name: &'c str,
+        reply_to_message_id: i64,
+    ) -> Self {
         Self {
             chat_id: chat_id.into(),
             phone_number,
@@ -71,7 +76,7 @@ impl<'a, 'b, 'c, 'd, 'e, 'f, 'g, 'h> SendContact<'a, 'b, 'c, 'd, 'e, 'f, 'g, 'h>
             vcard: None,
             disable_notification: false,
             reply_to_message_id: Some(reply_to_message_id),
-            reply_markup: None
+            reply_markup: None,
         }
     }
 }

@@ -9,14 +9,12 @@ use crate::responses::File;
 #[derive(Serialize, Debug, Clone)]
 pub struct GetFile<'a> {
     /// File identifier to get info about
-    pub file_id: &'a str
+    pub file_id: &'a str,
 }
 
 impl<'a> GetFile<'a> {
     pub fn new(file_id: &'a str) -> Self {
-        Self {
-            file_id
-        }
+        Self { file_id }
     }
 }
 

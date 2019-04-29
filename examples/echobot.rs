@@ -42,7 +42,8 @@ fn main() {
                         }),
                     ..
                 }) => {
-                    let request = SendMessage::new_reply(chat.id, "This is not text...", message_id);
+                    let request =
+                        SendMessage::new_reply(chat.id, "This is not text...", message_id);
                     Some(request)
                 }
                 Err(e) => {

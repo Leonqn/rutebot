@@ -45,7 +45,10 @@ impl<'a, 'b, 'c, 'd, 'e> EditMessageCaption<'a, 'b, 'c, 'd, 'e> {
 
     pub fn new_message(chat_id: impl Into<ChatId<'a>>, message_id: i64, caption: &'b str) -> Self {
         Self {
-            message_or_inline_message_id: MessageOrInlineMessageId::Chat { chat_id: chat_id.into(), message_id },
+            message_or_inline_message_id: MessageOrInlineMessageId::Chat {
+                chat_id: chat_id.into(),
+                message_id,
+            },
             caption: Some(caption),
             parse_mode: None,
             reply_markup: None,

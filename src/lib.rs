@@ -6,16 +6,16 @@
 //! ```no_run
 //! use hyper::rt::{Future, Stream};
 //! use std::env;
-//! 
+//!
 //! use rutebot::client::Rutebot;
 //! use rutebot::requests::{GetUpdates, SendMessage};
 //! use rutebot::responses::{Message, Update};
-//! 
+//!
 //! fn main() {
 //!     let token_env = env::var_os("TELEGRAM_TOKEN")
 //!         .expect("Please specify your bot's token in the TELEGRAM_TOKEN environment variable.");
 //!     let token = token_env.to_string_lossy();
-//! 
+//!
 //!     let rutebot = Rutebot::new(token);
 //!     let get_updates = GetUpdates {
 //!         timeout: Some(20),
@@ -67,7 +67,7 @@
 //!             }
 //!             Ok(())
 //!         });
-//! 
+//!
 //!     hyper::rt::run(updates);
 //! }
 //! ```

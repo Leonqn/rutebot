@@ -25,16 +25,26 @@ impl<'a, 'c, 'd, 'e> Request for EditMessageReplyMarkup<'a, 'c, 'd, 'e> {
 }
 
 impl<'a, 'b, 'c, 'd, 'e> EditMessageReplyMarkup<'a, 'c, 'd, 'e> {
-    pub fn new_inline_message(inline_message_id: &'a str, reply_markup: ReplyMarkup<'c, 'd, 'e>) -> Self {
+    pub fn new_inline_message(
+        inline_message_id: &'a str,
+        reply_markup: ReplyMarkup<'c, 'd, 'e>,
+    ) -> Self {
         Self {
             message_or_inline_message_id: MessageOrInlineMessageId::Inline { inline_message_id },
             reply_markup: Some(reply_markup),
         }
     }
 
-    pub fn new_message(chat_id: impl Into<ChatId<'a>>, message_id: i64, reply_markup: ReplyMarkup<'c, 'd, 'e>) -> Self {
+    pub fn new_message(
+        chat_id: impl Into<ChatId<'a>>,
+        message_id: i64,
+        reply_markup: ReplyMarkup<'c, 'd, 'e>,
+    ) -> Self {
         Self {
-            message_or_inline_message_id: MessageOrInlineMessageId::Chat { chat_id: chat_id.into(), message_id },
+            message_or_inline_message_id: MessageOrInlineMessageId::Chat {
+                chat_id: chat_id.into(),
+                message_id,
+            },
             reply_markup: Some(reply_markup),
         }
     }

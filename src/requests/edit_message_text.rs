@@ -52,7 +52,10 @@ impl<'a, 'b, 'c, 'd, 'e> EditMessageText<'a, 'b, 'c, 'd, 'e> {
 
     pub fn new_message(chat_id: impl Into<ChatId<'a>>, message_id: i64, text: &'b str) -> Self {
         Self {
-            message_or_inline_message_id: MessageOrInlineMessageId::Chat { chat_id: chat_id.into(), message_id },
+            message_or_inline_message_id: MessageOrInlineMessageId::Chat {
+                chat_id: chat_id.into(),
+                message_id,
+            },
             text,
             parse_mode: None,
             disable_web_page_preview: false,

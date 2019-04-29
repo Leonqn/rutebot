@@ -4,8 +4,8 @@ use std::sync::Arc;
 
 use futures::future::{Future, IntoFuture};
 use futures::stream::Stream;
-use hyper::{Body, Client, Request};
 use hyper::client::HttpConnector;
+use hyper::{Body, Client, Request};
 use hyper_tls::HttpsConnector;
 use serde::de::DeserializeOwned;
 use serde_json;
@@ -54,29 +54,37 @@ impl<TResponse: DeserializeOwned> ApiRequest<TResponse> {
     /// let future = request.send();
     /// # }
     /// ```
-    pub fn send(self) -> impl Future<Item=TResponse, Error=Error> {
+    pub fn send(self) -> impl Future<Item = TResponse, Error = Error> {
         let http_request = self.http_request;
         let bot = self.inner;
-        http_request.into_future()
-            .and_then(move |http_request| {
-                bot.http_client.request(http_request)
-                    .and_then(|r| r.into_body().concat2())
-                    .then(move |body| {
-                        let body_ref = &body.map_err(Error::Hyper)?;
-                        let response: TgResponse<TResponse> = serde_json::from_slice(body_ref).map_err(Error::Serde)?;
-                        match response {
-                            TgResponse { ok: true, result: Some(res), .. } =>
-                                Ok(res),
+        http_request.into_future().and_then(move |http_request| {
+            bot.http_client
+                .request(http_request)
+                .and_then(|r| r.into_body().concat2())
+                .then(move |body| {
+                    let body_ref = &body.map_err(Error::Hyper)?;
+                    let response: TgResponse<TResponse> =
+                        serde_json::from_slice(body_ref).map_err(Error::Serde)?;
+                    match response {
+                        TgResponse {
+                            ok: true,
+                            result: Some(res),
+                            ..
+                        } => Ok(res),
 
-                            TgResponse { description, error_code, parameters, .. } =>
-                                Err(Error::Api {
-                                    error_code: error_code.unwrap_or(0),
-                                    description: description.unwrap_or("Unknown error".to_string()),
-                                    parameters,
-                                }),
-                        }
-                    })
-            })
+                        TgResponse {
+                            description,
+                            error_code,
+                            parameters,
+                            ..
+                        } => Err(Error::Api {
+                            error_code: error_code.unwrap_or(0),
+                            description: description.unwrap_or("Unknown error".to_string()),
+                            parameters,
+                        }),
+                    }
+                })
+        })
     }
 }
 
@@ -88,11 +96,7 @@ impl Rutebot {
         let token = token.into();
 
         Rutebot {
-            inner: Arc::new(
-                Inner {
-                    http_client,
-                    token,
-                })
+            inner: Arc::new(Inner { http_client, token }),
         }
     }
 
@@ -113,9 +117,13 @@ impl Rutebot {
     /// let request = bot.prepare_api_request(get_updates);
     /// # }
     /// ```
-    pub fn prepare_api_request<TRequest, TResponse>(&self, request: TRequest) -> ApiRequest<TResponse>
-        where TRequest: requests::Request<ResponseType=TResponse>,
-              TResponse: DeserializeOwned,
+    pub fn prepare_api_request<TRequest, TResponse>(
+        &self,
+        request: TRequest,
+    ) -> ApiRequest<TResponse>
+    where
+        TRequest: requests::Request<ResponseType = TResponse>,
+        TResponse: DeserializeOwned,
     {
         let uri = format!("{}{}/{}", BASE_API_URI, self.inner.token, request.method());
         let http_request = request.set_http_request_body(Request::post(uri));
@@ -144,11 +152,13 @@ impl Rutebot {
     ///
     /// # }
     /// ```
-    pub fn download_file(&self, file_path: &str) -> impl Future<Item=Vec<u8>, Error=Error> {
+    pub fn download_file(&self, file_path: &str) -> impl Future<Item = Vec<u8>, Error = Error> {
         let uri = format!("{}{}/{}", GET_FILE_URI, self.inner.token, file_path)
             .parse()
             .expect("Error has occurred while creating get_file uri");
-        self.inner.http_client.get(uri)
+        self.inner
+            .http_client
+            .get(uri)
             .map_err(Error::Hyper)
             .and_then(|response| {
                 let http_code = response.status();
@@ -161,10 +171,13 @@ impl Rutebot {
                         if http_code.is_success() {
                             Ok(body.to_vec())
                         } else {
-                            let response: TgResponse<()> = serde_json::from_slice(&body).map_err(Error::Serde)?;
+                            let response: TgResponse<()> =
+                                serde_json::from_slice(&body).map_err(Error::Serde)?;
                             Err(Error::Api {
                                 error_code: response.error_code.unwrap_or(0),
-                                description: response.description.unwrap_or("Unknown error".to_string()),
+                                description: response
+                                    .description
+                                    .unwrap_or("Unknown error".to_string()),
                                 parameters: response.parameters,
                             })
                         }
@@ -192,7 +205,10 @@ impl Rutebot {
     ///     .for_each(|update| Ok(()));
     /// # }
     /// ```
-    pub fn incoming_updates(&self, request: GetUpdates) -> impl Stream<Item=Update, Error=Error> {
+    pub fn incoming_updates(
+        &self,
+        request: GetUpdates,
+    ) -> impl Stream<Item = Update, Error = Error> {
         let self_1 = self.clone();
         let allowed_updates = request.allowed_updates.map(|x| x.to_vec());
         let limit = request.limit;

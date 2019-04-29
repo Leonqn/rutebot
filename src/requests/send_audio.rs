@@ -6,7 +6,10 @@ use hyper_multipart_rfc7578::client::multipart::Form;
 use serde::Serialize;
 
 use crate::error::Error;
-use crate::requests::{add_fields_to_form, add_form_body, add_json_body, ChatId, FileKind, ParseMode, ReplyMarkup, Request};
+use crate::requests::{
+    add_fields_to_form, add_form_body, add_json_body, ChatId, FileKind, ParseMode, ReplyMarkup,
+    Request,
+};
 use crate::responses::Message;
 
 /// Use this struct to send audio files, if you want Telegram clients to display them in the music player.
@@ -64,7 +67,10 @@ impl<'a, 'b, 'c, 'd, 'e, 'f, 'g, 'i> Request for SendAudio<'a, 'b, 'c, 'd, 'e, '
         "sendAudio"
     }
 
-    fn set_http_request_body(self, request_builder: hyper::http::request::Builder) -> Result<hyper::http::request::Request<Body>, Error> {
+    fn set_http_request_body(
+        self,
+        request_builder: hyper::http::request::Builder,
+    ) -> Result<hyper::http::request::Request<Body>, Error> {
         if self.audio.is_input_file() {
             let mut form = Form::default();
             add_fields_to_form(&mut form, &self)?;
@@ -95,7 +101,11 @@ impl<'a, 'b, 'c, 'd, 'e, 'f, 'g, 'i> SendAudio<'a, 'b, 'c, 'd, 'e, 'f, 'g, 'i> {
         }
     }
 
-    pub fn new_reply(chat_id: impl Into<ChatId<'a>>, audio: FileKind<'b>, reply_to_message_id: i64) -> Self {
+    pub fn new_reply(
+        chat_id: impl Into<ChatId<'a>>,
+        audio: FileKind<'b>,
+        reply_to_message_id: i64,
+    ) -> Self {
         Self {
             chat_id: chat_id.into(),
             audio,

@@ -37,7 +37,6 @@ pub enum ChatAction {
     UploadVideoNote,
 }
 
-
 impl<'a> SendChatAction<'a> {
     pub fn new(chat_id: impl Into<ChatId<'a>>, action: ChatAction) -> Self {
         Self {

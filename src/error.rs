@@ -28,12 +28,9 @@ pub enum Error {
 impl error::Error for Error {
     fn cause(&self) -> Option<&error::Error> {
         match self {
-            Error::Hyper(hyper) =>
-                Some(hyper),
-            Error::Serde(serde) =>
-                Some(serde),
-            _ =>
-                None
+            Error::Hyper(hyper) => Some(hyper),
+            Error::Serde(serde) => Some(serde),
+            _ => None,
         }
     }
 }

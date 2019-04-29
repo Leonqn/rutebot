@@ -19,7 +19,6 @@ pub(crate) struct TgResponse<T> {
     pub parameters: Option<ResponseParameters>,
 }
 
-
 /// Contains information about why a request was unsuccessful.
 #[derive(Deserialize, Debug, Clone)]
 pub struct ResponseParameters {
@@ -29,7 +28,6 @@ pub struct ResponseParameters {
     /// before the request can be repeated
     retry_after: Option<i64>,
 }
-
 
 /// This object represents an incoming update.
 /// At most one of the optional parameters can be present in any given update
@@ -57,7 +55,6 @@ pub struct Update {
     /// New incoming callback query
     pub callback_query: Option<CallbackQuery>,
 }
-
 
 /// This object represents a message
 #[derive(Deserialize, Debug, Clone)]
@@ -214,7 +211,6 @@ pub struct Message {
     pub passport_data: Option<PassportData>,
 }
 
-
 ///This object represents one special entity in a text message. For example, hashtags, usernames, URLs, etc
 #[derive(Deserialize, Debug, Clone)]
 pub struct MessageEntity {
@@ -258,37 +254,36 @@ pub enum MessageEntityValue<'a> {
 impl MessageEntity {
     /// Try to extract correct messageEntity from text message.
     pub fn extract_value(&self, text: &str) -> Option<MessageEntityValue> {
-        let utf16_capture: Vec<u16> = text.encode_utf16().skip(self.offset as usize).take(self.length as usize).collect();
+        let utf16_capture: Vec<u16> = text
+            .encode_utf16()
+            .skip(self.offset as usize)
+            .take(self.length as usize)
+            .collect();
         let captured = String::from_utf16_lossy(&utf16_capture);
         match self.typ.as_ref() {
-            "mention" =>
-                Some(MessageEntityValue::Mention(captured)),
-            "hashtag" =>
-                Some(MessageEntityValue::Hashtag(captured)),
-            "cashtag" =>
-                Some(MessageEntityValue::Cashtag(captured)),
-            "bot_command" =>
-                Some(MessageEntityValue::BotCommand(captured)),
-            "url" =>
-                Some(MessageEntityValue::Url(captured)),
-            "email" =>
-                Some(MessageEntityValue::Email(captured)),
-            "phone_number" =>
-                Some(MessageEntityValue::PhoneNumber(captured)),
-            "bold" =>
-                Some(MessageEntityValue::Bold(captured)),
-            "italic" =>
-                Some(MessageEntityValue::Italic(captured)),
-            "code" =>
-                Some(MessageEntityValue::Code(captured)),
-            "pre" =>
-                Some(MessageEntityValue::Pre(captured)),
-            "text_link" =>
-                self.url.as_ref().map(|link| MessageEntityValue::TextLink { text: captured, link }),
-            "text_mention" =>
-                self.user.as_ref().map(|user| MessageEntityValue::TextMention { mention: captured, user }),
-            _ =>
-                None
+            "mention" => Some(MessageEntityValue::Mention(captured)),
+            "hashtag" => Some(MessageEntityValue::Hashtag(captured)),
+            "cashtag" => Some(MessageEntityValue::Cashtag(captured)),
+            "bot_command" => Some(MessageEntityValue::BotCommand(captured)),
+            "url" => Some(MessageEntityValue::Url(captured)),
+            "email" => Some(MessageEntityValue::Email(captured)),
+            "phone_number" => Some(MessageEntityValue::PhoneNumber(captured)),
+            "bold" => Some(MessageEntityValue::Bold(captured)),
+            "italic" => Some(MessageEntityValue::Italic(captured)),
+            "code" => Some(MessageEntityValue::Code(captured)),
+            "pre" => Some(MessageEntityValue::Pre(captured)),
+            "text_link" => self.url.as_ref().map(|link| MessageEntityValue::TextLink {
+                text: captured,
+                link,
+            }),
+            "text_mention" => self
+                .user
+                .as_ref()
+                .map(|user| MessageEntityValue::TextMention {
+                    mention: captured,
+                    user,
+                }),
+            _ => None,
         }
     }
 }
@@ -411,7 +406,6 @@ pub struct Audio {
     pub thumb: Option<PhotoSize>,
 }
 
-
 /// This object represents a general file (as opposed to
 /// [photos](https://core.telegram.org/bots/api#photosize),
 /// [voice messages](https://core.telegram.org/bots/api#voice) and
@@ -433,7 +427,6 @@ pub struct Document {
     /// File size
     pub file_size: Option<i64>,
 }
-
 
 /// This object represents an animation file (GIF or H.264/MPEG-4 AVC video without sound)
 #[derive(Deserialize, Debug, Clone)]
@@ -463,7 +456,6 @@ pub struct Animation {
     pub file_size: Option<i64>,
 }
 
-
 /// This object represents a game. Use BotFather to create and edit games,
 /// their short names will act as unique identifiers
 #[derive(Deserialize, Debug, Clone)]
@@ -491,7 +483,6 @@ pub struct Game {
     pub animation: Option<Animation>,
 }
 
-
 /// This object represents one size of a photo or a
 /// [file](https://core.telegram.org/bots/api#document) /
 /// [sticker](https://core.telegram.org/bots/api#sticker) thumbnail
@@ -509,7 +500,6 @@ pub struct PhotoSize {
     /// File size
     pub file_size: Option<i64>,
 }
-
 
 /// This object represents a sticker
 #[derive(Deserialize, Debug, Clone)]
@@ -558,7 +548,6 @@ pub struct MaskPosition {
     pub scale: f32,
 }
 
-
 /// This object represents a video file
 #[derive(Deserialize, Debug, Clone)]
 pub struct Video {
@@ -584,7 +573,6 @@ pub struct Video {
     pub file_size: Option<i64>,
 }
 
-
 /// This object represents a voice note
 #[derive(Deserialize, Debug, Clone)]
 pub struct Voice {
@@ -600,7 +588,6 @@ pub struct Voice {
     /// File size
     pub file_size: Option<i64>,
 }
-
 
 /// This object represents a [video message](https://telegram.org/blog/video-messages-and-telescope)
 /// (available in Telegram apps as of [v.4.0](https://telegram.org/blog/video-messages-and-telescope)
@@ -622,7 +609,6 @@ pub struct VideoNote {
     pub file_size: Option<i64>,
 }
 
-
 /// This object represents a phone contact
 #[derive(Deserialize, Debug, Clone)]
 pub struct Contact {
@@ -643,7 +629,6 @@ pub struct Contact {
     pub vcard: Option<String>,
 }
 
-
 /// This object represents a point on the map
 #[derive(Deserialize, Debug, Clone)]
 pub struct Location {
@@ -652,7 +637,6 @@ pub struct Location {
     /// Latitude as defined by sender
     pub latitude: f32,
 }
-
 
 /// This object represents a venue
 #[derive(Deserialize, Debug, Clone)]
@@ -696,7 +680,6 @@ pub struct File {
     /// File path. Pass it to `download_file` method to download it
     pub file_path: Option<String>,
 }
-
 
 /// This object represents a chat
 #[derive(Deserialize, Debug, Clone)]
@@ -756,7 +739,6 @@ pub struct ChatPhoto {
     pub big_file_id: String,
 }
 
-
 /// This object represents a shipping address
 #[derive(Deserialize, Debug, Clone)]
 pub struct ShippingAddress {
@@ -779,7 +761,6 @@ pub struct ShippingAddress {
     pub post_code: String,
 }
 
-
 /// This object represents information about an order
 #[derive(Deserialize, Debug, Clone)]
 pub struct OrderInfo {
@@ -795,7 +776,6 @@ pub struct OrderInfo {
     /// User shipping address
     pub shipping_address: Option<ShippingAddress>,
 }
-
 
 /// This object represents a Telegram user or bot.
 #[derive(Deserialize, Debug, Clone)]
@@ -818,7 +798,6 @@ pub struct User {
     /// [IETF language tag](https://en.wikipedia.org/wiki/IETF_language_tag) of the user's language
     pub language_code: Option<String>,
 }
-
 
 /// This object represents an incoming callback query from a callback button in an
 /// [inline keyboard](https://core.telegram.org/bots#inline-keyboards-and-on-the-fly-updating).

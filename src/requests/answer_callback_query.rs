@@ -30,7 +30,6 @@ pub struct AnswerCallbackQuery<'a, 'b, 'c> {
     pub cache_time: Option<i32>,
 }
 
-
 impl<'a, 'b, 'c> Request for AnswerCallbackQuery<'a, 'b, 'c> {
     type ResponseType = bool;
 

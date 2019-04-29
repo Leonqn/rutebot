@@ -57,7 +57,12 @@ impl<'a, 'b, 'c, 'd, 'e, 'f, 'g, 'h> SendPoll<'a, 'b, 'c, 'd, 'e, 'f, 'g, 'h> {
         }
     }
 
-    pub fn new_reply(chat_id: impl Into<ChatId<'a>>, question: &'b str, options: &'c [&'d str], reply_to_message_id: i64) -> Self {
+    pub fn new_reply(
+        chat_id: impl Into<ChatId<'a>>,
+        question: &'b str,
+        options: &'c [&'d str],
+        reply_to_message_id: i64,
+    ) -> Self {
         Self {
             chat_id: chat_id.into(),
             question,

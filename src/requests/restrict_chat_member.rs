@@ -52,7 +52,7 @@ impl<'a> RestrictChatMember<'a> {
             can_send_messages: None,
             can_send_media_messages: None,
             can_send_other_messages: None,
-            can_add_web_page_previews: None
+            can_add_web_page_previews: None,
         }
     }
 }

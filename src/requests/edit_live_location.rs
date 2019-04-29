@@ -42,9 +42,17 @@ impl<'a, 'd, 'e, 'f> EditLiveLocation<'a, 'd, 'e, 'f> {
         }
     }
 
-    pub fn new_message(chat_id: impl Into<ChatId<'a>>, message_id: i64, latitude: f64, longitude: f64) -> Self {
+    pub fn new_message(
+        chat_id: impl Into<ChatId<'a>>,
+        message_id: i64,
+        latitude: f64,
+        longitude: f64,
+    ) -> Self {
         Self {
-            message_or_inline_message_id: MessageOrInlineMessageId::Chat { chat_id: chat_id.into(), message_id },
+            message_or_inline_message_id: MessageOrInlineMessageId::Chat {
+                chat_id: chat_id.into(),
+                message_id,
+            },
             latitude,
             longitude,
             reply_markup: None,

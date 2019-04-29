@@ -5,7 +5,10 @@ use hyper_multipart_rfc7578::client::multipart::Form;
 use serde::Serialize;
 
 use crate::error::Error;
-use crate::requests::{add_fields_to_form, add_form_body, add_json_body, ChatId, FileKind, InputMedia, MessageOrInlineMessageId, ReplyMarkup, Request};
+use crate::requests::{
+    add_fields_to_form, add_form_body, add_json_body, ChatId, FileKind, InputMedia,
+    MessageOrInlineMessageId, ReplyMarkup, Request,
+};
 use crate::responses::EditedMessage;
 
 /// Use this struct to edit animation, audio, document, photo, or video messages.
@@ -34,7 +37,10 @@ impl<'a, 'b, 'c, 'd, 'e, 'f, 'g, 'h> Request for EditMessageMedia<'a, 'b, 'c, 'd
         "editMessageMedia"
     }
 
-    fn set_http_request_body(self, request_builder: hyper::http::request::Builder) -> Result<hyper::http::request::Request<Body>, Error> {
+    fn set_http_request_body(
+        self,
+        request_builder: hyper::http::request::Builder,
+    ) -> Result<hyper::http::request::Request<Body>, Error> {
         if self.media.contains_input_file() {
             let mut form = Form::default();
             add_fields_to_form(&mut form, &self)?;
@@ -50,7 +56,10 @@ impl<'a, 'b, 'c, 'd, 'e, 'f, 'g, 'h> Request for EditMessageMedia<'a, 'b, 'c, 'd
 }
 
 impl<'a, 'b, 'c, 'd, 'e, 'f, 'g, 'h> EditMessageMedia<'a, 'b, 'c, 'd, 'e, 'f, 'g, 'h> {
-    pub fn new_inline_message(inline_message_id: &'a str, media: InputMedia<'b, 'c, 'd, 'e>) -> Self {
+    pub fn new_inline_message(
+        inline_message_id: &'a str,
+        media: InputMedia<'b, 'c, 'd, 'e>,
+    ) -> Self {
         Self {
             message_or_inline_message_id: MessageOrInlineMessageId::Inline { inline_message_id },
             media,
@@ -58,9 +67,16 @@ impl<'a, 'b, 'c, 'd, 'e, 'f, 'g, 'h> EditMessageMedia<'a, 'b, 'c, 'd, 'e, 'f, 'g
         }
     }
 
-    pub fn new_message(chat_id: impl Into<ChatId<'a>>, message_id: i64, media: InputMedia<'b, 'c, 'd, 'e>) -> Self {
+    pub fn new_message(
+        chat_id: impl Into<ChatId<'a>>,
+        message_id: i64,
+        media: InputMedia<'b, 'c, 'd, 'e>,
+    ) -> Self {
         Self {
-            message_or_inline_message_id: MessageOrInlineMessageId::Chat { chat_id: chat_id.into(), message_id },
+            message_or_inline_message_id: MessageOrInlineMessageId::Chat {
+                chat_id: chat_id.into(),
+                message_id,
+            },
             media,
             reply_markup: None,
         }
