@@ -3,7 +3,7 @@ use hyper::rt::{Future, Stream};
 
 use rutebot::client::Rutebot;
 use rutebot::requests::get_updates::GetUpdates;
-use rutebot::requests::send_text::SendText;
+use rutebot::requests::send_message::SendMessage;
 use rutebot::responses::{Message, Update};
 
 fn main() {
@@ -31,7 +31,7 @@ fn main() {
                         }),
                     ..
                 }) => {
-                    let request = SendText::new_reply(chat.id, text, message_id);
+                    let request = SendMessage::new_reply(chat.id, text, message_id);
                     Some(request)
                 }
                 Ok(Update {
@@ -43,7 +43,7 @@ fn main() {
                         }),
                     ..
                 }) => {
-                    let request = SendText::new_reply(chat.id, "This is not text...", message_id);
+                    let request = SendMessage::new_reply(chat.id, "This is not text...", message_id);
                     Some(request)
                 }
                 Err(e) => {
