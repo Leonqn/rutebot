@@ -4,7 +4,7 @@ use std::ops::Not;
 use hyper::Body;
 use hyper_multipart_rfc7578::client::multipart;
 use hyper_multipart_rfc7578::client::multipart::Form;
-use serde::{Deserialize, Serialize, Serializer};
+use serde::{Serialize, Serializer, Deserialize};
 use serde_json::Value;
 
 use crate::error::Error;

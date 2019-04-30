@@ -11,8 +11,8 @@ fn handle_update(update: Update) -> Option<impl Request> {
             message:
                 Some(Message {
                     message_id,
-                    chat,
-                    text: Some(text),
+                    ref chat,
+                    text: Some(ref text),
                     ..
                 }),
             ..
@@ -29,8 +29,7 @@ fn handle_update(update: Update) -> Option<impl Request> {
                 }),
             ..
         } => {
-            let request =
-                SendMessage::new_reply(chat.id, "This is not text...".to_owned(), message_id);
+            let request = SendMessage::new_reply(chat.id, "This is not text...", message_id);
             Some(request)
         }
         _ => None,
