@@ -39,7 +39,7 @@ pub fn send_message_works() {
 
     let response: Message = run_one(
         rutebot
-            .prepare_api_request(SendMessage::new(chat_id, "Some text".to_owned()))
+            .prepare_api_request(SendMessage::new(chat_id, "Some text"))
             .send(),
     );
 
@@ -52,7 +52,7 @@ pub fn forward_message_works() {
     let chat_id = common::get_chat_id();
     let sent_msg: Message = run_one(
         rutebot
-            .prepare_api_request(SendMessage::new(chat_id, "test".to_owned()))
+            .prepare_api_request(SendMessage::new(chat_id, "test"))
             .send(),
     );
 
@@ -510,7 +510,7 @@ pub fn pin_chat_message_works() {
     let chat_id = common::get_chat_id();
     let new_message: Message = run_one(
         rutebot
-            .prepare_api_request(SendMessage::new(chat_id, "Some text".to_owned()))
+            .prepare_api_request(SendMessage::new(chat_id, "Some text"))
             .send(),
     );
     let request = PinChatMessage {
@@ -573,7 +573,7 @@ pub fn edit_message_text_works() {
     let chat_id = common::get_chat_id();
     let text_message: Message = run_one(
         rutebot
-            .prepare_api_request(SendMessage::new(chat_id, "Some text".to_owned()))
+            .prepare_api_request(SendMessage::new(chat_id, "Some text"))
             .send(),
     );
     let edit_request = EditMessageText::new_message(chat_id, text_message.message_id, "new text");
@@ -684,7 +684,7 @@ pub fn delete_message_works() {
     let chat_id = common::get_chat_id();
     let response: Message = run_one(
         rutebot
-            .prepare_api_request(SendMessage::new(chat_id, "Some text".to_owned()))
+            .prepare_api_request(SendMessage::new(chat_id, "Some text"))
             .send(),
     );
     let delete_message_request = DeleteMessage::new(chat_id, response.message_id);
@@ -705,7 +705,7 @@ pub fn message_entity_values_extracted_correctly() {
         rutebot
             .prepare_api_request(SendMessage {
                 parse_mode: Some(ParseMode::Markdown),
-                ..SendMessage::new(chat_id, weird_text.to_owned())
+                ..SendMessage::new(chat_id, weird_text)
             })
             .send(),
     );
