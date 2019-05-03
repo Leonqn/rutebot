@@ -2,6 +2,15 @@ language: rust
 rust:
   - stable
 
+# For why not to use `cache: cargo`, see https://levans.fr/rust_travis_cache.html.
+# Added target/debug/'s subfolders, since for now they are not too big.
+# Removed caching of $HOME/.cargo/bin, because it built the bins anyway.
+cache:
+  directories:
+    - $TRAVIS_BUILD_DIR/target/debug/.fingerprint
+    - $TRAVIS_BUILD_DIR/target/debug/build
+    - $TRAVIS_BUILD_DIR/target/debug/deps
+
 install:
   - cargo build --verbose --all-targets
   - rustup component add rustfmt
