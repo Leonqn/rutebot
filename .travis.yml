@@ -1,3 +1,22 @@
 language: rust
 rust:
   - stable
+
+# For why not to use `cache: cargo`, see https://levans.fr/rust_travis_cache.html.
+# Added target/debug/'s subfolders, since for now they are not too big.
+# Removed caching of $HOME/.cargo/bin, because it built the bins anyway.
+cache:
+  directories:
+    - $TRAVIS_BUILD_DIR/target/debug/.fingerprint
+    - $TRAVIS_BUILD_DIR/target/debug/build
+    - $TRAVIS_BUILD_DIR/target/debug/deps
+
+install:
+  - cargo build --verbose --all-targets
+  - rustup component add rustfmt
+
+script:
+  - cargo fmt -- --check
+  # Only run tests when environment variables are available, because they will fail otherwise.
+  # For details, see https://docs.travis-ci.com/user/pull-requests/#pull-requests-and-security-restrictions.
+  - 'if [ "$TRAVIS_PULL_REQUEST" == "false" ]; then cargo test --verbose --all-targets; else echo "Tests do not run on PRs for security reasons."; fi'
