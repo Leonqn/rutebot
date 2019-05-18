@@ -668,6 +668,7 @@ pub fn edit_message_media_works() {
     let chat_id = common::get_chat_id();
     let mut old_video = Vec::new();
     let mut new_video = Vec::new();
+    let mut photo_content = Vec::new();
     File::open("./tests/sample_video_note.mp4")
         .unwrap()
         .read_to_end(&mut old_video)
@@ -675,6 +676,10 @@ pub fn edit_message_media_works() {
     File::open("./tests/sample_video.mp4")
         .unwrap()
         .read_to_end(&mut new_video)
+        .unwrap();
+    File::open("./tests/photo_test.jpg")
+        .unwrap()
+        .read_to_end(&mut photo_content)
         .unwrap();
     let request = SendVideo::new(
         chat_id,
@@ -691,13 +696,14 @@ pub fn edit_message_media_works() {
         InputMedia::Video(InputMediaVideo::new(FileKind::InputFile {
             name: "supervideo",
             content: new_video,
-            thumb: None,
+            thumb: Some(photo_content),
         })),
     );
 
     if let EditedMessage::Message(message) = run_one(rutebot.prepare_api_request(edit_video).send())
     {
         assert_eq!(message.video.is_some(), true);
+        assert_eq!(message.video.unwrap().thumb.is_some(), true);
     } else {
         panic!("Returned true.");
     }
