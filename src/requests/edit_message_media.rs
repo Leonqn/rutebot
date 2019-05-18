@@ -1,13 +1,11 @@
-use std::io::Cursor;
-
 use hyper::Body;
 use hyper_multipart_rfc7578::client::multipart::Form;
 use serde::Serialize;
 
 use crate::error::Error;
 use crate::requests::{
-    add_fields_to_form, add_form_body, add_json_body, ChatId, FileKind, InputMedia,
-    MessageOrInlineMessageId, ReplyMarkup, Request,
+    add_fields_to_form, add_file_to_form, add_form_body, add_json_body, ChatId, FileKind,
+    InputMedia, MessageOrInlineMessageId, ReplyMarkup, Request,
 };
 use crate::responses::EditedMessage;
 
@@ -44,10 +42,7 @@ impl<'a, 'b, 'c, 'd, 'e, 'f, 'g, 'h> Request for EditMessageMedia<'a, 'b, 'c, 'd
         if self.media.contains_input_file() {
             let mut form = Form::default();
             add_fields_to_form(&mut form, &self)?;
-            if let FileKind::InputFile { name, content } = self.media.get_file() {
-                form.add_reader_file(name, Cursor::new(content), name);
-            }
-
+            add_file_to_form(&mut form, file, None);
             add_form_body(request_builder, form)
         } else {
             add_json_body(request_builder, &self)

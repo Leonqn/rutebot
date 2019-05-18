@@ -104,6 +104,7 @@ pub fn send_document_works() {
             FileKind::InputFile {
                 name: "superfile",
                 content: vec![1, 2, 3, 4, 5],
+                thumb: None,
             },
         )
     };
@@ -124,6 +125,36 @@ pub fn send_document_works() {
 }
 
 #[test]
+pub fn send_document_with_thumb_works() {
+    let rutebot = common::create_client();
+    let chat_id = common::get_chat_id();
+    let mut photo_content = Vec::new();
+    File::open("./tests/photo_test.jpg")
+        .unwrap()
+        .read_to_end(&mut photo_content)
+        .unwrap();
+    let request = SendDocument {
+        caption: Some("random file with thumb"),
+        ..SendDocument::new(
+            chat_id,
+            FileKind::InputFile {
+                name: "superfile",
+                content: vec![1, 2, 3, 4, 5],
+                thumb: Some(photo_content),
+            },
+        )
+    };
+
+    let response: Document = run_one(rutebot.prepare_api_request(request).send())
+        .document
+        .unwrap();
+
+    assert_eq!(response.file_size, Some(5));
+    assert_eq!(response.file_name, Some("superfile".to_owned()));
+    assert_eq!(response.thumb.is_some(), true);
+}
+
+#[test]
 pub fn send_photo_works() {
     let rutebot = common::create_client();
     let chat_id = common::get_chat_id();
@@ -137,6 +168,7 @@ pub fn send_photo_works() {
         FileKind::InputFile {
             name: "superphoto",
             content: photo_content,
+            thumb: None,
         },
     );
 
@@ -162,6 +194,7 @@ pub fn send_audio_works() {
             FileKind::InputFile {
                 name: "superaudio",
                 content: audio_content,
+                thumb: None,
             },
         )
     };
@@ -194,6 +227,7 @@ pub fn send_video_works() {
         FileKind::InputFile {
             name: "supervideo",
             content: video_content,
+            thumb: None,
         },
     );
 
@@ -227,6 +261,7 @@ pub fn send_animation_works() {
             FileKind::InputFile {
                 name: "supergif",
                 content: gif_content,
+                thumb: None,
             },
         )
     };
@@ -251,6 +286,7 @@ pub fn send_voice_works() {
         FileKind::InputFile {
             name: "supervoice",
             content: voice_content,
+            thumb: None,
         },
     );
 
@@ -282,6 +318,7 @@ pub fn send_video_note_works() {
         FileKind::InputFile {
             name: "supervideonote",
             content: video_note_content,
+            thumb: None,
         },
     );
 
@@ -318,10 +355,12 @@ pub fn send_media_group_works() {
             InputMediaPhotoOrVideo::Video(InputMediaVideo::new(FileKind::InputFile {
                 name: "video",
                 content: video_note_content,
+                thumb: None,
             })),
             InputMediaPhotoOrVideo::Photo(InputMediaPhoto::new(FileKind::InputFile {
                 name: "photo",
                 content: photo_content,
+                thumb: None,
             })),
         ],
     );
@@ -605,6 +644,7 @@ pub fn edit_message_caption_works() {
             FileKind::InputFile {
                 name: "supergif",
                 content: gif_content,
+                thumb: None,
             },
         )
     };
@@ -641,6 +681,7 @@ pub fn edit_message_media_works() {
         FileKind::InputFile {
             name: "supervideo",
             content: old_video,
+            thumb: None,
         },
     );
     let response: Message = run_one(rutebot.prepare_api_request(request).send());
@@ -650,6 +691,7 @@ pub fn edit_message_media_works() {
         InputMedia::Video(InputMediaVideo::new(FileKind::InputFile {
             name: "supervideo",
             content: new_video,
+            thumb: None,
         })),
     );
 

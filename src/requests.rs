@@ -7,145 +7,102 @@ use hyper_multipart_rfc7578::client::multipart::Form;
 use serde::{Serialize, Serializer};
 use serde_json::Value;
 
-use crate::error::Error;
-
-mod get_updates;
-pub use get_updates::*;
-
-mod get_file;
-pub use get_file::*;
-
-mod get_me;
-pub use get_me::*;
-
-mod send_message;
-pub use send_message::*;
-
-mod send_document;
-pub use send_document::*;
-
-mod send_photo;
-pub use send_photo::*;
-
-mod send_audio;
-pub use send_audio::*;
-
-mod send_video;
-pub use send_video::*;
-
-mod send_animation;
-pub use send_animation::*;
-
-mod send_voice;
-pub use send_voice::*;
-
-mod send_video_note;
-pub use send_video_note::*;
-
-mod send_media_group;
-pub use send_media_group::*;
-
-mod send_location;
-pub use send_location::*;
-
-mod edit_live_location;
-pub use edit_live_location::*;
-
-mod stop_live_location;
-pub use stop_live_location::*;
-
-mod send_venue;
-pub use send_venue::*;
-
-mod send_contact;
-pub use send_contact::*;
-
-mod send_poll;
-pub use send_poll::*;
-
-mod send_chat_action;
-pub use send_chat_action::*;
-
-mod answer_callback_query;
 pub use answer_callback_query::*;
-
-mod forward_message;
-pub use forward_message::*;
-
-mod get_user_profile_photos;
-pub use get_user_profile_photos::*;
-
-mod restrict_chat_member;
-pub use restrict_chat_member::*;
-
-mod unban_chat_member;
-pub use unban_chat_member::*;
-
-mod kick_chat_member;
-pub use kick_chat_member::*;
-
-mod promote_chat_member;
-pub use promote_chat_member::*;
-
-mod export_chat_invite_link;
-pub use export_chat_invite_link::*;
-
-mod set_chat_photo;
-pub use set_chat_photo::*;
-
-mod delete_chat_photo;
 pub use delete_chat_photo::*;
-
-mod set_chat_title;
-pub use set_chat_title::*;
-
-mod set_chat_description;
-pub use set_chat_description::*;
-
-mod pin_chat_message;
+pub use delete_chat_sticker_set::*;
+pub use delete_message::*;
+pub use edit_live_location::*;
+pub use edit_message_caption::*;
+pub use edit_message_media::*;
+pub use edit_message_reply_markup::*;
+pub use edit_message_text::*;
+pub use export_chat_invite_link::*;
+pub use forward_message::*;
+pub use get_chat::*;
+pub use get_chat_administrators::*;
+pub use get_chat_member::*;
+pub use get_chat_members_count::*;
+pub use get_file::*;
+pub use get_me::*;
+pub use get_updates::*;
+pub use get_user_profile_photos::*;
+pub use kick_chat_member::*;
+pub use leave_chat::*;
 pub use pin_chat_message::*;
-
-mod unpin_chat_message;
+pub use promote_chat_member::*;
+pub use restrict_chat_member::*;
+pub use send_animation::*;
+pub use send_audio::*;
+pub use send_chat_action::*;
+pub use send_contact::*;
+pub use send_document::*;
+pub use send_location::*;
+pub use send_media_group::*;
+pub use send_message::*;
+pub use send_photo::*;
+pub use send_poll::*;
+pub use send_venue::*;
+pub use send_video::*;
+pub use send_video_note::*;
+pub use send_voice::*;
+pub use set_chat_description::*;
+pub use set_chat_photo::*;
+pub use set_chat_sticker_set::*;
+pub use set_chat_title::*;
+pub use stop_live_location::*;
+pub use stop_poll::*;
+pub use unban_chat_member::*;
 pub use unpin_chat_message::*;
 
-mod leave_chat;
-pub use leave_chat::*;
+use crate::error::Error;
+use std::io::Cursor;
 
-mod get_chat;
-pub use get_chat::*;
-
-mod get_chat_administrators;
-pub use get_chat_administrators::*;
-
-mod get_chat_members_count;
-pub use get_chat_members_count::*;
-
-mod get_chat_member;
-pub use get_chat_member::*;
-
-mod set_chat_sticker_set;
-pub use set_chat_sticker_set::*;
-
+mod answer_callback_query;
+mod delete_chat_photo;
 mod delete_chat_sticker_set;
-pub use delete_chat_sticker_set::*;
-
-mod edit_message_text;
-pub use edit_message_text::*;
-
-mod edit_message_caption;
-pub use edit_message_caption::*;
-
-mod edit_message_media;
-pub use edit_message_media::*;
-
-mod edit_message_reply_markup;
-pub use edit_message_reply_markup::*;
-
-mod stop_poll;
-pub use stop_poll::*;
-
 mod delete_message;
-pub use delete_message::*;
+mod edit_live_location;
+mod edit_message_caption;
+mod edit_message_media;
+mod edit_message_reply_markup;
+mod edit_message_text;
+mod export_chat_invite_link;
+mod forward_message;
+mod get_chat;
+mod get_chat_administrators;
+mod get_chat_member;
+mod get_chat_members_count;
+mod get_file;
+mod get_me;
+mod get_updates;
+mod get_user_profile_photos;
+mod kick_chat_member;
+mod leave_chat;
+mod pin_chat_message;
+mod promote_chat_member;
+mod restrict_chat_member;
+mod send_animation;
+mod send_audio;
+mod send_chat_action;
+mod send_contact;
+mod send_document;
+mod send_location;
+mod send_media_group;
+mod send_message;
+mod send_photo;
+mod send_poll;
+mod send_venue;
+mod send_video;
+mod send_video_note;
+mod send_voice;
+mod set_chat_description;
+mod set_chat_photo;
+mod set_chat_sticker_set;
+mod set_chat_title;
+mod stop_live_location;
+mod stop_poll;
+mod unban_chat_member;
+mod unpin_chat_message;
 
 /// Basic request type.
 pub trait Request: Serialize + Sized {
@@ -180,6 +137,22 @@ pub(crate) fn add_form_body(
         .map_err(|x| Error::RequestBuild(x.description().to_string()))
 }
 
+pub(crate) fn add_file_to_form(form: &mut Form, file: FileKind, upload_type: Option<&str>) {
+    if let FileKind::InputFile {
+        name,
+        content,
+        thumb,
+    } = file
+    {
+        form.add_reader_file(upload_type.unwrap_or(name), Cursor::new(content), name);
+        if let Some(thumb) = thumb {
+            let thumb_name = format!("thumb_{}", name);
+            form.add_reader_file(&thumb_name, Cursor::new(thumb), thumb_name.as_str());
+            form.add_text("thumb", format!("attach://{}", &thumb_name));
+        }
+    }
+}
+
 pub(crate) fn add_fields_to_form<S: Serialize + Sized>(
     form: &mut Form<'static>,
     serializable: &S,
@@ -212,8 +185,13 @@ pub enum FileKind<'a> {
     InputFile {
         /// Name of the file
         name: &'a str,
+
         /// File content
         content: Vec<u8>,
+
+        /// Thumbnail of the file sent; can be ignored if thumbnail generation for the file is supported server-side.
+        /// The thumbnail should be in JPEG format and less than 200 kB in size. A thumbnail‘s width and height should not exceed 320
+        thumb: Option<Vec<u8>>,
     },
 }
 
@@ -229,6 +207,7 @@ impl<'a> FileKind<'a> {
     pub(crate) fn serialize_attach<S: Serializer>(
         field0: &str,
         _: &[u8],
+        _: &Option<Vec<u8>>,
         s: S,
     ) -> Result<S::Ok, S::Error> {
         s.serialize_str(&format!("attach://{}", field0))
@@ -299,6 +278,7 @@ pub struct InputMediaVideo<'a, 'b> {
     /// [bold, italic, fixed-width text or inline URLs](https://core.telegram.org/bots/api#formatting-options) in the media caption.
     #[serde(skip_serializing_if = "Option::is_none")]
     pub parse_mode: Option<ParseMode>,
+
     /// Duration of sent video in seconds
     #[serde(skip_serializing_if = "Option::is_none")]
     pub duration: Option<i64>,
@@ -405,6 +385,11 @@ pub struct InputMediaAudio<'a, 'b, 'c, 'd> {
     /// File to send
     pub media: FileKind<'a>,
 
+    /// Thumbnail of the file sent; can be ignored if thumbnail generation for the file is supported server-side.
+    /// The thumbnail should be in JPEG format and less than 200 kB in size. A thumbnail‘s width and height should not exceed 320
+    #[serde(skip_serializing)]
+    pub thumb: Option<Vec<u8>>,
+
     /// Caption of the audio to be sent, 0-1024 characters
     #[serde(skip_serializing_if = "Option::is_none")]
     pub caption: Option<&'b str>,
@@ -432,6 +417,7 @@ impl<'a, 'b, 'c, 'd> InputMediaAudio<'a, 'b, 'c, 'd> {
     pub fn new(media: FileKind<'a>) -> Self {
         Self {
             media,
+            thumb: None,
             caption: None,
             parse_mode: None,
             duration: None,

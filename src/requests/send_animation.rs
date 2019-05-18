@@ -1,4 +1,3 @@
-use std::io::Cursor;
 use std::ops::Not;
 
 use hyper::Body;
@@ -7,8 +6,8 @@ use serde::Serialize;
 
 use crate::error::Error;
 use crate::requests::{
-    add_fields_to_form, add_form_body, add_json_body, ChatId, FileKind, ParseMode, ReplyMarkup,
-    Request,
+    add_fields_to_form, add_file_to_form, add_form_body, add_json_body, ChatId, FileKind,
+    ParseMode, ReplyMarkup, Request,
 };
 use crate::responses::Message;
 
@@ -74,10 +73,7 @@ impl<'a, 'b, 'c, 'd, 'e, 'f> Request for SendAnimation<'a, 'b, 'c, 'd, 'e, 'f> {
         if self.animation.is_input_file() {
             let mut form = Form::default();
             add_fields_to_form(&mut form, &self)?;
-            if let FileKind::InputFile { name, content } = self.animation {
-                form.add_reader_file("animation", Cursor::new(content), name);
-            }
-
+            add_file_to_form(&mut form, self.animation, Some("animation"));
             add_form_body(request_builder, form)
         } else {
             add_json_body(request_builder, &self)

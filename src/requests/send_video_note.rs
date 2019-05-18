@@ -1,4 +1,3 @@
-use std::io::Cursor;
 use std::ops::Not;
 
 use hyper::Body;
@@ -7,8 +6,8 @@ use serde::Serialize;
 
 use crate::error::Error;
 use crate::requests::{
-    add_fields_to_form, add_form_body, add_json_body, ChatId, FileKind, ParseMode, ReplyMarkup,
-    Request,
+    add_fields_to_form, add_file_to_form, add_form_body, add_json_body, ChatId, FileKind,
+    ParseMode, ReplyMarkup, Request,
 };
 use crate::responses::Message;
 
@@ -69,10 +68,7 @@ impl<'a, 'b, 'c, 'd, 'e, 'f> Request for SendVideoNote<'a, 'b, 'c, 'd, 'e, 'f> {
         if self.video_note.is_input_file() {
             let mut form = Form::default();
             add_fields_to_form(&mut form, &self)?;
-            if let FileKind::InputFile { name, content } = self.video_note {
-                form.add_reader_file("video_note", Cursor::new(content), name);
-            }
-
+            add_file_to_form(&mut form, self.video_note, Some("video_note"));
             add_form_body(request_builder, form)
         } else {
             add_json_body(request_builder, &self)
