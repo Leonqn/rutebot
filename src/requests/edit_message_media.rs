@@ -51,10 +51,7 @@ impl<'a> Request for EditMessageMedia<'a> {
 }
 
 impl<'a> EditMessageMedia<'a> {
-    pub fn new_inline_message(
-        inline_message_id: &'a str,
-        media: InputMedia<'a>,
-    ) -> Self {
+    pub fn new_inline_message(inline_message_id: &'a str, media: InputMedia<'a>) -> Self {
         Self {
             message_or_inline_message_id: MessageOrInlineMessageId::Inline { inline_message_id },
             media,

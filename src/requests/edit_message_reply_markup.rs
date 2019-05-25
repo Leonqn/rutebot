@@ -25,10 +25,7 @@ impl<'a> Request for EditMessageReplyMarkup<'a> {
 }
 
 impl<'a> EditMessageReplyMarkup<'a> {
-    pub fn new_inline_message(
-        inline_message_id: &'a str,
-        reply_markup: ReplyMarkup<'a>,
-    ) -> Self {
+    pub fn new_inline_message(inline_message_id: &'a str, reply_markup: ReplyMarkup<'a>) -> Self {
         Self {
             message_or_inline_message_id: MessageOrInlineMessageId::Inline { inline_message_id },
             reply_markup: Some(reply_markup),
