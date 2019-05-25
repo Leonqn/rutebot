@@ -85,6 +85,3 @@ pub mod requests;
 pub mod error;
 
 mod updates_pool_stream;
-
-#[cfg(test)]
-mod tests {}

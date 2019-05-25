@@ -3,3 +3,4 @@
 Cargo.lock
 .idea
 main.rs
+set_test_env_variables.cmd
