@@ -15,20 +15,20 @@ use crate::responses::EditedMessage;
 /// can't be uploaded. Use previously uploaded file via its file_id or specify a URL. On success,
 /// if the edited message was sent by the bot, the edited `Message` is returned, otherwise `True` is returned.
 #[derive(Serialize, Debug, Clone)]
-pub struct EditMessageMedia<'a, 'b, 'c, 'd, 'e, 'f, 'g, 'h> {
+pub struct EditMessageMedia<'a> {
     /// Identifier of message in chat or identifier of inline message
     #[serde(flatten)]
     pub message_or_inline_message_id: MessageOrInlineMessageId<'a>,
 
     /// New media content of the message.
-    pub media: InputMedia<'b, 'c, 'd, 'e>,
+    pub media: InputMedia<'a>,
 
     /// Additional interface options.
     #[serde(skip_serializing_if = "Option::is_none")]
-    pub reply_markup: Option<ReplyMarkup<'f, 'g, 'h>>,
+    pub reply_markup: Option<ReplyMarkup<'a>>,
 }
 
-impl<'a, 'b, 'c, 'd, 'e, 'f, 'g, 'h> Request for EditMessageMedia<'a, 'b, 'c, 'd, 'e, 'f, 'g, 'h> {
+impl<'a> Request for EditMessageMedia<'a> {
     type ResponseType = EditedMessage;
 
     fn method(&self) -> &'static str {
@@ -50,11 +50,8 @@ impl<'a, 'b, 'c, 'd, 'e, 'f, 'g, 'h> Request for EditMessageMedia<'a, 'b, 'c, 'd
     }
 }
 
-impl<'a, 'b, 'c, 'd, 'e, 'f, 'g, 'h> EditMessageMedia<'a, 'b, 'c, 'd, 'e, 'f, 'g, 'h> {
-    pub fn new_inline_message(
-        inline_message_id: &'a str,
-        media: InputMedia<'b, 'c, 'd, 'e>,
-    ) -> Self {
+impl<'a> EditMessageMedia<'a> {
+    pub fn new_inline_message(inline_message_id: &'a str, media: InputMedia<'a>) -> Self {
         Self {
             message_or_inline_message_id: MessageOrInlineMessageId::Inline { inline_message_id },
             media,
@@ -65,7 +62,7 @@ impl<'a, 'b, 'c, 'd, 'e, 'f, 'g, 'h> EditMessageMedia<'a, 'b, 'c, 'd, 'e, 'f, 'g
     pub fn new_message(
         chat_id: impl Into<ChatId<'a>>,
         message_id: i64,
-        media: InputMedia<'b, 'c, 'd, 'e>,
+        media: InputMedia<'a>,
     ) -> Self {
         Self {
             message_or_inline_message_id: MessageOrInlineMessageId::Chat {

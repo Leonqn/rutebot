@@ -9,15 +9,15 @@ use crate::requests::{ChatId, Request};
 /// Note: In regular groups (non-supergroups), this method will only work if the
 /// ‘All Members Are Admins’ setting is off in the target group.
 #[derive(Serialize, Debug, Clone)]
-pub struct SetChatTitle<'a, 'b> {
+pub struct SetChatTitle<'a> {
     /// Unique identifier for the target group or username of the target supergroup or channel
     pub chat_id: ChatId<'a>,
 
     /// New chat title, 1-255 characters
-    pub title: &'b str,
+    pub title: &'a str,
 }
 
-impl<'a, 'b> Request for SetChatTitle<'a, 'b> {
+impl<'a> Request for SetChatTitle<'a> {
     type ResponseType = bool;
 
     fn method(&self) -> &'static str {
@@ -25,8 +25,8 @@ impl<'a, 'b> Request for SetChatTitle<'a, 'b> {
     }
 }
 
-impl<'a, 'b> SetChatTitle<'a, 'b> {
-    pub fn new(chat_id: impl Into<ChatId<'a>>, title: &'b str) -> Self {
+impl<'a> SetChatTitle<'a> {
+    pub fn new(chat_id: impl Into<ChatId<'a>>, title: &'a str) -> Self {
         Self {
             chat_id: chat_id.into(),
             title,

@@ -7,12 +7,12 @@ use crate::responses::Message;
 
 /// Use this struct to forward messages of any kind. On success, the sent `Message` is returned.
 #[derive(Serialize, Debug, Clone)]
-pub struct ForwardMessage<'a, 'b> {
+pub struct ForwardMessage<'a> {
     /// Unique identifier for the target chat
     chat_id: ChatId<'a>,
 
     /// Unique identifier for the chat where the original message was sent
-    from_chat_id: ChatId<'b>,
+    from_chat_id: ChatId<'a>,
 
     /// Sends the message [silently](https://telegram.org/blog/channels-2-0#silent-messages).
     /// Users will receive a notification with no sound.
@@ -23,7 +23,7 @@ pub struct ForwardMessage<'a, 'b> {
     message_id: i64,
 }
 
-impl<'a, 'b> Request for ForwardMessage<'a, 'b> {
+impl<'a> Request for ForwardMessage<'a> {
     type ResponseType = Message;
 
     fn method(&self) -> &'static str {
@@ -31,8 +31,8 @@ impl<'a, 'b> Request for ForwardMessage<'a, 'b> {
     }
 }
 
-impl<'a, 'b> ForwardMessage<'a, 'b> {
-    pub fn new(from: impl Into<ChatId<'b>>, to: impl Into<ChatId<'a>>, message_id: i64) -> Self {
+impl<'a> ForwardMessage<'a> {
+    pub fn new(from: impl Into<ChatId<'a>>, to: impl Into<ChatId<'a>>, message_id: i64) -> Self {
         Self {
             chat_id: to.into(),
             from_chat_id: from.into(),

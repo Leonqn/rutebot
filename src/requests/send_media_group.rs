@@ -13,14 +13,14 @@ use crate::responses::Message;
 
 #[derive(Serialize, Debug, Clone)]
 #[serde(tag = "type")]
-pub enum InputMediaPhotoOrVideo<'a, 'b> {
+pub enum InputMediaPhotoOrVideo<'a> {
     #[serde(rename = "video")]
-    Video(InputMediaVideo<'a, 'b>),
+    Video(InputMediaVideo<'a>),
     #[serde(rename = "photo")]
-    Photo(InputMediaPhoto<'a, 'b>),
+    Photo(InputMediaPhoto<'a>),
 }
 
-impl<'a, 'b> InputMediaPhotoOrVideo<'a, 'b> {
+impl<'a> InputMediaPhotoOrVideo<'a> {
     fn contains_input_file(&self) -> bool {
         match &self {
             InputMediaPhotoOrVideo::Video(x) => x.media.is_input_file(),
@@ -39,12 +39,12 @@ impl<'a, 'b> InputMediaPhotoOrVideo<'a, 'b> {
 /// Use this struct to send a group of photos or videos as an album.
 /// On success, an array of the sent `Messages` is returned.
 #[derive(Serialize, Debug, Clone)]
-pub struct SendMediaGroup<'a, 'b, 'c> {
+pub struct SendMediaGroup<'a> {
     /// Identifier for the target chat
     pub chat_id: ChatId<'a>,
 
     /// Photos and videos to be sent, must include 2–10 items
-    pub media: Vec<InputMediaPhotoOrVideo<'b, 'c>>,
+    pub media: Vec<InputMediaPhotoOrVideo<'a>>,
 
     /// Sends the message [silently](https://telegram.org/blog/channels-2-0#silent-messages).
     /// Users will receive a notification with no sound.
@@ -56,7 +56,7 @@ pub struct SendMediaGroup<'a, 'b, 'c> {
     pub reply_to_message_id: Option<i64>,
 }
 
-impl<'a, 'b, 'c> Request for SendMediaGroup<'a, 'b, 'c> {
+impl<'a> Request for SendMediaGroup<'a> {
     type ResponseType = Vec<Message>;
 
     fn method(&self) -> &'static str {
@@ -85,10 +85,10 @@ impl<'a, 'b, 'c> Request for SendMediaGroup<'a, 'b, 'c> {
     }
 }
 
-impl<'a, 'b, 'c> SendMediaGroup<'a, 'b, 'c> {
+impl<'a> SendMediaGroup<'a> {
     pub fn new(
         chat_id: impl Into<ChatId<'a>>,
-        photo_or_video: Vec<InputMediaPhotoOrVideo<'b, 'c>>,
+        photo_or_video: Vec<InputMediaPhotoOrVideo<'a>>,
     ) -> Self {
         Self {
             chat_id: chat_id.into(),
@@ -100,7 +100,7 @@ impl<'a, 'b, 'c> SendMediaGroup<'a, 'b, 'c> {
 
     pub fn new_reply(
         chat_id: impl Into<ChatId<'a>>,
-        photo_or_video: Vec<InputMediaPhotoOrVideo<'b, 'c>>,
+        photo_or_video: Vec<InputMediaPhotoOrVideo<'a>>,
         reply_to_message_id: i64,
     ) -> Self {
         Self {

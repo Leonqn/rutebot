@@ -238,13 +238,13 @@ impl<'a> From<&'a str> for ChatId<'a> {
 
 /// Represents a photo to be sent.
 #[derive(Serialize, Debug, Clone)]
-pub struct InputMediaPhoto<'a, 'b> {
+pub struct InputMediaPhoto<'a> {
     /// File to send
     pub media: FileKind<'a>,
 
     /// Caption of the photo to be sent, 0-1024 characters
     #[serde(skip_serializing_if = "Option::is_none")]
-    pub caption: Option<&'b str>,
+    pub caption: Option<&'a str>,
 
     /// Send `ParseMode::Markdown` or `ParseMode::Html`,
     /// if you want Telegram apps to show
@@ -253,7 +253,7 @@ pub struct InputMediaPhoto<'a, 'b> {
     pub parse_mode: Option<ParseMode>,
 }
 
-impl<'a, 'b> InputMediaPhoto<'a, 'b> {
+impl<'a> InputMediaPhoto<'a> {
     pub fn new(media: FileKind<'a>) -> Self {
         Self {
             media,
@@ -265,13 +265,13 @@ impl<'a, 'b> InputMediaPhoto<'a, 'b> {
 
 /// Represents a video to be sent.
 #[derive(Serialize, Debug, Clone)]
-pub struct InputMediaVideo<'a, 'b> {
+pub struct InputMediaVideo<'a> {
     /// File to send
     pub media: FileKind<'a>,
 
     /// Caption of the photo to be sent, 0-1024 characters
     #[serde(skip_serializing_if = "Option::is_none")]
-    pub caption: Option<&'b str>,
+    pub caption: Option<&'a str>,
 
     /// Send `ParseMode::Markdown` or `ParseMode::Html`,
     /// if you want Telegram apps to show
@@ -296,7 +296,7 @@ pub struct InputMediaVideo<'a, 'b> {
     pub supports_streaming: bool,
 }
 
-impl<'a, 'b> InputMediaVideo<'a, 'b> {
+impl<'a> InputMediaVideo<'a> {
     pub fn new(media: FileKind<'a>) -> Self {
         Self {
             media,
@@ -312,13 +312,13 @@ impl<'a, 'b> InputMediaVideo<'a, 'b> {
 
 /// Represents an animation file (GIF or H.264/MPEG-4 AVC video without sound) to be sent.
 #[derive(Serialize, Debug, Clone)]
-pub struct InputMediaAnimation<'a, 'b> {
+pub struct InputMediaAnimation<'a> {
     /// File to send
     pub media: FileKind<'a>,
 
     /// Caption of the animation to be sent, 0-1024 characters
     #[serde(skip_serializing_if = "Option::is_none")]
-    pub caption: Option<&'b str>,
+    pub caption: Option<&'a str>,
 
     /// Send `ParseMode::Markdown` or `ParseMode::Html`,
     /// if you want Telegram apps to show
@@ -339,7 +339,7 @@ pub struct InputMediaAnimation<'a, 'b> {
     pub height: Option<i64>,
 }
 
-impl<'a, 'b> InputMediaAnimation<'a, 'b> {
+impl<'a> InputMediaAnimation<'a> {
     pub fn new(media: FileKind<'a>) -> Self {
         Self {
             media,
@@ -354,13 +354,13 @@ impl<'a, 'b> InputMediaAnimation<'a, 'b> {
 
 /// Represents a general file to be sent.
 #[derive(Serialize, Debug, Clone)]
-pub struct InputMediaDocument<'a, 'b> {
+pub struct InputMediaDocument<'a> {
     /// File to send
     pub media: FileKind<'a>,
 
     /// Caption of the document to be sent, 0-1024 characters
     #[serde(skip_serializing_if = "Option::is_none")]
-    pub caption: Option<&'b str>,
+    pub caption: Option<&'a str>,
 
     /// Send `ParseMode::Markdown` or `ParseMode::Html`,
     /// if you want Telegram apps to show
@@ -369,7 +369,7 @@ pub struct InputMediaDocument<'a, 'b> {
     pub parse_mode: Option<ParseMode>,
 }
 
-impl<'a, 'b> InputMediaDocument<'a, 'b> {
+impl<'a> InputMediaDocument<'a> {
     pub fn new(media: FileKind<'a>) -> Self {
         Self {
             media,
@@ -381,7 +381,7 @@ impl<'a, 'b> InputMediaDocument<'a, 'b> {
 
 /// Represents an audio file to be treated as music to be sent.
 #[derive(Serialize, Debug, Clone)]
-pub struct InputMediaAudio<'a, 'b, 'c, 'd> {
+pub struct InputMediaAudio<'a> {
     /// File to send
     pub media: FileKind<'a>,
 
@@ -392,7 +392,7 @@ pub struct InputMediaAudio<'a, 'b, 'c, 'd> {
 
     /// Caption of the audio to be sent, 0-1024 characters
     #[serde(skip_serializing_if = "Option::is_none")]
-    pub caption: Option<&'b str>,
+    pub caption: Option<&'a str>,
 
     /// Send `ParseMode::Markdown` or `ParseMode::Html`,
     /// if you want Telegram apps to show
@@ -406,14 +406,14 @@ pub struct InputMediaAudio<'a, 'b, 'c, 'd> {
 
     /// Performer of the audio
     #[serde(skip_serializing_if = "Option::is_none")]
-    pub performer: Option<&'c str>,
+    pub performer: Option<&'a str>,
 
     /// Title of the audio
     #[serde(skip_serializing_if = "Option::is_none")]
-    pub title: Option<&'d str>,
+    pub title: Option<&'a str>,
 }
 
-impl<'a, 'b, 'c, 'd> InputMediaAudio<'a, 'b, 'c, 'd> {
+impl<'a> InputMediaAudio<'a> {
     pub fn new(media: FileKind<'a>) -> Self {
         Self {
             media,
@@ -429,24 +429,24 @@ impl<'a, 'b, 'c, 'd> InputMediaAudio<'a, 'b, 'c, 'd> {
 
 #[derive(Serialize, Debug, Clone)]
 #[serde(tag = "type")]
-pub enum InputMedia<'a, 'b, 'c, 'd> {
+pub enum InputMedia<'a> {
     #[serde(rename = "video")]
-    Video(InputMediaVideo<'a, 'b>),
+    Video(InputMediaVideo<'a>),
 
     #[serde(rename = "photo")]
-    Photo(InputMediaPhoto<'a, 'b>),
+    Photo(InputMediaPhoto<'a>),
 
     #[serde(rename = "animation")]
-    Animation(InputMediaAnimation<'a, 'b>),
+    Animation(InputMediaAnimation<'a>),
 
     #[serde(rename = "document")]
-    Document(InputMediaDocument<'a, 'b>),
+    Document(InputMediaDocument<'a>),
 
     #[serde(rename = "audio")]
-    Audio(InputMediaAudio<'a, 'b, 'c, 'd>),
+    Audio(InputMediaAudio<'a>),
 }
 
-impl<'a, 'b, 'c, 'd> InputMedia<'a, 'b, 'c, 'd> {
+impl<'a> InputMedia<'a> {
     fn get_file(self) -> FileKind<'a> {
         match self {
             InputMedia::Photo(x) => x.media,
@@ -471,9 +471,9 @@ impl<'a, 'b, 'c, 'd> InputMedia<'a, 'b, 'c, 'd> {
 /// Additional interface options
 #[derive(Serialize, Debug, Clone)]
 #[serde(untagged)]
-pub enum ReplyMarkup<'a, 'b, 'c> {
-    InlineKeyboard(InlineKeyboard<'a, 'b, 'c>),
-    ReplyKeyboardMarkup(ReplyKeyboardMarkup<'a, 'b>),
+pub enum ReplyMarkup<'a> {
+    InlineKeyboard(InlineKeyboard<'a>),
+    ReplyKeyboardMarkup(ReplyKeyboardMarkup<'a>),
     ReplyKeyboardRemove(ReplyKeyboardRemove),
     ForceReply(ForceReply),
 }
@@ -481,16 +481,16 @@ pub enum ReplyMarkup<'a, 'b, 'c> {
 /// This object represents an [inline keyboard](https://core.telegram.org/bots#inline-keyboards-and-on-the-fly-updating)
 /// that appears right next to the message it belongs to
 #[derive(Serialize, Debug, Clone)]
-pub struct InlineKeyboard<'a, 'b, 'c> {
+pub struct InlineKeyboard<'a> {
     /// Array of button rows, each represented by an Array of `InlineKeyboardButton` objects
-    pub inline_keyboard: &'c [Vec<InlineKeyboardButton<'a, 'b>>],
+    pub inline_keyboard: &'a [Vec<InlineKeyboardButton<'a>>],
 }
 
 /// This object represents a custom keyboard with reply options.
 #[derive(Serialize, Debug, Clone)]
-pub struct ReplyKeyboardMarkup<'a, 'b> {
+pub struct ReplyKeyboardMarkup<'a> {
     /// Array of button rows, each represented by an Array of `KeyboardButton` objects
-    pub keyboard: &'b [Vec<KeyboardButton<'a>>],
+    pub keyboard: &'a [Vec<KeyboardButton<'a>>],
 
     /// Requests clients to resize the keyboard vertically for optimal fit
     /// (e.g., make the keyboard smaller if there are just two rows of buttons).
@@ -555,19 +555,19 @@ pub struct ForceReply {
 
 #[derive(Serialize, Debug, Clone)]
 #[serde(untagged)]
-pub enum InlineKeyboardButton<'a, 'b> {
+pub enum InlineKeyboardButton<'a> {
     Url {
         /// Label text on the button
         text: &'a str,
         /// HTTP or tg:// url to be opened when button is pressed
-        url: &'b str,
+        url: &'a str,
     },
     CallbackData {
         /// Label text on the button
         text: &'a str,
         /// Data to be sent in a [callback query](https://core.telegram.org/bots/api#callbackquery)
         /// to the bot when button is pressed, 1-64 bytes
-        callback_data: &'b str,
+        callback_data: &'a str,
     },
 }
 

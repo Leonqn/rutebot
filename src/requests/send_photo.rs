@@ -13,17 +13,17 @@ use crate::responses::Message;
 
 /// Use this struct to send photos. On success, the sent `Message` is returned.
 #[derive(Serialize, Debug, Clone)]
-pub struct SendPhoto<'a, 'b, 'c, 'd, 'e, 'f> {
+pub struct SendPhoto<'a> {
     /// Identifier for the target chat
     pub chat_id: ChatId<'a>,
 
     /// Photo to send.
     #[serde(skip_serializing_if = "FileKind::is_input_file")]
-    pub photo: FileKind<'b>,
+    pub photo: FileKind<'a>,
 
     /// Photo caption (may also be used when resending photos by file_id), 0-1024 characters
     #[serde(skip_serializing_if = "Option::is_none")]
-    pub caption: Option<&'c str>,
+    pub caption: Option<&'a str>,
 
     /// Sends the message [silently](https://telegram.org/blog/channels-2-0#silent-messages).
     /// Users will receive a notification with no sound.
@@ -42,10 +42,10 @@ pub struct SendPhoto<'a, 'b, 'c, 'd, 'e, 'f> {
 
     /// Additional interface options.
     #[serde(skip_serializing_if = "Option::is_none")]
-    pub reply_markup: Option<ReplyMarkup<'d, 'e, 'f>>,
+    pub reply_markup: Option<ReplyMarkup<'a>>,
 }
 
-impl<'a, 'b, 'c, 'd, 'e, 'f> Request for SendPhoto<'a, 'b, 'c, 'd, 'e, 'f> {
+impl<'a> Request for SendPhoto<'a> {
     type ResponseType = Message;
 
     fn method(&self) -> &'static str {
@@ -67,8 +67,8 @@ impl<'a, 'b, 'c, 'd, 'e, 'f> Request for SendPhoto<'a, 'b, 'c, 'd, 'e, 'f> {
     }
 }
 
-impl<'a, 'b, 'c, 'd, 'e, 'f, 'g> SendPhoto<'a, 'b, 'c, 'd, 'e, 'f> {
-    pub fn new(chat_id: impl Into<ChatId<'a>>, photo: FileKind<'b>) -> Self {
+impl<'a> SendPhoto<'a> {
+    pub fn new(chat_id: impl Into<ChatId<'a>>, photo: FileKind<'a>) -> Self {
         Self {
             chat_id: chat_id.into(),
             photo,
@@ -82,7 +82,7 @@ impl<'a, 'b, 'c, 'd, 'e, 'f, 'g> SendPhoto<'a, 'b, 'c, 'd, 'e, 'f> {
 
     pub fn new_reply(
         chat_id: impl Into<ChatId<'a>>,
-        photo: FileKind<'b>,
+        photo: FileKind<'a>,
         reply_to_message_id: i64,
     ) -> Self {
         Self {

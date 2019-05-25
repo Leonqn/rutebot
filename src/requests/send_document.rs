@@ -14,17 +14,17 @@ use crate::responses::Message;
 /// Use this struct to send general files. On success, the sent `Message` is returned.
 /// Bots can currently send files of any type of up to 50 MB in size, this limit may be changed in the future
 #[derive(Serialize, Debug, Clone)]
-pub struct SendDocument<'a, 'b, 'c, 'd, 'e, 'g> {
+pub struct SendDocument<'a> {
     /// Identifier for the target chat
     pub chat_id: ChatId<'a>,
 
     /// File to send.
     #[serde(skip_serializing_if = "FileKind::is_input_file")]
-    pub document: FileKind<'b>,
+    pub document: FileKind<'a>,
 
     /// Document caption (may also be used when resending documents by file_id), 0-1024 characters
     #[serde(skip_serializing_if = "Option::is_none")]
-    pub caption: Option<&'g str>,
+    pub caption: Option<&'a str>,
 
     /// Sends the message [silently](https://telegram.org/blog/channels-2-0#silent-messages).
     /// Users will receive a notification with no sound.
@@ -43,10 +43,10 @@ pub struct SendDocument<'a, 'b, 'c, 'd, 'e, 'g> {
 
     /// Additional interface options.
     #[serde(skip_serializing_if = "Option::is_none")]
-    pub reply_markup: Option<ReplyMarkup<'c, 'd, 'e>>,
+    pub reply_markup: Option<ReplyMarkup<'a>>,
 }
 
-impl<'a, 'b, 'c, 'd, 'e, 'g> Request for SendDocument<'a, 'b, 'c, 'd, 'e, 'g> {
+impl<'a> Request for SendDocument<'a> {
     type ResponseType = Message;
 
     fn method(&self) -> &'static str {
@@ -68,8 +68,8 @@ impl<'a, 'b, 'c, 'd, 'e, 'g> Request for SendDocument<'a, 'b, 'c, 'd, 'e, 'g> {
     }
 }
 
-impl<'a, 'b, 'c, 'd, 'e, 'g> SendDocument<'a, 'b, 'c, 'd, 'e, 'g> {
-    pub fn new(chat_id: impl Into<ChatId<'a>>, document: FileKind<'b>) -> Self {
+impl<'a> SendDocument<'a> {
+    pub fn new(chat_id: impl Into<ChatId<'a>>, document: FileKind<'a>) -> Self {
         Self {
             chat_id: chat_id.into(),
             document,
@@ -83,7 +83,7 @@ impl<'a, 'b, 'c, 'd, 'e, 'g> SendDocument<'a, 'b, 'c, 'd, 'e, 'g> {
 
     pub fn new_reply(
         chat_id: impl Into<ChatId<'a>>,
-        document: FileKind<'b>,
+        document: FileKind<'a>,
         reply_to_message_id: i64,
     ) -> Self {
         Self {

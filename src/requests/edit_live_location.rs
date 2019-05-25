@@ -8,7 +8,7 @@ use crate::responses::EditedMessage;
 /// call to `StopMessageLiveLocation`. On success, if the edited message was sent by the bot,
 /// the edited `EditLiveLocationResponse::Message` is returned, otherwise `EditLiveLocationResponse::True` is returned
 #[derive(Serialize, Debug, Clone)]
-pub struct EditLiveLocation<'a, 'd, 'e, 'f> {
+pub struct EditLiveLocation<'a> {
     /// Identifier of message in chat or identifier of inline message
     #[serde(flatten)]
     pub message_or_inline_message_id: MessageOrInlineMessageId<'a>,
@@ -21,10 +21,10 @@ pub struct EditLiveLocation<'a, 'd, 'e, 'f> {
 
     /// Additional interface options.
     #[serde(skip_serializing_if = "Option::is_none")]
-    pub reply_markup: Option<ReplyMarkup<'d, 'e, 'f>>,
+    pub reply_markup: Option<ReplyMarkup<'a>>,
 }
 
-impl<'a, 'd, 'e, 'f> Request for EditLiveLocation<'a, 'd, 'e, 'f> {
+impl<'a> Request for EditLiveLocation<'a> {
     type ResponseType = EditedMessage;
 
     fn method(&self) -> &'static str {
@@ -32,7 +32,7 @@ impl<'a, 'd, 'e, 'f> Request for EditLiveLocation<'a, 'd, 'e, 'f> {
     }
 }
 
-impl<'a, 'd, 'e, 'f> EditLiveLocation<'a, 'd, 'e, 'f> {
+impl<'a> EditLiveLocation<'a> {
     pub fn new_inline_message(inline_message_id: &'a str, latitude: f64, longitude: f64) -> Self {
         Self {
             message_or_inline_message_id: MessageOrInlineMessageId::Inline { inline_message_id },

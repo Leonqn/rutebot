@@ -7,7 +7,7 @@ use crate::responses::Message;
 
 /// Use this struct to send information about a venue. On success, the sent `Message` is returned.
 #[derive(Serialize, Debug, Clone)]
-pub struct SendVenue<'a, 'b, 'c, 'd, 'e, 'f, 'g, 'h> {
+pub struct SendVenue<'a> {
     /// Identifier for the target chat
     pub chat_id: ChatId<'a>,
 
@@ -18,18 +18,18 @@ pub struct SendVenue<'a, 'b, 'c, 'd, 'e, 'f, 'g, 'h> {
     pub longitude: f64,
 
     /// Name of the venue
-    pub title: &'b str,
+    pub title: &'a str,
 
     /// Address of the venue
-    pub address: &'c str,
+    pub address: &'a str,
 
     /// Foursquare identifier of the venue
     #[serde(skip_serializing_if = "Option::is_none")]
-    pub foursquare_id: Option<&'d str>,
+    pub foursquare_id: Option<&'a str>,
 
     /// Foursquare type of the venue, if known. (For example, “arts_entertainment/default”, “arts_entertainment/aquarium” or “food/icecream”.)
     #[serde(skip_serializing_if = "Option::is_none")]
-    pub foursquare_type: Option<&'e str>,
+    pub foursquare_type: Option<&'a str>,
 
     /// Sends the message [silently](https://telegram.org/blog/channels-2-0#silent-messages).
     /// Users will receive a notification with no sound.
@@ -42,10 +42,10 @@ pub struct SendVenue<'a, 'b, 'c, 'd, 'e, 'f, 'g, 'h> {
 
     /// Additional interface options.
     #[serde(skip_serializing_if = "Option::is_none")]
-    pub reply_markup: Option<ReplyMarkup<'f, 'g, 'h>>,
+    pub reply_markup: Option<ReplyMarkup<'a>>,
 }
 
-impl<'a, 'b, 'c, 'd, 'e, 'f, 'g, 'h> Request for SendVenue<'a, 'b, 'c, 'd, 'e, 'f, 'g, 'h> {
+impl<'a> Request for SendVenue<'a> {
     type ResponseType = Message;
 
     fn method(&self) -> &'static str {
@@ -53,13 +53,13 @@ impl<'a, 'b, 'c, 'd, 'e, 'f, 'g, 'h> Request for SendVenue<'a, 'b, 'c, 'd, 'e, '
     }
 }
 
-impl<'a, 'b, 'c, 'd, 'e, 'f, 'g, 'h> SendVenue<'a, 'b, 'c, 'd, 'e, 'f, 'g, 'h> {
+impl<'a> SendVenue<'a> {
     pub fn new(
         chat_id: impl Into<ChatId<'a>>,
         latitude: f64,
         longitude: f64,
-        title: &'b str,
-        address: &'c str,
+        title: &'a str,
+        address: &'a str,
     ) -> Self {
         Self {
             chat_id: chat_id.into(),
@@ -79,8 +79,8 @@ impl<'a, 'b, 'c, 'd, 'e, 'f, 'g, 'h> SendVenue<'a, 'b, 'c, 'd, 'e, 'f, 'g, 'h> {
         chat_id: impl Into<ChatId<'a>>,
         latitude: f64,
         longitude: f64,
-        title: &'b str,
-        address: &'c str,
+        title: &'a str,
+        address: &'a str,
         reply_to_message_id: i64,
     ) -> Self {
         Self {

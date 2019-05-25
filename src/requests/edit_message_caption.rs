@@ -6,13 +6,13 @@ use crate::responses::EditedMessage;
 /// Use this struct to edit captions of messages. On success,
 /// if edited message is sent by the bot, the edited `Message` is returned, otherwise `True` is returned.
 #[derive(Serialize, Debug, Clone)]
-pub struct EditMessageCaption<'a, 'b, 'c, 'd, 'e> {
+pub struct EditMessageCaption<'a> {
     /// Identifier of message in chat or identifier of inline message
     #[serde(flatten)]
     pub message_or_inline_message_id: MessageOrInlineMessageId<'a>,
 
     /// New caption of the message.
-    pub caption: Option<&'b str>,
+    pub caption: Option<&'a str>,
 
     /// Send `ParseMode::Markdown` or `ParseMode::Html`,
     /// if you want Telegram apps to show
@@ -22,10 +22,10 @@ pub struct EditMessageCaption<'a, 'b, 'c, 'd, 'e> {
 
     /// Additional interface options.
     #[serde(skip_serializing_if = "Option::is_none")]
-    pub reply_markup: Option<ReplyMarkup<'c, 'd, 'e>>,
+    pub reply_markup: Option<ReplyMarkup<'a>>,
 }
 
-impl<'a, 'b, 'c, 'd, 'e> Request for EditMessageCaption<'a, 'b, 'c, 'd, 'e> {
+impl<'a> Request for EditMessageCaption<'a> {
     type ResponseType = EditedMessage;
 
     fn method(&self) -> &'static str {
@@ -33,8 +33,8 @@ impl<'a, 'b, 'c, 'd, 'e> Request for EditMessageCaption<'a, 'b, 'c, 'd, 'e> {
     }
 }
 
-impl<'a, 'b, 'c, 'd, 'e> EditMessageCaption<'a, 'b, 'c, 'd, 'e> {
-    pub fn new_inline_message(inline_message_id: &'a str, caption: &'b str) -> Self {
+impl<'a> EditMessageCaption<'a> {
+    pub fn new_inline_message(inline_message_id: &'a str, caption: &'a str) -> Self {
         Self {
             message_or_inline_message_id: MessageOrInlineMessageId::Inline { inline_message_id },
             caption: Some(caption),
@@ -43,7 +43,7 @@ impl<'a, 'b, 'c, 'd, 'e> EditMessageCaption<'a, 'b, 'c, 'd, 'e> {
         }
     }
 
-    pub fn new_message(chat_id: impl Into<ChatId<'a>>, message_id: i64, caption: &'b str) -> Self {
+    pub fn new_message(chat_id: impl Into<ChatId<'a>>, message_id: i64, caption: &'a str) -> Self {
         Self {
             message_or_inline_message_id: MessageOrInlineMessageId::Chat {
                 chat_id: chat_id.into(),

@@ -15,17 +15,17 @@ use crate::responses::Message;
 /// Your audio must be in the .mp3 format. On success, the sent `Message` is returned.
 /// Bots can currently send audio files of up to 50 MB in size, this limit may be changed in the future
 #[derive(Serialize, Debug, Clone)]
-pub struct SendAudio<'a, 'b, 'c, 'd, 'e, 'f, 'g, 'i> {
+pub struct SendAudio<'a> {
     /// Identifier for the target chat
     pub chat_id: ChatId<'a>,
 
     /// Audio file to send.
     #[serde(skip_serializing_if = "FileKind::is_input_file")]
-    pub audio: FileKind<'b>,
+    pub audio: FileKind<'a>,
 
     /// Audio caption, 0-1024 characters
     #[serde(skip_serializing_if = "Option::is_none")]
-    pub caption: Option<&'c str>,
+    pub caption: Option<&'a str>,
 
     /// Duration of the audio in seconds
     #[serde(skip_serializing_if = "Option::is_none")]
@@ -33,11 +33,11 @@ pub struct SendAudio<'a, 'b, 'c, 'd, 'e, 'f, 'g, 'i> {
 
     /// Performer
     #[serde(skip_serializing_if = "Option::is_none")]
-    pub performer: Option<&'g str>,
+    pub performer: Option<&'a str>,
 
     /// Track name
     #[serde(skip_serializing_if = "Option::is_none")]
-    pub title: Option<&'i str>,
+    pub title: Option<&'a str>,
 
     /// Sends the message [silently](https://telegram.org/blog/channels-2-0#silent-messages).
     /// Users will receive a notification with no sound.
@@ -56,10 +56,10 @@ pub struct SendAudio<'a, 'b, 'c, 'd, 'e, 'f, 'g, 'i> {
 
     /// Additional interface options.
     #[serde(skip_serializing_if = "Option::is_none")]
-    pub reply_markup: Option<ReplyMarkup<'d, 'e, 'f>>,
+    pub reply_markup: Option<ReplyMarkup<'a>>,
 }
 
-impl<'a, 'b, 'c, 'd, 'e, 'f, 'g, 'i> Request for SendAudio<'a, 'b, 'c, 'd, 'e, 'f, 'g, 'i> {
+impl<'a> Request for SendAudio<'a> {
     type ResponseType = Message;
 
     fn method(&self) -> &'static str {
@@ -81,8 +81,8 @@ impl<'a, 'b, 'c, 'd, 'e, 'f, 'g, 'i> Request for SendAudio<'a, 'b, 'c, 'd, 'e, '
     }
 }
 
-impl<'a, 'b, 'c, 'd, 'e, 'f, 'g, 'i> SendAudio<'a, 'b, 'c, 'd, 'e, 'f, 'g, 'i> {
-    pub fn new(chat_id: impl Into<ChatId<'a>>, audio: FileKind<'b>) -> Self {
+impl<'a> SendAudio<'a> {
+    pub fn new(chat_id: impl Into<ChatId<'a>>, audio: FileKind<'a>) -> Self {
         Self {
             chat_id: chat_id.into(),
             audio,
@@ -99,7 +99,7 @@ impl<'a, 'b, 'c, 'd, 'e, 'f, 'g, 'i> SendAudio<'a, 'b, 'c, 'd, 'e, 'f, 'g, 'i> {
 
     pub fn new_reply(
         chat_id: impl Into<ChatId<'a>>,
-        audio: FileKind<'b>,
+        audio: FileKind<'a>,
         reply_to_message_id: i64,
     ) -> Self {
         Self {
