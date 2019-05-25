@@ -1,20 +1,3 @@
-# rutebot
-[![Build Status](https://travis-ci.org/Leonqn/rutebot.svg?branch=master)](https://travis-ci.org/Leonqn/rutebot)
-[![Crates.io](https://img.shields.io/crates/v/rutebot.svg)](https://crates.io/crates/rutebot)
-[![doc.rs](https://docs.rs/rutebot/badge.svg)](https://docs.rs/rutebot)
-[![License MIT](https://img.shields.io/badge/license-MIT-blue.svg)](https://github.com/Leonqn/rutebot/LICENSE)
-
-**Ru**st **Te**legram **Bot**. A framework offering [Telegram Bot API](https://core.telegram.org/bots/api) bindings for the Rust programming language.
-
-For details see the [docs](https://docs.rs/rutebot).
-
-## Example
-A simple greetings bot. Replies to all messages with text "Hello %USERNAME%"
-
-You can run the following example with `cargo run --example simplebot`.
-
-
-```rust
 use std::env;
 
 use futures::future::Future;
@@ -54,4 +37,3 @@ fn main() {
 
     tokio::run(updates);
 }
-```

@@ -1,6 +1,7 @@
-use hyper::rt::{Future, Stream};
 use std::env;
 
+use futures::future::Future;
+use futures::stream::Stream;
 use rutebot::client::Rutebot;
 use rutebot::requests::{GetUpdates, SendMessage};
 use rutebot::responses::{Message, Update};
@@ -11,15 +12,12 @@ fn main() {
     let token = token_env.to_string_lossy();
 
     let rutebot = Rutebot::new(token);
-    let get_updates = GetUpdates {
-        timeout: Some(20),
-        ..GetUpdates::new()
-    };
+    let get_updates = GetUpdates::new_with_timeout(20);
     let updates = rutebot
         .incoming_updates(get_updates)
         .then(Ok)
-        .for_each(move |x| {
-            let reply_msg_request = match x {
+        .for_each(move |update| {
+            match update {
                 Ok(Update {
                     message:
                         Some(Message {
@@ -31,37 +29,20 @@ fn main() {
                     ..
                 }) => {
                     let request = SendMessage::new_reply(chat.id, text, message_id);
-                    Some(request)
-                }
-                Ok(Update {
-                    message:
-                        Some(Message {
-                            message_id,
-                            ref chat,
-                            ..
-                        }),
-                    ..
-                }) => {
-                    let request =
-                        SendMessage::new_reply(chat.id, "This is not text...", message_id);
-                    Some(request)
+                    let send_future = rutebot
+                        .prepare_api_request(request)
+                        .send()
+                        .map(|_| ())
+                        .map_err(|x| println!("Got error while sending message: {:?}", x));
+                    tokio::spawn(send_future);
                 }
                 Err(e) => {
                     println!("Got error while getting updates {:?}", e);
-                    None
                 }
-                _ => None,
+                _ => (),
             };
-            if let Some(reply) = reply_msg_request {
-                let send_future = rutebot
-                    .prepare_api_request(reply)
-                    .send()
-                    .map(|_| ())
-                    .map_err(|x| println!("Got error while sending message: {:?}", x));
-                hyper::rt::spawn(send_future);
-            }
             Ok(())
         });
 
-    hyper::rt::run(updates);
+    tokio::run(updates);
 }

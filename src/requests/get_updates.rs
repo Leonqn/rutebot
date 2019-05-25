@@ -64,4 +64,13 @@ impl<'a> GetUpdates<'a> {
             allowed_updates: None,
         }
     }
+
+    pub fn new_with_timeout(timeout: u32) -> Self {
+        Self {
+            offset: None,
+            limit: None,
+            timeout: Some(timeout),
+            allowed_updates: None,
+        }
+    }
 }

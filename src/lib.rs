@@ -4,9 +4,10 @@
 //! # Example
 //! Simple echo bot. It listens all incoming messages and echos text messages, on other messages it replies with text "I can echo only text message".
 //! ```no_run
-//! use hyper::rt::{Future, Stream};
 //! use std::env;
 //!
+//! use futures::future::Future;
+//! use futures::stream::Stream;
 //! use rutebot::client::Rutebot;
 //! use rutebot::requests::{GetUpdates, SendMessage};
 //! use rutebot::responses::{Message, Update};
@@ -17,58 +18,30 @@
 //!     let token = token_env.to_string_lossy();
 //!
 //!     let rutebot = Rutebot::new(token);
-//!     let get_updates = GetUpdates {
-//!         timeout: Some(20),
-//!         ..GetUpdates::new()
-//!     };
+//!     let get_updates = GetUpdates::new_with_timeout(20);
 //!     let updates = rutebot
 //!         .incoming_updates(get_updates)
-//!         .then(Ok)
-//!         .for_each(move |x| {
-//!             let reply_msg_request = match x {
-//!                 Ok(Update {
-//!                     message:
-//!                         Some(Message {
-//!                             message_id,
-//!                             ref chat,
-//!                             text: Some(ref text),
-//!                             ..
-//!                         }),
-//!                     ..
-//!                 }) => {
-//!                     let request = SendMessage::new_reply(chat.id, text, message_id);
-//!                     Some(request)
-//!                 }
-//!                 Ok(Update {
-//!                     message:
-//!                         Some(Message {
-//!                             message_id,
-//!                             ref chat,
-//!                             ..
-//!                         }),
-//!                     ..
-//!                 }) => {
-//!                     let request = SendMessage::new_reply(chat.id, "This is not text...", message_id);
-//!                     Some(request)
-//!                 }
-//!                 Err(e) => {
-//!                     println!("Got error while getting updates {:?}", e);
-//!                     None
-//!                 }
-//!                 _ => None,
-//!             };
-//!             if let Some(reply) = reply_msg_request {
-//!                 let send_future = rutebot
-//!                     .prepare_api_request(reply)
-//!                     .send()
-//!                     .map(|_| ())
-//!                     .map_err(|x| println!("Got error while sending message: {:?}", x));
-//!                 hyper::rt::spawn(send_future);
+//!         .for_each(move |update| {
+//!             if let Update {
+//!                 message:
+//!                 Some(Message {
+//!                          message_id,
+//!                          chat,
+//!                          from: Some(user),
+//!                          ..
+//!                      }),
+//!                 ..
+//!             } = update
+//!             {
+//!                 let response_message = format!("Hello {}", user.first_name);
+//!                 let request = SendMessage::new_reply(chat.id, &response_message, message_id);
+//!                 tokio::spawn(rutebot.prepare_api_request(request).send().then(|_| Ok(())));
 //!             }
 //!             Ok(())
-//!         });
+//!         })
+//!         .then(|_| Ok(()));
 //!
-//!     hyper::rt::run(updates);
+//!     tokio::run(updates);
 //! }
 //! ```
 
