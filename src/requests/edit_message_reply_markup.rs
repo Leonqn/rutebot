@@ -6,17 +6,17 @@ use crate::responses::EditedMessage;
 /// Use this struct to edit only the reply markup of messages.
 /// On success, if edited message is sent by the bot, the edited `Message` is returned, otherwise `True` is returned.
 #[derive(Serialize, Debug, Clone)]
-pub struct EditMessageReplyMarkup<'a, 'c, 'd, 'e> {
+pub struct EditMessageReplyMarkup<'a> {
     /// Identifier of message in chat or identifier of inline message
     #[serde(flatten)]
     pub message_or_inline_message_id: MessageOrInlineMessageId<'a>,
 
     /// Additional interface options.
     #[serde(skip_serializing_if = "Option::is_none")]
-    pub reply_markup: Option<ReplyMarkup<'c, 'd, 'e>>,
+    pub reply_markup: Option<ReplyMarkup<'a>>,
 }
 
-impl<'a, 'c, 'd, 'e> Request for EditMessageReplyMarkup<'a, 'c, 'd, 'e> {
+impl<'a> Request for EditMessageReplyMarkup<'a> {
     type ResponseType = EditedMessage;
 
     fn method(&self) -> &'static str {
@@ -24,10 +24,10 @@ impl<'a, 'c, 'd, 'e> Request for EditMessageReplyMarkup<'a, 'c, 'd, 'e> {
     }
 }
 
-impl<'a, 'b, 'c, 'd, 'e> EditMessageReplyMarkup<'a, 'c, 'd, 'e> {
+impl<'a> EditMessageReplyMarkup<'a> {
     pub fn new_inline_message(
         inline_message_id: &'a str,
-        reply_markup: ReplyMarkup<'c, 'd, 'e>,
+        reply_markup: ReplyMarkup<'a>,
     ) -> Self {
         Self {
             message_or_inline_message_id: MessageOrInlineMessageId::Inline { inline_message_id },
@@ -38,7 +38,7 @@ impl<'a, 'b, 'c, 'd, 'e> EditMessageReplyMarkup<'a, 'c, 'd, 'e> {
     pub fn new_message(
         chat_id: impl Into<ChatId<'a>>,
         message_id: i64,
-        reply_markup: ReplyMarkup<'c, 'd, 'e>,
+        reply_markup: ReplyMarkup<'a>,
     ) -> Self {
         Self {
             message_or_inline_message_id: MessageOrInlineMessageId::Chat {

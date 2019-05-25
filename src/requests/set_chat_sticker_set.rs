@@ -7,15 +7,15 @@ use crate::requests::{ChatId, Request};
 /// appropriate admin rights. Use the field `can_set_sticker_set optionally` returned in
 /// getChat requests to check if the bot can use this method. Returns `True` on success.
 #[derive(Serialize, Debug, Clone)]
-pub struct SetChatStickerSet<'a, 'b> {
+pub struct SetChatStickerSet<'a> {
     /// Unique identifier for the target group or username of the target supergroup or channel
     pub chat_id: ChatId<'a>,
 
     /// Name of the sticker set to be set as the group sticker set
-    pub sticker_set_name: &'b str,
+    pub sticker_set_name: &'a str,
 }
 
-impl<'a, 'b> Request for SetChatStickerSet<'a, 'b> {
+impl<'a> Request for SetChatStickerSet<'a> {
     type ResponseType = bool;
 
     fn method(&self) -> &'static str {
@@ -23,8 +23,8 @@ impl<'a, 'b> Request for SetChatStickerSet<'a, 'b> {
     }
 }
 
-impl<'a, 'b> SetChatStickerSet<'a, 'b> {
-    pub fn new(chat_id: impl Into<ChatId<'a>>, sticker_set_name: &'b str) -> Self {
+impl<'a> SetChatStickerSet<'a> {
+    pub fn new(chat_id: impl Into<ChatId<'a>>, sticker_set_name: &'a str) -> Self {
         Self {
             chat_id: chat_id.into(),
             sticker_set_name,

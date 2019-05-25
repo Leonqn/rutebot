@@ -8,13 +8,13 @@ use crate::responses::EditedMessage;
 /// Use this struct to edit text and game messages. On success, if edited message is sent by the bot, the edited
 /// `Message `is returned, otherwise `True` is returned.
 #[derive(Serialize, Debug, Clone)]
-pub struct EditMessageText<'a, 'b, 'c, 'd, 'e> {
+pub struct EditMessageText<'a> {
     /// Identifier of message in chat or identifier of inline message
     #[serde(flatten)]
     pub message_or_inline_message_id: MessageOrInlineMessageId<'a>,
 
     /// New text of the message.
-    pub text: &'b str,
+    pub text: &'a str,
 
     /// Send `ParseMode::Markdown` or `ParseMode::Html`,
     /// if you want Telegram apps to show
@@ -28,10 +28,10 @@ pub struct EditMessageText<'a, 'b, 'c, 'd, 'e> {
 
     /// Additional interface options.
     #[serde(skip_serializing_if = "Option::is_none")]
-    pub reply_markup: Option<ReplyMarkup<'c, 'd, 'e>>,
+    pub reply_markup: Option<ReplyMarkup<'a>>,
 }
 
-impl<'a, 'b, 'c, 'd, 'e> Request for EditMessageText<'a, 'b, 'c, 'd, 'e> {
+impl<'a> Request for EditMessageText<'a> {
     type ResponseType = EditedMessage;
 
     fn method(&self) -> &'static str {
@@ -39,8 +39,8 @@ impl<'a, 'b, 'c, 'd, 'e> Request for EditMessageText<'a, 'b, 'c, 'd, 'e> {
     }
 }
 
-impl<'a, 'b, 'c, 'd, 'e> EditMessageText<'a, 'b, 'c, 'd, 'e> {
-    pub fn new_inline_message(inline_message_id: &'a str, text: &'b str) -> Self {
+impl<'a> EditMessageText<'a> {
+    pub fn new_inline_message(inline_message_id: &'a str, text: &'a str) -> Self {
         Self {
             message_or_inline_message_id: MessageOrInlineMessageId::Inline { inline_message_id },
             text,
@@ -50,7 +50,7 @@ impl<'a, 'b, 'c, 'd, 'e> EditMessageText<'a, 'b, 'c, 'd, 'e> {
         }
     }
 
-    pub fn new_message(chat_id: impl Into<ChatId<'a>>, message_id: i64, text: &'b str) -> Self {
+    pub fn new_message(chat_id: impl Into<ChatId<'a>>, message_id: i64, text: &'a str) -> Self {
         Self {
             message_or_inline_message_id: MessageOrInlineMessageId::Chat {
                 chat_id: chat_id.into(),

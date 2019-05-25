@@ -7,7 +7,7 @@ use crate::responses::Message;
 
 /// Use this struct to send point on the map. On success, the sent `Message` is returned.
 #[derive(Serialize, Debug, Clone)]
-pub struct SendLocation<'a, 'd, 'e, 'f> {
+pub struct SendLocation<'a> {
     /// Identifier for the target chat
     pub chat_id: ChatId<'a>,
 
@@ -32,10 +32,10 @@ pub struct SendLocation<'a, 'd, 'e, 'f> {
 
     /// Additional interface options.
     #[serde(skip_serializing_if = "Option::is_none")]
-    pub reply_markup: Option<ReplyMarkup<'d, 'e, 'f>>,
+    pub reply_markup: Option<ReplyMarkup<'a>>,
 }
 
-impl<'a, 'd, 'e, 'f> Request for SendLocation<'a, 'd, 'e, 'f> {
+impl<'a> Request for SendLocation<'a> {
     type ResponseType = Message;
 
     fn method(&self) -> &'static str {
@@ -43,7 +43,7 @@ impl<'a, 'd, 'e, 'f> Request for SendLocation<'a, 'd, 'e, 'f> {
     }
 }
 
-impl<'a, 'd, 'e, 'f> SendLocation<'a, 'd, 'e, 'f> {
+impl<'a> SendLocation<'a> {
     pub fn new(chat_id: impl Into<ChatId<'a>>, latitude: f64, longitude: f64) -> Self {
         Self {
             chat_id: chat_id.into(),

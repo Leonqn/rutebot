@@ -7,12 +7,12 @@ use crate::responses::Message;
 
 /// Use this struct to send text messages. On success, the sent `Message` is returned.
 #[derive(Serialize, Debug, Clone)]
-pub struct SendMessage<'a, 'b, 'c, 'd, 'e> {
+pub struct SendMessage<'a> {
     /// Identifier for the target chat
     pub chat_id: ChatId<'a>,
 
     /// Text of the message to be sent.
-    pub text: &'b str,
+    pub text: &'a str,
 
     /// Sends the message [silently](https://telegram.org/blog/channels-2-0#silent-messages).
     /// Users will receive a notification with no sound.
@@ -35,10 +35,10 @@ pub struct SendMessage<'a, 'b, 'c, 'd, 'e> {
 
     /// Additional interface options.
     #[serde(skip_serializing_if = "Option::is_none")]
-    pub reply_markup: Option<ReplyMarkup<'c, 'd, 'e>>,
+    pub reply_markup: Option<ReplyMarkup<'a>>,
 }
 
-impl<'a, 'b, 'c, 'd, 'e> Request for SendMessage<'a, 'b, 'c, 'd, 'e> {
+impl<'a> Request for SendMessage<'a> {
     type ResponseType = Message;
 
     fn method(&self) -> &'static str {
@@ -46,8 +46,8 @@ impl<'a, 'b, 'c, 'd, 'e> Request for SendMessage<'a, 'b, 'c, 'd, 'e> {
     }
 }
 
-impl<'a, 'b, 'c, 'd, 'e> SendMessage<'a, 'b, 'c, 'd, 'e> {
-    pub fn new(chat_id: impl Into<ChatId<'a>>, text: &'b str) -> Self {
+impl<'a> SendMessage<'a> {
+    pub fn new(chat_id: impl Into<ChatId<'a>>, text: &'a str) -> Self {
         Self {
             chat_id: chat_id.into(),
             text,
@@ -61,7 +61,7 @@ impl<'a, 'b, 'c, 'd, 'e> SendMessage<'a, 'b, 'c, 'd, 'e> {
 
     pub fn new_reply(
         chat_id: impl Into<ChatId<'a>>,
-        text: &'b str,
+        text: &'a str,
         reply_to_message_id: i64,
     ) -> Self {
         Self {

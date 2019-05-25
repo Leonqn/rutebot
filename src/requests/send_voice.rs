@@ -17,17 +17,17 @@ use crate::responses::Message;
 /// On success, the sent `Message` is returned. Bots can currently send voice messages of up to 50 MB in size,
 /// this limit may be changed in the future
 #[derive(Serialize, Debug, Clone)]
-pub struct SendVoice<'a, 'b, 'c, 'd, 'e, 'f> {
+pub struct SendVoice<'a> {
     /// Identifier for the target chat
     pub chat_id: ChatId<'a>,
 
     /// Audio file to send.
     #[serde(skip_serializing_if = "FileKind::is_input_file")]
-    pub voice: FileKind<'b>,
+    pub voice: FileKind<'a>,
 
     /// Voice message caption, 0-1024 characters
     #[serde(skip_serializing_if = "Option::is_none")]
-    pub caption: Option<&'c str>,
+    pub caption: Option<&'a str>,
 
     /// Duration of the voice message in seconds
     #[serde(skip_serializing_if = "Option::is_none")]
@@ -50,10 +50,10 @@ pub struct SendVoice<'a, 'b, 'c, 'd, 'e, 'f> {
 
     /// Additional interface options.
     #[serde(skip_serializing_if = "Option::is_none")]
-    pub reply_markup: Option<ReplyMarkup<'d, 'e, 'f>>,
+    pub reply_markup: Option<ReplyMarkup<'a>>,
 }
 
-impl<'a, 'b, 'c, 'd, 'e, 'f> Request for SendVoice<'a, 'b, 'c, 'd, 'e, 'f> {
+impl<'a> Request for SendVoice<'a> {
     type ResponseType = Message;
 
     fn method(&self) -> &'static str {
@@ -75,8 +75,8 @@ impl<'a, 'b, 'c, 'd, 'e, 'f> Request for SendVoice<'a, 'b, 'c, 'd, 'e, 'f> {
     }
 }
 
-impl<'a, 'b, 'c, 'd, 'e, 'f, 'g> SendVoice<'a, 'b, 'c, 'd, 'e, 'f> {
-    pub fn new(chat_id: impl Into<ChatId<'a>>, voice: FileKind<'b>) -> Self {
+impl<'a> SendVoice<'a> {
+    pub fn new(chat_id: impl Into<ChatId<'a>>, voice: FileKind<'a>) -> Self {
         Self {
             chat_id: chat_id.into(),
             voice,
@@ -91,7 +91,7 @@ impl<'a, 'b, 'c, 'd, 'e, 'f, 'g> SendVoice<'a, 'b, 'c, 'd, 'e, 'f> {
 
     pub fn new_reply(
         chat_id: impl Into<ChatId<'a>>,
-        voice: FileKind<'b>,
+        voice: FileKind<'a>,
         reply_to_message_id: i64,
     ) -> Self {
         Self {

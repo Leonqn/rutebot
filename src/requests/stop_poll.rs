@@ -5,7 +5,7 @@ use crate::responses::Poll;
 
 /// Use this struct to stop a poll which was sent by the bot. On success, the stopped `Poll` with the final results is returned.
 #[derive(Serialize, Debug, Clone)]
-pub struct StopPoll<'a, 'f, 'g, 'h> {
+pub struct StopPoll<'a> {
     /// Identifier for the target chat
     pub chat_id: ChatId<'a>,
 
@@ -14,10 +14,10 @@ pub struct StopPoll<'a, 'f, 'g, 'h> {
 
     /// Additional interface options.
     #[serde(skip_serializing_if = "Option::is_none")]
-    pub reply_markup: Option<ReplyMarkup<'f, 'g, 'h>>,
+    pub reply_markup: Option<ReplyMarkup<'a>>,
 }
 
-impl<'a, 'f, 'g, 'h> Request for StopPoll<'a, 'f, 'g, 'h> {
+impl<'a> Request for StopPoll<'a> {
     type ResponseType = Poll;
 
     fn method(&self) -> &'static str {
@@ -25,7 +25,7 @@ impl<'a, 'f, 'g, 'h> Request for StopPoll<'a, 'f, 'g, 'h> {
     }
 }
 
-impl<'a, 'f, 'g, 'h> StopPoll<'a, 'f, 'g, 'h> {
+impl<'a> StopPoll<'a> {
     pub fn new(chat_id: impl Into<ChatId<'a>>, message_id: i64) -> Self {
         Self {
             chat_id: chat_id.into(),

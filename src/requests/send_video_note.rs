@@ -14,17 +14,17 @@ use crate::responses::Message;
 /// As of [v.4.0](https://telegram.org/blog/video-messages-and-telescope), Telegram clients support rounded square mp4 videos of up to 1 minute long.
 /// Use this struct to send video messages. On success, the sent `Message` is returned
 #[derive(Serialize, Debug, Clone)]
-pub struct SendVideoNote<'a, 'b, 'c, 'd, 'e, 'f> {
+pub struct SendVideoNote<'a> {
     /// Identifier for the target chat
     pub chat_id: ChatId<'a>,
 
     /// Video note to send.
     #[serde(skip_serializing_if = "FileKind::is_input_file")]
-    pub video_note: FileKind<'b>,
+    pub video_note: FileKind<'a>,
 
     /// Voice message caption, 0-1024 characters
     #[serde(skip_serializing_if = "Option::is_none")]
-    pub caption: Option<&'c str>,
+    pub caption: Option<&'a str>,
 
     /// Duration of the voice message in seconds
     #[serde(skip_serializing_if = "Option::is_none")]
@@ -51,10 +51,10 @@ pub struct SendVideoNote<'a, 'b, 'c, 'd, 'e, 'f> {
 
     /// Additional interface options.
     #[serde(skip_serializing_if = "Option::is_none")]
-    pub reply_markup: Option<ReplyMarkup<'d, 'e, 'f>>,
+    pub reply_markup: Option<ReplyMarkup<'a>>,
 }
 
-impl<'a, 'b, 'c, 'd, 'e, 'f> Request for SendVideoNote<'a, 'b, 'c, 'd, 'e, 'f> {
+impl<'a> Request for SendVideoNote<'a> {
     type ResponseType = Message;
 
     fn method(&self) -> &'static str {
@@ -76,8 +76,8 @@ impl<'a, 'b, 'c, 'd, 'e, 'f> Request for SendVideoNote<'a, 'b, 'c, 'd, 'e, 'f> {
     }
 }
 
-impl<'a, 'b, 'c, 'd, 'e, 'f> SendVideoNote<'a, 'b, 'c, 'd, 'e, 'f> {
-    pub fn new(chat_id: impl Into<ChatId<'a>>, video_note: FileKind<'b>) -> Self {
+impl<'a> SendVideoNote<'a> {
+    pub fn new(chat_id: impl Into<ChatId<'a>>, video_note: FileKind<'a>) -> Self {
         Self {
             chat_id: chat_id.into(),
             video_note,
@@ -93,7 +93,7 @@ impl<'a, 'b, 'c, 'd, 'e, 'f> SendVideoNote<'a, 'b, 'c, 'd, 'e, 'f> {
 
     pub fn new_reply(
         chat_id: impl Into<ChatId<'a>>,
-        video_note: FileKind<'b>,
+        video_note: FileKind<'a>,
         reply_to_message_id: i64,
     ) -> Self {
         Self {
