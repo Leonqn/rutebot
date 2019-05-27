@@ -4,7 +4,7 @@ use futures::future::Future;
 use futures::stream::Stream;
 use rutebot::client::Rutebot;
 use rutebot::requests::{GetUpdates, SendMessage};
-use rutebot::responses::{Message, Update};
+use rutebot::responses::Update;
 
 fn main() {
     let token_env = env::var_os("TELEGRAM_TOKEN")
@@ -16,20 +16,16 @@ fn main() {
     let updates = rutebot
         .incoming_updates(get_updates)
         .for_each(move |update| {
-            if let Update {
-                message:
-                    Some(Message {
-                        message_id,
-                        chat,
-                        from: Some(user),
-                        ..
-                    }),
-                ..
-            } = update
-            {
-                let response_message = format!("Hello {}", user.first_name);
-                let request = SendMessage::new_reply(chat.id, &response_message, message_id);
-                tokio::spawn(rutebot.prepare_api_request(request).send().then(|_| Ok(())));
+            let create_reply_request = |update: Update| {
+                let message = update.message?;
+                let response_message = format!("Hello {}", message.from?.first_name);
+                let reply =
+                    SendMessage::new_reply(message.chat.id, &response_message, message.message_id);
+                Some(rutebot.prepare_api_request(reply))
+            };
+
+            if let Some(reply) = create_reply_request(update) {
+                tokio::spawn(reply.send().then(|_| Ok(())));
             }
             Ok(())
         })
