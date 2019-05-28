@@ -2,7 +2,7 @@
 //! You can find all implemented methods in `requests` module.
 //!
 //! # Example
-//! Simple echo bot. It listens all incoming messages and echos text messages, on other messages it replies with text "I can echo only text message".
+//! A simple greetings bot. Replies to all messages with text "Hello %USERNAME%"
 //! ```no_run
 //! use std::env;
 //!
