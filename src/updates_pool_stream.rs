@@ -1,4 +1,4 @@
-use std::cmp::max;
+use std::cmp::{max, min};
 use std::collections::VecDeque;
 use std::time::{Duration, Instant};
 
@@ -38,7 +38,7 @@ where
             return Ok(Async::Ready(Some(update)));
         }
         if self.has_error {
-            let retry_delay = max(self.max_retry_delay_sec, 2u8.pow(self.retries.into()));
+            let retry_delay = min(self.max_retry_delay_sec, 2u8.pow(self.retries.into()));
             let deadline = Instant::now() + Duration::from_secs(retry_delay.into());
 
             self.retry_delay = Some(Delay::new(deadline));
