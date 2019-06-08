@@ -16,7 +16,6 @@ pub struct UpdatesPoolStream<Fut, Sender> {
     pub executing_request: Fut,
     pub is_canceled: bool,
     pub last_id: Option<i64>,
-    pub has_error: bool,
     pub retry_delay: Option<Delay>,
     pub max_retry_delay_sec: u8,
     pub retries: u16,
@@ -36,14 +35,6 @@ where
         }
         if let Some(update) = self.buffer.pop_front() {
             return Ok(Async::Ready(Some(update)));
-        }
-        if self.has_error {
-            let retry_delay = min(self.max_retry_delay_sec, 2u8.pow(self.retries.into()));
-            let deadline = Instant::now() + Duration::from_secs(retry_delay.into());
-
-            self.retry_delay = Some(Delay::new(deadline));
-            self.retries += 1;
-            self.has_error = false
         }
         if let Some(retry_delay) = &mut self.retry_delay {
             return match retry_delay.poll() {
@@ -68,7 +59,12 @@ where
                 self.poll()
             }
             Err(err) => {
-                self.has_error = true;
+                let retry_delay = min(self.max_retry_delay_sec, 2u8.pow(self.retries.into()));
+                let deadline = Instant::now() + Duration::from_secs(retry_delay.into());
+
+                self.retry_delay = Some(Delay::new(deadline));
+                self.retries += 1;
+
                 Err(err)
             }
         }
