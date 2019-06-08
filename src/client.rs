@@ -232,6 +232,9 @@ impl Rutebot {
             is_canceled: false,
             last_id: offset,
             has_error: false,
+            retry_delay: None,
+            max_retry_delay_sec: 8,
+            retries: 0,
         }
     }
 }
