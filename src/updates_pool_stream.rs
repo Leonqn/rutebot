@@ -37,12 +37,11 @@ where
             return Ok(Async::Ready(Some(update)));
         }
         if let Some(retry_delay) = &mut self.retry_delay {
-            return match retry_delay.poll() {
-                Ok(Async::NotReady) => Ok(Async::NotReady),
+            match retry_delay.poll() {
+                Ok(Async::NotReady) => return Ok(Async::NotReady),
                 _ => {
                     self.retry_delay = None;
                     self.executing_request = (self.send_request)(self.last_id);
-                    self.poll()
                 }
             };
         }
