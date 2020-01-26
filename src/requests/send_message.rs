@@ -61,7 +61,11 @@ impl<'a> SendMessage<'a> {
         }
     }
 
-    pub fn new_reply(chat_id: impl Into<ChatId<'a>>, text: &'a str, reply_to_message_id: i64) -> Self {
+    pub fn new_reply(
+        chat_id: impl Into<ChatId<'a>>,
+        text: &'a str,
+        reply_to_message_id: i64,
+    ) -> Self {
         Self {
             chat_id: chat_id.into(),
             text,

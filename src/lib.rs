@@ -49,4 +49,3 @@ pub mod requests;
 
 /// Errors definitions
 pub mod error;
-

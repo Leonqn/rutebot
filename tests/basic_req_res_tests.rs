@@ -2,16 +2,19 @@ use pretty_assertions::assert_eq;
 
 use rutebot::{
     requests::{
-        ChatAction, DeleteChatPhoto, DeleteMessage, EditLiveLocation, EditMessageCaption, EditMessageMedia, EditMessageText,
-        ExportChatInviteLink, FileKind, ForwardMessage, GetChat, GetChatAdministrators, GetChatMembersCount, GetFile, GetMe, GetUpdates,
-        GetUserProfilePhotos, InlineKeyboard, InlineKeyboardButton, InputMedia, InputMediaPhoto, InputMediaPhotoOrVideo, InputMediaVideo,
-        ParseMode, PinChatMessage, ReplyMarkup, SendAnimation, SendAudio, SendChatAction, SendContact, SendDocument, SendLocation,
-        SendMediaGroup, SendMessage, SendPhoto, SendPoll, SendVenue, SendVideo, SendVideoNote, SendVoice, SetChatDescription, SetChatPhoto,
-        SetChatTitle, StopLiveLocation, StopPoll, UnpinChatMessage,
+        ChatAction, DeleteChatPhoto, DeleteMessage, EditLiveLocation, EditMessageCaption,
+        EditMessageMedia, EditMessageText, ExportChatInviteLink, FileKind, ForwardMessage, GetChat,
+        GetChatAdministrators, GetChatMembersCount, GetFile, GetMe, GetUpdates,
+        GetUserProfilePhotos, InlineKeyboard, InlineKeyboardButton, InputMedia, InputMediaPhoto,
+        InputMediaPhotoOrVideo, InputMediaVideo, ParseMode, PinChatMessage, ReplyMarkup,
+        SendAnimation, SendAudio, SendChatAction, SendContact, SendDocument, SendLocation,
+        SendMediaGroup, SendMessage, SendPhoto, SendPoll, SendVenue, SendVideo, SendVideoNote,
+        SendVoice, SetChatDescription, SetChatPhoto, SetChatTitle, StopLiveLocation, StopPoll,
+        UnpinChatMessage,
     },
     responses::{
-        Audio, Chat, ChatMember, Contact, Document, EditedMessage, Message, MessageEntityValue, Poll, Update, User, UserProfilePhotos,
-        Venue, Video, VideoNote, Voice,
+        Audio, Chat, ChatMember, Contact, Document, EditedMessage, Message, MessageEntityValue,
+        Poll, Update, User, UserProfilePhotos, Venue, Video, VideoNote, Voice,
     },
 };
 use std::{fs::File, io::Read, time::Instant};
@@ -45,7 +48,11 @@ async fn send_message_works() {
 async fn forward_message_works() {
     let rutebot = common::create_client();
     let chat_id = common::get_chat_id();
-    let sent_msg: Message = rutebot.prepare_api_request(SendMessage::new(chat_id, "test")).send().await.unwrap();
+    let sent_msg: Message = rutebot
+        .prepare_api_request(SendMessage::new(chat_id, "test"))
+        .send()
+        .await
+        .unwrap();
 
     let response: Message = rutebot
         .prepare_api_request(ForwardMessage::new(chat_id, chat_id, sent_msg.message_id))
@@ -74,7 +81,11 @@ async fn send_chat_action_works() {
 async fn get_updates_works() {
     let rutebot = common::create_client();
 
-    let _response: Vec<Update> = rutebot.prepare_api_request(GetUpdates::new()).send().await.unwrap();
+    let _response: Vec<Update> = rutebot
+        .prepare_api_request(GetUpdates::new())
+        .send()
+        .await
+        .unwrap();
 }
 
 #[tokio::test]
@@ -100,9 +111,22 @@ async fn send_document_works() {
         )
     };
 
-    let response: Document = rutebot.prepare_api_request(request).send().await.unwrap().document.unwrap();
-    let file_handle = rutebot.prepare_api_request(GetFile::new(&response.file_id)).send().await.unwrap();
-    let downloaded_document = rutebot.download_file(&file_handle.file_path.unwrap()).await.unwrap();
+    let response: Document = rutebot
+        .prepare_api_request(request)
+        .send()
+        .await
+        .unwrap()
+        .document
+        .unwrap();
+    let file_handle = rutebot
+        .prepare_api_request(GetFile::new(&response.file_id))
+        .send()
+        .await
+        .unwrap();
+    let downloaded_document = rutebot
+        .download_file(&file_handle.file_path.unwrap())
+        .await
+        .unwrap();
 
     assert_eq!(response.file_size, Some(5));
     assert_eq!(response.file_name, Some("superfile".to_owned()));
@@ -130,7 +154,13 @@ async fn send_document_with_thumb_works() {
         )
     };
 
-    let response: Document = rutebot.prepare_api_request(request).send().await.unwrap().document.unwrap();
+    let response: Document = rutebot
+        .prepare_api_request(request)
+        .send()
+        .await
+        .unwrap()
+        .document
+        .unwrap();
 
     assert_eq!(response.file_size, Some(5));
     assert_eq!(response.file_name, Some("superfile".to_owned()));
@@ -182,9 +212,22 @@ async fn send_audio_works() {
         )
     };
 
-    let response: Audio = rutebot.prepare_api_request(request).send().await.unwrap().audio.unwrap();
-    let file_handle = rutebot.prepare_api_request(GetFile::new(&response.file_id)).send().await.unwrap();
-    let downloaded_audio = rutebot.download_file(&file_handle.file_path.unwrap()).await.unwrap();
+    let response: Audio = rutebot
+        .prepare_api_request(request)
+        .send()
+        .await
+        .unwrap()
+        .audio
+        .unwrap();
+    let file_handle = rutebot
+        .prepare_api_request(GetFile::new(&response.file_id))
+        .send()
+        .await
+        .unwrap();
+    let downloaded_audio = rutebot
+        .download_file(&file_handle.file_path.unwrap())
+        .await
+        .unwrap();
 
     assert_eq!(downloaded_audio.len(), audio_size);
 }
@@ -208,9 +251,22 @@ async fn send_video_works() {
         },
     );
 
-    let response: Video = rutebot.prepare_api_request(request).send().await.unwrap().video.unwrap();
-    let file_handle = rutebot.prepare_api_request(GetFile::new(&response.file_id)).send().await.unwrap();
-    let downloaded_video = rutebot.download_file(&file_handle.file_path.unwrap()).await.unwrap();
+    let response: Video = rutebot
+        .prepare_api_request(request)
+        .send()
+        .await
+        .unwrap()
+        .video
+        .unwrap();
+    let file_handle = rutebot
+        .prepare_api_request(GetFile::new(&response.file_id))
+        .send()
+        .await
+        .unwrap();
+    let downloaded_video = rutebot
+        .download_file(&file_handle.file_path.unwrap())
+        .await
+        .unwrap();
 
     assert_eq!(downloaded_video.len(), video_size);
 }
@@ -220,7 +276,10 @@ async fn send_animation_works() {
     let rutebot = common::create_client();
     let chat_id = common::get_chat_id();
     let mut gif_content = Vec::new();
-    File::open("./tests/sample_gif.gif").unwrap().read_to_end(&mut gif_content).unwrap();
+    File::open("./tests/sample_gif.gif")
+        .unwrap()
+        .read_to_end(&mut gif_content)
+        .unwrap();
     let request = SendAnimation {
         width: Some(808),
         height: Some(538),
@@ -258,9 +317,18 @@ async fn send_voice_works() {
         },
     );
 
-    let response: Voice = (rutebot.prepare_api_request(request).send().await.unwrap()).voice.unwrap();
-    let file_handle = rutebot.prepare_api_request(GetFile::new(&response.file_id)).send().await.unwrap();
-    let downloaded_voice = rutebot.download_file(&file_handle.file_path.unwrap()).await.unwrap();
+    let response: Voice = (rutebot.prepare_api_request(request).send().await.unwrap())
+        .voice
+        .unwrap();
+    let file_handle = rutebot
+        .prepare_api_request(GetFile::new(&response.file_id))
+        .send()
+        .await
+        .unwrap();
+    let downloaded_voice = rutebot
+        .download_file(&file_handle.file_path.unwrap())
+        .await
+        .unwrap();
 
     assert_eq!(downloaded_voice.len(), voice_size);
 }
@@ -284,9 +352,18 @@ async fn send_video_note_works() {
         },
     );
 
-    let response: VideoNote = (rutebot.prepare_api_request(request).send().await.unwrap()).video_note.unwrap();
-    let file_handle = rutebot.prepare_api_request(GetFile::new(&response.file_id)).send().await.unwrap();
-    let downloaded_video_note = rutebot.download_file(&file_handle.file_path.unwrap()).await.unwrap();
+    let response: VideoNote = (rutebot.prepare_api_request(request).send().await.unwrap())
+        .video_note
+        .unwrap();
+    let file_handle = rutebot
+        .prepare_api_request(GetFile::new(&response.file_id))
+        .send()
+        .await
+        .unwrap();
+    let downloaded_video_note = rutebot
+        .download_file(&file_handle.file_path.unwrap())
+        .await
+        .unwrap();
 
     assert_eq!(downloaded_video_note.len(), video_note_size);
 }
@@ -348,7 +425,12 @@ async fn edit_location_works() {
     let location: Message = rutebot.prepare_api_request(request).send().await.unwrap();
     let edit_request = EditLiveLocation::new_message(chat_id, location.message_id, 63.2, 32.1);
 
-    if let EditedMessage::Message(message) = rutebot.prepare_api_request(edit_request).send().await.unwrap() {
+    if let EditedMessage::Message(message) = rutebot
+        .prepare_api_request(edit_request)
+        .send()
+        .await
+        .unwrap()
+    {
         assert_eq!(message.location.is_some(), true);
     } else {
         panic!("Returned true.");
@@ -366,7 +448,12 @@ async fn stop_location_works() {
     let location: Message = rutebot.prepare_api_request(request).send().await.unwrap();
     let stop_request = StopLiveLocation::new_chat(chat_id, location.message_id);
 
-    if let EditedMessage::Message(message) = rutebot.prepare_api_request(stop_request).send().await.unwrap() {
+    if let EditedMessage::Message(message) = rutebot
+        .prepare_api_request(stop_request)
+        .send()
+        .await
+        .unwrap()
+    {
         assert_eq!(message.location.is_some(), true);
     } else {
         panic!("Returned true.");
@@ -379,7 +466,9 @@ async fn send_venue_works() {
     let chat_id = common::get_chat_id();
     let request = SendVenue::new(chat_id, 63.4, 32.2, "test_title", "test_address");
 
-    let venue: Venue = (rutebot.prepare_api_request(request).send().await.unwrap()).venue.unwrap();
+    let venue: Venue = (rutebot.prepare_api_request(request).send().await.unwrap())
+        .venue
+        .unwrap();
 
     assert_eq!(venue.address, "test_address");
     assert_eq!(venue.title, "test_title");
@@ -391,7 +480,9 @@ async fn send_contact_works() {
     let chat_id = common::get_chat_id();
     let request = SendContact::new(chat_id, "+79506470372", "imya");
 
-    let contact: Contact = (rutebot.prepare_api_request(request).send().await.unwrap()).contact.unwrap();
+    let contact: Contact = (rutebot.prepare_api_request(request).send().await.unwrap())
+        .contact
+        .unwrap();
 
     assert_eq!(contact.phone_number, "+79506470372");
     assert_eq!(contact.first_name, "imya");
@@ -401,9 +492,15 @@ async fn send_contact_works() {
 async fn send_poll_works() {
     let rutebot = common::create_client();
     let chat_id = common::get_chat_id();
-    let request = SendPoll::new(chat_id, "to be or not to be", &["to be", "do not to be", "see results"]);
+    let request = SendPoll::new(
+        chat_id,
+        "to be or not to be",
+        &["to be", "do not to be", "see results"],
+    );
 
-    let poll: Poll = (rutebot.prepare_api_request(request).send().await.unwrap()).poll.unwrap();
+    let poll: Poll = (rutebot.prepare_api_request(request).send().await.unwrap())
+        .poll
+        .unwrap();
 
     assert_eq!(&poll.question, "to be or not to be");
 }
@@ -454,7 +551,11 @@ async fn delete_chat_photo_works() {
         .read_to_end(&mut photo_content)
         .unwrap();
     let set_request = SetChatPhoto::new(chat_id, photo_content);
-    (rutebot.prepare_api_request(set_request).send().await.unwrap());
+    (rutebot
+        .prepare_api_request(set_request)
+        .send()
+        .await
+        .unwrap());
     let request = DeleteChatPhoto::new(chat_id);
 
     let is_deleted = rutebot.prepare_api_request(request).send().await.unwrap();
@@ -559,7 +660,12 @@ async fn edit_message_text_works() {
         .unwrap();
     let edit_request = EditMessageText::new_message(chat_id, text_message.message_id, "new text");
 
-    if let EditedMessage::Message(message) = rutebot.prepare_api_request(edit_request).send().await.unwrap() {
+    if let EditedMessage::Message(message) = rutebot
+        .prepare_api_request(edit_request)
+        .send()
+        .await
+        .unwrap()
+    {
         assert_eq!(message.text.unwrap(), "new text");
     } else {
         panic!("Returned true.");
@@ -571,7 +677,10 @@ async fn edit_message_caption_works() {
     let rutebot = common::create_client();
     let chat_id = common::get_chat_id();
     let mut gif_content = Vec::new();
-    File::open("./tests/sample_gif.gif").unwrap().read_to_end(&mut gif_content).unwrap();
+    File::open("./tests/sample_gif.gif")
+        .unwrap()
+        .read_to_end(&mut gif_content)
+        .unwrap();
     let request = SendAnimation {
         width: Some(808),
         height: Some(538),
@@ -587,9 +696,15 @@ async fn edit_message_caption_works() {
     };
 
     let animation: Message = rutebot.prepare_api_request(request).send().await.unwrap();
-    let edit_request = EditMessageCaption::new_message(chat_id, animation.message_id, "new caption");
+    let edit_request =
+        EditMessageCaption::new_message(chat_id, animation.message_id, "new caption");
 
-    if let EditedMessage::Message(message) = rutebot.prepare_api_request(edit_request).send().await.unwrap() {
+    if let EditedMessage::Message(message) = rutebot
+        .prepare_api_request(edit_request)
+        .send()
+        .await
+        .unwrap()
+    {
         assert_eq!(&message.caption.unwrap(), "new caption");
     } else {
         panic!("Returned true.");
@@ -607,7 +722,10 @@ async fn edit_message_media_works() {
         .unwrap()
         .read_to_end(&mut old_video)
         .unwrap();
-    File::open("./tests/sample_video.mp4").unwrap().read_to_end(&mut new_video).unwrap();
+    File::open("./tests/sample_video.mp4")
+        .unwrap()
+        .read_to_end(&mut new_video)
+        .unwrap();
     File::open("./tests/photo_test.jpg")
         .unwrap()
         .read_to_end(&mut photo_content)
@@ -631,7 +749,12 @@ async fn edit_message_media_works() {
         })),
     );
 
-    if let EditedMessage::Message(message) = rutebot.prepare_api_request(edit_video).send().await.unwrap() {
+    if let EditedMessage::Message(message) = rutebot
+        .prepare_api_request(edit_video)
+        .send()
+        .await
+        .unwrap()
+    {
         assert_eq!(message.video.is_some(), true);
         assert_eq!(message.video.unwrap().thumb.is_some(), true);
     } else {
@@ -643,11 +766,19 @@ async fn edit_message_media_works() {
 async fn stop_poll_works() {
     let rutebot = common::create_client();
     let chat_id = common::get_chat_id();
-    let request = SendPoll::new(chat_id, "to be or not to be", &["to be", "do not to be", "see results"]);
+    let request = SendPoll::new(
+        chat_id,
+        "to be or not to be",
+        &["to be", "do not to be", "see results"],
+    );
     let msg_with_poll: Message = rutebot.prepare_api_request(request).send().await.unwrap();
     let stop_poll_request = StopPoll::new(chat_id, msg_with_poll.message_id);
 
-    let response: Poll = rutebot.prepare_api_request(stop_poll_request).send().await.unwrap();
+    let response: Poll = rutebot
+        .prepare_api_request(stop_poll_request)
+        .send()
+        .await
+        .unwrap();
 
     assert_eq!(&response.question, "to be or not to be");
 }
@@ -663,7 +794,11 @@ async fn delete_message_works() {
         .unwrap();
     let delete_message_request = DeleteMessage::new(chat_id, response.message_id);
 
-    let response: bool = rutebot.prepare_api_request(delete_message_request).send().await.unwrap();
+    let response: bool = rutebot
+        .prepare_api_request(delete_message_request)
+        .send()
+        .await
+        .unwrap();
 
     assert_eq!(response, true);
 }
@@ -694,7 +829,7 @@ async fn message_entity_values_extracted_correctly() {
         Some(MessageEntityValue::TextLink { link, text }) => {
             assert_eq!(link.as_str(), "http://example.com/");
             assert_eq!(text.as_str(), "экзамл.ком");
-        },
+        }
         x => panic!("wrong message entity: {:?}", x),
     }
 }

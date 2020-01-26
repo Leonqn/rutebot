@@ -58,7 +58,12 @@ impl<'a> SendLocation<'a> {
         }
     }
 
-    pub fn new_reply(chat_id: impl Into<ChatId<'a>>, latitude: f64, longitude: f64, reply_to_message_id: i64) -> Self {
+    pub fn new_reply(
+        chat_id: impl Into<ChatId<'a>>,
+        latitude: f64,
+        longitude: f64,
+        reply_to_message_id: i64,
+    ) -> Self {
         Self {
             chat_id: chat_id.into(),
             latitude,

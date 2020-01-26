@@ -21,6 +21,8 @@ impl<'a> Request for ExportChatInviteLink<'a> {
 
 impl<'a> ExportChatInviteLink<'a> {
     pub fn new(chat_id: impl Into<ChatId<'a>>) -> Self {
-        Self { chat_id: chat_id.into() }
+        Self {
+            chat_id: chat_id.into(),
+        }
     }
 }

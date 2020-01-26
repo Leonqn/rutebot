@@ -56,7 +56,13 @@ impl<'a> Request for SendVenue<'a> {
 }
 
 impl<'a> SendVenue<'a> {
-    pub fn new(chat_id: impl Into<ChatId<'a>>, latitude: f64, longitude: f64, title: &'a str, address: &'a str) -> Self {
+    pub fn new(
+        chat_id: impl Into<ChatId<'a>>,
+        latitude: f64,
+        longitude: f64,
+        title: &'a str,
+        address: &'a str,
+    ) -> Self {
         Self {
             chat_id: chat_id.into(),
             latitude,

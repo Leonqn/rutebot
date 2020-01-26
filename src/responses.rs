@@ -254,7 +254,11 @@ pub enum MessageEntityValue<'a> {
 impl MessageEntity {
     /// Try to extract correct messageEntity from text message.
     pub fn extract_value(&self, text: &str) -> Option<MessageEntityValue> {
-        let utf16_capture: Vec<u16> = text.encode_utf16().skip(self.offset as usize).take(self.length as usize).collect();
+        let utf16_capture: Vec<u16> = text
+            .encode_utf16()
+            .skip(self.offset as usize)
+            .take(self.length as usize)
+            .collect();
         let captured = String::from_utf16_lossy(&utf16_capture);
         match self.typ.as_ref() {
             "mention" => Some(MessageEntityValue::Mention(captured)),
@@ -268,11 +272,17 @@ impl MessageEntity {
             "italic" => Some(MessageEntityValue::Italic(captured)),
             "code" => Some(MessageEntityValue::Code(captured)),
             "pre" => Some(MessageEntityValue::Pre(captured)),
-            "text_link" => self.url.as_ref().map(|link| MessageEntityValue::TextLink { text: captured, link }),
+            "text_link" => self.url.as_ref().map(|link| MessageEntityValue::TextLink {
+                text: captured,
+                link,
+            }),
             "text_mention" => self
                 .user
                 .as_ref()
-                .map(|user| MessageEntityValue::TextMention { mention: captured, user }),
+                .map(|user| MessageEntityValue::TextMention {
+                    mention: captured,
+                    user,
+                }),
             _ => None,
         }
     }

@@ -54,10 +54,18 @@ impl<TResponse: DeserializeOwned> ApiRequest<TResponse> {
     pub async fn send(self) -> Result<TResponse, Error> {
         let http_request = self.http_request;
 
-        let response = self.inner.http_client.request(http_request?).await.map_err(Error::Hyper)?;
+        let response = self
+            .inner
+            .http_client
+            .request(http_request?)
+            .await
+            .map_err(Error::Hyper)?;
 
-        let body = hyper::body::aggregate(response).await.map_err(Error::Hyper)?;
-        let response: TgResponse<TResponse> = serde_json::from_reader(body.reader()).map_err(Error::Serde)?;
+        let body = hyper::body::aggregate(response)
+            .await
+            .map_err(Error::Hyper)?;
+        let response: TgResponse<TResponse> =
+            serde_json::from_reader(body.reader()).map_err(Error::Serde)?;
 
         match response {
             TgResponse {
@@ -106,7 +114,10 @@ impl Rutebot {
     /// };
     /// let response = bot.prepare_api_request(get_updates);
     /// ```
-    pub fn prepare_api_request<TRequest, TResponse>(&self, request: TRequest) -> ApiRequest<TResponse>
+    pub fn prepare_api_request<TRequest, TResponse>(
+        &self,
+        request: TRequest,
+    ) -> ApiRequest<TResponse>
     where
         TRequest: requests::Request<ResponseType = TResponse>,
         TResponse: DeserializeOwned + 'static,
@@ -135,17 +146,27 @@ impl Rutebot {
         let uri = format!("{}{}/{}", GET_FILE_URI, self.inner.token, file_path)
             .parse()
             .expect("Error has occurred while creating get_file uri");
-        let response = self.inner.http_client.get(uri).await.map_err(Error::Hyper)?;
+        let response = self
+            .inner
+            .http_client
+            .get(uri)
+            .await
+            .map_err(Error::Hyper)?;
         let http_code = response.status();
-        let body = hyper::body::aggregate(response).await.map_err(Error::Hyper)?;
+        let body = hyper::body::aggregate(response)
+            .await
+            .map_err(Error::Hyper)?;
 
         if http_code.is_success() {
             Ok(body.bytes().to_vec())
         } else {
-            let response: TgResponse<()> = serde_json::from_reader(body.reader()).map_err(Error::Serde)?;
+            let response: TgResponse<()> =
+                serde_json::from_reader(body.reader()).map_err(Error::Serde)?;
             Err(Error::Api {
                 error_code: response.error_code.unwrap_or(0),
-                description: response.description.unwrap_or_else(|| "Unknown error".to_string()),
+                description: response
+                    .description
+                    .unwrap_or_else(|| "Unknown error".to_string()),
                 parameters: response.parameters,
             })
         }
@@ -157,29 +178,32 @@ impl Rutebot {
         updates_filter: Option<Vec<UpdateKind>>,
     ) -> impl Stream<Item = Result<Update, Error>> {
         let api = self.clone();
-        futures_util::stream::unfold((start_offset, updates_filter, api), |(offset, updates_filter, api)| {
-            async move {
-                let request = GetUpdates {
-                    offset,
-                    limit: None,
-                    timeout: Some(10),
-                    allowed_updates: updates_filter.as_ref().map(Vec::as_slice),
-                };
-                let response = api.prepare_api_request(request).send().await;
-                let new_offset = response
-                    .as_ref()
-                    .ok()
-                    .and_then(|updates| {
-                        updates
-                            .iter()
-                            .map(|update| update.update_id)
-                            .max()
-                            .map(|max_update_id| max_update_id + 1)
-                    })
-                    .or(offset);
-                Some((response, (new_offset, updates_filter, api)))
-            }
-        })
+        futures_util::stream::unfold(
+            (start_offset, updates_filter, api),
+            |(offset, updates_filter, api)| {
+                async move {
+                    let request = GetUpdates {
+                        offset,
+                        limit: None,
+                        timeout: Some(10),
+                        allowed_updates: updates_filter.as_ref().map(Vec::as_slice),
+                    };
+                    let response = api.prepare_api_request(request).send().await;
+                    let new_offset = response
+                        .as_ref()
+                        .ok()
+                        .and_then(|updates| {
+                            updates
+                                .iter()
+                                .map(|update| update.update_id)
+                                .max()
+                                .map(|max_update_id| max_update_id + 1)
+                        })
+                        .or(offset);
+                    Some((response, (new_offset, updates_filter, api)))
+                }
+            },
+        )
         .map_ok(|updates| futures_util::stream::iter(updates).map(Ok))
         .try_flatten()
     }

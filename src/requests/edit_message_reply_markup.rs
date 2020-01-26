@@ -34,7 +34,11 @@ impl<'a> EditMessageReplyMarkup<'a> {
         }
     }
 
-    pub fn new_message(chat_id: impl Into<ChatId<'a>>, message_id: i64, reply_markup: ReplyMarkup<'a>) -> Self {
+    pub fn new_message(
+        chat_id: impl Into<ChatId<'a>>,
+        message_id: i64,
+        reply_markup: ReplyMarkup<'a>,
+    ) -> Self {
         Self {
             message_or_inline_message_id: MessageOrInlineMessageId::Chat {
                 chat_id: chat_id.into(),

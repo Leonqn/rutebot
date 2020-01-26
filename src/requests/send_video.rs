@@ -6,7 +6,10 @@ use serde::Serialize;
 
 use crate::{
     error::Error,
-    requests::{add_fields_to_form, add_file_to_form, add_form_body, add_json_body, ChatId, FileKind, ParseMode, ReplyMarkup, Request},
+    requests::{
+        add_fields_to_form, add_file_to_form, add_form_body, add_json_body, ChatId, FileKind,
+        ParseMode, ReplyMarkup, Request,
+    },
     responses::Message,
 };
 
@@ -69,7 +72,10 @@ impl<'a> Request for SendVideo<'a> {
         "sendVideo"
     }
 
-    fn set_http_request_body(self, request_builder: hyper::http::request::Builder) -> Result<hyper::http::request::Request<Body>, Error> {
+    fn set_http_request_body(
+        self,
+        request_builder: hyper::http::request::Builder,
+    ) -> Result<hyper::http::request::Request<Body>, Error> {
         if self.video.is_input_file() {
             let mut form = Form::default();
             add_fields_to_form(&mut form, &self)?;
@@ -98,7 +104,11 @@ impl<'a> SendVideo<'a> {
         }
     }
 
-    pub fn new_reply(chat_id: impl Into<ChatId<'a>>, video: FileKind<'a>, reply_to_message_id: i64) -> Self {
+    pub fn new_reply(
+        chat_id: impl Into<ChatId<'a>>,
+        video: FileKind<'a>,
+        reply_to_message_id: i64,
+    ) -> Self {
         Self {
             chat_id: chat_id.into(),
             video,
