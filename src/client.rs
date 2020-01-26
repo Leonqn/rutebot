@@ -13,6 +13,7 @@ use hyper_tls::HttpsConnector;
 use serde::de::DeserializeOwned;
 use serde_json;
 
+use std::io::Read;
 use std::marker::PhantomData;
 
 const BASE_API_URI: &str = "https://api.telegram.org/bot";
@@ -158,7 +159,10 @@ impl Rutebot {
             .map_err(Error::Hyper)?;
 
         if http_code.is_success() {
-            Ok(body.bytes().to_vec())
+            let mut response_bytes = Vec::with_capacity(body.remaining());
+            let mut reader = body.reader();
+            reader.read_to_end(&mut response_bytes).map_err(Error::IO)?;
+            Ok(response_bytes)
         } else {
             let response: TgResponse<()> =
                 serde_json::from_reader(body.reader()).map_err(Error::Serde)?;

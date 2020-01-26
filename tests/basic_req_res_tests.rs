@@ -495,7 +495,7 @@ async fn send_poll_works() {
     let request = SendPoll::new(
         chat_id,
         "to be or not to be",
-        &["to be", "do not to be", "see results"],
+        &["to be", "not to be", "see results"],
     );
 
     let poll: Poll = (rutebot.prepare_api_request(request).send().await.unwrap())

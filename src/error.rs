@@ -11,6 +11,7 @@ pub enum Error {
     Hyper(hyper::Error),
     RequestBuilt(String),
     Serde(serde_json::Error),
+    IO(std::io::Error),
     /// Telegram bot api error
     Api {
         /// Error code returned by api
@@ -29,6 +30,7 @@ impl error::Error for Error {
         match self {
             Error::Hyper(hyper) => Some(hyper),
             Error::Serde(serde) => Some(serde),
+            Error::IO(io) => Some(io),
             _ => None,
         }
     }
@@ -49,6 +51,7 @@ impl fmt::Display for Error {
                 error_code, description, parameters
             ),
             Error::RequestBuilt(x) => write!(f, "Request building was unsuccessful: {}", x),
+            Error::IO(io) => write!(f, "IO error has occurred: {}", io)
         }
     }
 }
