@@ -50,4 +50,3 @@ pub mod requests;
 /// Errors definitions
 pub mod error;
 
-//mod updates_pool_stream;
