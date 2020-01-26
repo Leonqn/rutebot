@@ -2,8 +2,10 @@ use std::ops::Not;
 
 use serde::Serialize;
 
-use crate::requests::{ChatId, ReplyMarkup, Request};
-use crate::responses::Message;
+use crate::{
+    requests::{ChatId, ReplyMarkup, Request},
+    responses::Message,
+};
 
 /// Use this struct to send point on the map. On success, the sent `Message` is returned.
 #[derive(Serialize, Debug, Clone)]
@@ -56,12 +58,7 @@ impl<'a> SendLocation<'a> {
         }
     }
 
-    pub fn new_reply(
-        chat_id: impl Into<ChatId<'a>>,
-        latitude: f64,
-        longitude: f64,
-        reply_to_message_id: i64,
-    ) -> Self {
+    pub fn new_reply(chat_id: impl Into<ChatId<'a>>, latitude: f64, longitude: f64, reply_to_message_id: i64) -> Self {
         Self {
             chat_id: chat_id.into(),
             latitude,

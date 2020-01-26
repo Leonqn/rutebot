@@ -1,7 +1,6 @@
 use serde::Serialize;
 
-use crate::requests::Request;
-use crate::responses::UserProfilePhotos;
+use crate::{requests::Request, responses::UserProfilePhotos};
 
 /// Use this struct to send text messages. On success, the sent `Message` is returned.
 #[derive(Serialize, Debug, Clone)]

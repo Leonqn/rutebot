@@ -2,12 +2,14 @@ use hyper::Body;
 use hyper_multipart_rfc7578::client::multipart::Form;
 use serde::Serialize;
 
-use crate::error::Error;
-use crate::requests::{
-    add_fields_to_form, add_file_to_form, add_form_body, add_json_body, ChatId, InputMedia,
-    MessageOrInlineMessageId, ReplyMarkup, Request,
+use crate::{
+    error::Error,
+    requests::{
+        add_fields_to_form, add_file_to_form, add_form_body, add_json_body, ChatId, InputMedia, MessageOrInlineMessageId, ReplyMarkup,
+        Request,
+    },
+    responses::EditedMessage,
 };
-use crate::responses::EditedMessage;
 
 /// Use this struct to edit animation, audio, document, photo, or video messages.
 /// If a message is a part of a message album, then it can be edited only to a photo or a video.
@@ -35,10 +37,7 @@ impl<'a> Request for EditMessageMedia<'a> {
         "editMessageMedia"
     }
 
-    fn set_http_request_body(
-        self,
-        request_builder: hyper::http::request::Builder,
-    ) -> Result<hyper::http::request::Request<Body>, Error> {
+    fn set_http_request_body(self, request_builder: hyper::http::request::Builder) -> Result<hyper::http::request::Request<Body>, Error> {
         if self.media.contains_input_file() {
             let mut form = Form::default();
             add_fields_to_form(&mut form, &self)?;
@@ -59,11 +58,7 @@ impl<'a> EditMessageMedia<'a> {
         }
     }
 
-    pub fn new_message(
-        chat_id: impl Into<ChatId<'a>>,
-        message_id: i64,
-        media: InputMedia<'a>,
-    ) -> Self {
+    pub fn new_message(chat_id: impl Into<ChatId<'a>>, message_id: i64, media: InputMedia<'a>) -> Self {
         Self {
             message_or_inline_message_id: MessageOrInlineMessageId::Chat {
                 chat_id: chat_id.into(),

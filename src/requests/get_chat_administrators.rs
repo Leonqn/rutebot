@@ -1,7 +1,9 @@
 use serde::Serialize;
 
-use crate::requests::{ChatId, Request};
-use crate::responses::ChatMember;
+use crate::{
+    requests::{ChatId, Request},
+    responses::ChatMember,
+};
 
 /// Use this struct to get a list of administrators in a chat. On success,
 /// returns an Array of `ChatMember` objects that contains information about all chat
@@ -23,8 +25,6 @@ impl<'a> Request for GetChatAdministrators<'a> {
 
 impl<'a> GetChatAdministrators<'a> {
     pub fn new(chat_id: impl Into<ChatId<'a>>) -> Self {
-        Self {
-            chat_id: chat_id.into(),
-        }
+        Self { chat_id: chat_id.into() }
     }
 }

@@ -4,12 +4,13 @@ use hyper::Body;
 use hyper_multipart_rfc7578::client::multipart::Form;
 use serde::Serialize;
 
-use crate::error::Error;
-use crate::requests::{
-    add_fields_to_form, add_file_to_form, add_form_body, add_json_body, ChatId, FileKind,
-    InputMediaPhoto, InputMediaVideo, Request,
+use crate::{
+    error::Error,
+    requests::{
+        add_fields_to_form, add_file_to_form, add_form_body, add_json_body, ChatId, FileKind, InputMediaPhoto, InputMediaVideo, Request,
+    },
+    responses::Message,
 };
-use crate::responses::Message;
 
 #[derive(Serialize, Debug, Clone)]
 #[serde(tag = "type")]
@@ -63,15 +64,8 @@ impl<'a> Request for SendMediaGroup<'a> {
         "sendMediaGroup"
     }
 
-    fn set_http_request_body(
-        self,
-        request_builder: hyper::http::request::Builder,
-    ) -> Result<hyper::http::request::Request<Body>, Error> {
-        if self
-            .media
-            .iter()
-            .any(InputMediaPhotoOrVideo::contains_input_file)
-        {
+    fn set_http_request_body(self, request_builder: hyper::http::request::Builder) -> Result<hyper::http::request::Request<Body>, Error> {
+        if self.media.iter().any(InputMediaPhotoOrVideo::contains_input_file) {
             let mut form = Form::default();
             add_fields_to_form(&mut form, &self)?;
             for media in self.media.into_iter() {
@@ -86,10 +80,7 @@ impl<'a> Request for SendMediaGroup<'a> {
 }
 
 impl<'a> SendMediaGroup<'a> {
-    pub fn new(
-        chat_id: impl Into<ChatId<'a>>,
-        photo_or_video: Vec<InputMediaPhotoOrVideo<'a>>,
-    ) -> Self {
+    pub fn new(chat_id: impl Into<ChatId<'a>>, photo_or_video: Vec<InputMediaPhotoOrVideo<'a>>) -> Self {
         Self {
             chat_id: chat_id.into(),
             media: photo_or_video,
@@ -98,11 +89,7 @@ impl<'a> SendMediaGroup<'a> {
         }
     }
 
-    pub fn new_reply(
-        chat_id: impl Into<ChatId<'a>>,
-        photo_or_video: Vec<InputMediaPhotoOrVideo<'a>>,
-        reply_to_message_id: i64,
-    ) -> Self {
+    pub fn new_reply(chat_id: impl Into<ChatId<'a>>, photo_or_video: Vec<InputMediaPhotoOrVideo<'a>>, reply_to_message_id: i64) -> Self {
         Self {
             chat_id: chat_id.into(),
             media: photo_or_video,

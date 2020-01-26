@@ -1,7 +1,9 @@
 use serde::Serialize;
 
-use crate::requests::{ChatId, MessageOrInlineMessageId, ParseMode, ReplyMarkup, Request};
-use crate::responses::EditedMessage;
+use crate::{
+    requests::{ChatId, MessageOrInlineMessageId, ParseMode, ReplyMarkup, Request},
+    responses::EditedMessage,
+};
 
 /// Use this struct to edit captions of messages. On success,
 /// if edited message is sent by the bot, the edited `Message` is returned, otherwise `True` is returned.

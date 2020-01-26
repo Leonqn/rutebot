@@ -2,8 +2,10 @@ use std::ops::Not;
 
 use serde::Serialize;
 
-use crate::requests::{ChatId, Request};
-use crate::responses::Message;
+use crate::{
+    requests::{ChatId, Request},
+    responses::Message,
+};
 
 /// Use this struct to forward messages of any kind. On success, the sent `Message` is returned.
 #[derive(Serialize, Debug, Clone)]

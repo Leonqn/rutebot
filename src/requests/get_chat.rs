@@ -1,7 +1,9 @@
 use serde::Serialize;
 
-use crate::requests::{ChatId, Request};
-use crate::responses::Chat;
+use crate::{
+    requests::{ChatId, Request},
+    responses::Chat,
+};
 
 /// Use this struct to get up to date information about the chat
 /// (current name of the user for one-on-one
@@ -22,8 +24,6 @@ impl<'a> Request for GetChat<'a> {
 
 impl<'a> GetChat<'a> {
     pub fn new(chat_id: impl Into<ChatId<'a>>) -> Self {
-        Self {
-            chat_id: chat_id.into(),
-        }
+        Self { chat_id: chat_id.into() }
     }
 }

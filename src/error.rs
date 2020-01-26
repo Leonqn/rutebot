@@ -1,5 +1,4 @@
-use std::error;
-use std::fmt;
+use std::{error, fmt};
 
 use hyper;
 use serde_json;
@@ -10,7 +9,7 @@ use crate::responses::ResponseParameters;
 #[derive(Debug)]
 pub enum Error {
     Hyper(hyper::Error),
-    RequestBuild(String),
+    RequestBuilt(String),
     Serde(serde_json::Error),
     /// Telegram bot api error
     Api {
@@ -26,7 +25,7 @@ pub enum Error {
 }
 
 impl error::Error for Error {
-    fn cause(&self) -> Option<&error::Error> {
+    fn cause(&self) -> Option<&dyn error::Error> {
         match self {
             Error::Hyper(hyper) => Some(hyper),
             Error::Serde(serde) => Some(serde),
@@ -38,15 +37,18 @@ impl error::Error for Error {
 impl fmt::Display for Error {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
         match self {
-            Error::Hyper(hyper) =>
-                write!(f, "Hyper error has occurred: {}", hyper),
-            Error::Serde(serde) =>
-                write!(f, "Serde error has occurred: {}", serde),
-            Error::Api { error_code, description, parameters } =>
-                write!(f, "Error response from telegram bot api: error_code: {:?}, description: {:?}, parameters: {:?}", error_code, description, parameters),
-            Error::RequestBuild(x) => {
-                write!(f, "Request building was unsuccessful: {}", x)
-            }
+            Error::Hyper(hyper) => write!(f, "Hyper error has occurred: {}", hyper),
+            Error::Serde(serde) => write!(f, "Serde error has occurred: {}", serde),
+            Error::Api {
+                error_code,
+                description,
+                parameters,
+            } => write!(
+                f,
+                "Error response from telegram bot api: error_code: {:?}, description: {:?}, parameters: {:?}",
+                error_code, description, parameters
+            ),
+            Error::RequestBuilt(x) => write!(f, "Request building was unsuccessful: {}", x),
         }
     }
 }

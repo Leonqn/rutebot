@@ -22,8 +22,6 @@ impl<'a> Request for DeleteChatStickerSet<'a> {
 
 impl<'a> DeleteChatStickerSet<'a> {
     pub fn new(chat_id: impl Into<ChatId<'a>>) -> Self {
-        Self {
-            chat_id: chat_id.into(),
-        }
+        Self { chat_id: chat_id.into() }
     }
 }

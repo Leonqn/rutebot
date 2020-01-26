@@ -1,7 +1,6 @@
 use serde::Serialize;
 
-use crate::requests::Request;
-use crate::responses::Update;
+use crate::{requests::Request, responses::Update};
 
 /// Use this struct to receive incoming updates using long polling. An Array of `Update` objects is returned.
 #[derive(Serialize, Debug, Clone, Default)]
@@ -24,18 +23,18 @@ pub struct GetUpdates<'a> {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub timeout: Option<u32>,
     /// List the types of updates you want your bot to receive.
-    /// For example, specify ```&[AllowedUpdate::Message, AllowedUpdate::EditedChannelPost, AllowedUpdate::CallbackQuery]```
+    /// For example, specify ```&[UpdateKind::Message, UpdateKind::EditedChannelPost, UpdateKind::CallbackQuery]```
     /// to only receive updates of these types.
     /// See Update for a complete list of available update types. Specify an empty list to receive all updates regardless of type (default).
     /// If not specified, the previous setting will be used.
     #[serde(skip_serializing_if = "Option::is_none")]
-    pub allowed_updates: Option<&'a [AllowedUpdate]>,
+    pub allowed_updates: Option<&'a [UpdateKind]>,
 }
 
 /// Enumeration of possible update types from telegram bot api
 #[derive(Serialize, Debug, Clone, Copy)]
 #[serde(rename_all = "snake_case")]
-pub enum AllowedUpdate {
+pub enum UpdateKind {
     Message,
     EditedMessage,
     ChannelPost,

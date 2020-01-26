@@ -1,7 +1,9 @@
 use serde::Serialize;
 
-use crate::requests::{ChatId, MessageOrInlineMessageId, ReplyMarkup, Request};
-use crate::responses::EditedMessage;
+use crate::{
+    requests::{ChatId, MessageOrInlineMessageId, ReplyMarkup, Request},
+    responses::EditedMessage,
+};
 
 /// Use this struct to edit live location messages.
 /// A location can be edited until its live_period expires or editing is explicitly disabled by a

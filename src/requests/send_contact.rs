@@ -2,8 +2,10 @@ use std::ops::Not;
 
 use serde::Serialize;
 
-use crate::requests::{ChatId, ReplyMarkup, Request};
-use crate::responses::Message;
+use crate::{
+    requests::{ChatId, ReplyMarkup, Request},
+    responses::Message,
+};
 
 /// Use this struct to send phone contacts. On success, the sent `Message` is returned.
 #[derive(Serialize, Debug, Clone)]
@@ -62,12 +64,7 @@ impl<'a> SendContact<'a> {
         }
     }
 
-    pub fn new_reply(
-        chat_id: impl Into<ChatId<'a>>,
-        phone_number: &'a str,
-        first_name: &'a str,
-        reply_to_message_id: i64,
-    ) -> Self {
+    pub fn new_reply(chat_id: impl Into<ChatId<'a>>, phone_number: &'a str, first_name: &'a str, reply_to_message_id: i64) -> Self {
         Self {
             chat_id: chat_id.into(),
             phone_number,

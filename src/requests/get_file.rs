@@ -1,7 +1,6 @@
 use serde::Serialize;
 
-use crate::requests::Request;
-use crate::responses::File;
+use crate::{requests::Request, responses::File};
 
 /// Use this struct to get basic info about a file and prepare it for downloading. For the moment,
 /// bots can download files of up to 20MB in size. On success, a `File` object is returned.

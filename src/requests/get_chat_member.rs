@@ -1,7 +1,9 @@
 use serde::Serialize;
 
-use crate::requests::{ChatId, Request};
-use crate::responses::ChatMember;
+use crate::{
+    requests::{ChatId, Request},
+    responses::ChatMember,
+};
 
 /// Use this method to get information about a member of a chat. Returns a `ChatMember` object on success.
 #[derive(Serialize, Debug, Clone)]

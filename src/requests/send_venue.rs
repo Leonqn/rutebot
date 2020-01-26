@@ -2,8 +2,10 @@ use std::ops::Not;
 
 use serde::Serialize;
 
-use crate::requests::{ChatId, ReplyMarkup, Request};
-use crate::responses::Message;
+use crate::{
+    requests::{ChatId, ReplyMarkup, Request},
+    responses::Message,
+};
 
 /// Use this struct to send information about a venue. On success, the sent `Message` is returned.
 #[derive(Serialize, Debug, Clone)]
@@ -54,13 +56,7 @@ impl<'a> Request for SendVenue<'a> {
 }
 
 impl<'a> SendVenue<'a> {
-    pub fn new(
-        chat_id: impl Into<ChatId<'a>>,
-        latitude: f64,
-        longitude: f64,
-        title: &'a str,
-        address: &'a str,
-    ) -> Self {
+    pub fn new(chat_id: impl Into<ChatId<'a>>, latitude: f64, longitude: f64, title: &'a str, address: &'a str) -> Self {
         Self {
             chat_id: chat_id.into(),
             latitude,

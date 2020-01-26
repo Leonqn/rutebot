@@ -1,9 +1,7 @@
-use std::error::Error as StdError;
-use std::ops::Not;
+use std::{error::Error as StdError, ops::Not};
 
 use hyper::Body;
-use hyper_multipart_rfc7578::client::multipart;
-use hyper_multipart_rfc7578::client::multipart::Form;
+use hyper_multipart_rfc7578::client::{multipart, multipart::Form};
 use serde::{Serialize, Serializer};
 use serde_json::Value;
 
@@ -110,40 +108,32 @@ pub trait Request: Serialize + Sized {
 
     fn method(&self) -> &'static str;
 
-    fn set_http_request_body(
-        self,
-        request_builder: hyper::http::request::Builder,
-    ) -> Result<hyper::http::request::Request<Body>, Error> {
+    fn set_http_request_body(self, request_builder: hyper::http::request::Builder) -> Result<hyper::http::request::Request<Body>, Error> {
         add_json_body(request_builder, &self)
     }
 }
 
 pub(crate) fn add_json_body<S: Serialize + Sized>(
-    mut request_builder: hyper::http::request::Builder,
+    request_builder: hyper::http::request::Builder,
     serializable: &S,
 ) -> Result<hyper::http::request::Request<Body>, Error> {
     let json_bytes = serde_json::to_vec(serializable).map_err(Error::Serde)?;
     request_builder
         .header("content-type", "application/json")
         .body(Body::from(json_bytes))
-        .map_err(|x| Error::RequestBuild(x.description().to_string()))
+        .map_err(|x| Error::RequestBuilt(x.description().to_string()))
 }
 
 pub(crate) fn add_form_body(
-    mut request_builder: hyper::http::request::Builder,
+    request_builder: hyper::http::request::Builder,
     form: Form<'static>,
 ) -> Result<hyper::http::request::Request<Body>, Error> {
-    form.set_body_convert::<hyper::Body, multipart::Body>(&mut request_builder)
-        .map_err(|x| Error::RequestBuild(x.description().to_string()))
+    form.set_body_convert::<hyper::Body, multipart::Body>(request_builder)
+        .map_err(|x| Error::RequestBuilt(x.description().to_string()))
 }
 
 pub(crate) fn add_file_to_form(form: &mut Form, file: FileKind, upload_type: Option<&str>) {
-    if let FileKind::InputFile {
-        name,
-        content,
-        thumb,
-    } = file
-    {
+    if let FileKind::InputFile { name, content, thumb } = file {
         form.add_reader_file(upload_type.unwrap_or(name), Cursor::new(content), name);
         if let Some(thumb) = thumb {
             let thumb_name = format!("thumb_{}", name);
@@ -153,10 +143,7 @@ pub(crate) fn add_file_to_form(form: &mut Form, file: FileKind, upload_type: Opt
     }
 }
 
-pub(crate) fn add_fields_to_form<S: Serialize + Sized>(
-    form: &mut Form<'static>,
-    serializable: &S,
-) -> Result<(), Error> {
+pub(crate) fn add_fields_to_form<S: Serialize + Sized>(form: &mut Form<'static>, serializable: &S) -> Result<(), Error> {
     let json = serde_json::to_value(serializable).map_err(Error::Serde)?;
     if let Value::Object(map) = json {
         for (k, v) in map {
@@ -204,12 +191,7 @@ impl<'a> FileKind<'a> {
         }
     }
 
-    pub(crate) fn serialize_attach<S: Serializer>(
-        field0: &str,
-        _: &[u8],
-        _: &Option<Vec<u8>>,
-        s: S,
-    ) -> Result<S::Ok, S::Error> {
+    pub(crate) fn serialize_attach<S: Serializer>(field0: &str, _: &[u8], _: &Option<Vec<u8>>, s: S) -> Result<S::Ok, S::Error> {
         s.serialize_str(&format!("attach://{}", field0))
     }
 }
@@ -588,11 +570,6 @@ pub enum ParseMode {
 #[serde(untagged)]
 #[derive(Serialize, Debug, Clone)]
 pub enum MessageOrInlineMessageId<'a> {
-    Inline {
-        inline_message_id: &'a str,
-    },
-    Chat {
-        chat_id: ChatId<'a>,
-        message_id: i64,
-    },
+    Inline { inline_message_id: &'a str },
+    Chat { chat_id: ChatId<'a>, message_id: i64 },
 }

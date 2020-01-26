@@ -1,7 +1,9 @@
 use serde::Serialize;
 
-use crate::requests::{ChatId, MessageOrInlineMessageId, ReplyMarkup, Request};
-use crate::responses::EditedMessage;
+use crate::{
+    requests::{ChatId, MessageOrInlineMessageId, ReplyMarkup, Request},
+    responses::EditedMessage,
+};
 
 /// Use this struct to edit live location messages.
 /// A location can be edited until its live_period expires or editing is explicitly disabled by a
@@ -42,12 +44,7 @@ impl<'a> EditLiveLocation<'a> {
         }
     }
 
-    pub fn new_message(
-        chat_id: impl Into<ChatId<'a>>,
-        message_id: i64,
-        latitude: f64,
-        longitude: f64,
-    ) -> Self {
+    pub fn new_message(chat_id: impl Into<ChatId<'a>>, message_id: i64, latitude: f64, longitude: f64) -> Self {
         Self {
             message_or_inline_message_id: MessageOrInlineMessageId::Chat {
                 chat_id: chat_id.into(),

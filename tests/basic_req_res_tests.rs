@@ -1,93 +1,84 @@
-use futures::future::Future;
 use pretty_assertions::assert_eq;
 
-use rutebot::requests::{
-    DeleteChatPhoto, DeleteMessage, EditLiveLocation, EditMessageCaption, EditMessageMedia,
-    EditMessageText, ExportChatInviteLink, FileKind, ForwardMessage, GetChat,
-    GetChatAdministrators, GetChatMembersCount, GetFile, GetMe, GetUpdates, GetUserProfilePhotos,
-    InlineKeyboard, InlineKeyboardButton, InputMedia, InputMediaPhoto, InputMediaVideo, ParseMode,
-    PinChatMessage, ReplyMarkup, SendAnimation, SendAudio, SendContact, SendDocument, SendLocation,
-    SendMessage, SendPhoto, SendPoll, SendVenue, SendVideo, SendVideoNote, SendVoice,
-    SetChatDescription, SetChatPhoto, SetChatTitle, StopLiveLocation, StopPoll, UnpinChatMessage,
-    {ChatAction, SendChatAction}, {InputMediaPhotoOrVideo, SendMediaGroup},
+use rutebot::{
+    requests::{
+        ChatAction, DeleteChatPhoto, DeleteMessage, EditLiveLocation, EditMessageCaption, EditMessageMedia, EditMessageText,
+        ExportChatInviteLink, FileKind, ForwardMessage, GetChat, GetChatAdministrators, GetChatMembersCount, GetFile, GetMe, GetUpdates,
+        GetUserProfilePhotos, InlineKeyboard, InlineKeyboardButton, InputMedia, InputMediaPhoto, InputMediaPhotoOrVideo, InputMediaVideo,
+        ParseMode, PinChatMessage, ReplyMarkup, SendAnimation, SendAudio, SendChatAction, SendContact, SendDocument, SendLocation,
+        SendMediaGroup, SendMessage, SendPhoto, SendPoll, SendVenue, SendVideo, SendVideoNote, SendVoice, SetChatDescription, SetChatPhoto,
+        SetChatTitle, StopLiveLocation, StopPoll, UnpinChatMessage,
+    },
+    responses::{
+        Audio, Chat, ChatMember, Contact, Document, EditedMessage, Message, MessageEntityValue, Poll, Update, User, UserProfilePhotos,
+        Venue, Video, VideoNote, Voice,
+    },
 };
-use rutebot::responses::{
-    Audio, Chat, ChatMember, Contact, Document, EditedMessage, Message, MessageEntityValue, Poll,
-    Update, User, UserProfilePhotos, Venue, Video, VideoNote, Voice,
-};
-use std::fs::File;
-use std::io::Read;
-use std::time::Instant;
-
-use crate::common::run_one;
+use std::{fs::File, io::Read, time::Instant};
 
 mod common;
 
-#[test]
-pub fn get_me_works() {
+#[tokio::test]
+async fn get_me_works() {
     let rutebot = common::create_client();
 
-    let response: User = run_one(rutebot.prepare_api_request(GetMe).send());
+    let response: User = rutebot.prepare_api_request(GetMe).send().await.unwrap();
 
     assert_eq!(response.is_bot, true);
 }
 
-#[test]
-pub fn send_message_works() {
+#[tokio::test]
+async fn send_message_works() {
     let rutebot = common::create_client();
     let chat_id = common::get_chat_id();
 
-    let response: Message = run_one(
-        rutebot
-            .prepare_api_request(SendMessage::new(chat_id, "Some text"))
-            .send(),
-    );
+    let response: Message = rutebot
+        .prepare_api_request(SendMessage::new(chat_id, "Some text"))
+        .send()
+        .await
+        .unwrap();
 
     assert_eq!(response.text.unwrap(), "Some text");
 }
 
-#[test]
-pub fn forward_message_works() {
+#[tokio::test]
+async fn forward_message_works() {
     let rutebot = common::create_client();
     let chat_id = common::get_chat_id();
-    let sent_msg: Message = run_one(
-        rutebot
-            .prepare_api_request(SendMessage::new(chat_id, "test"))
-            .send(),
-    );
+    let sent_msg: Message = rutebot.prepare_api_request(SendMessage::new(chat_id, "test")).send().await.unwrap();
 
-    let response: Message = run_one(
-        rutebot
-            .prepare_api_request(ForwardMessage::new(chat_id, chat_id, sent_msg.message_id))
-            .send(),
-    );
+    let response: Message = rutebot
+        .prepare_api_request(ForwardMessage::new(chat_id, chat_id, sent_msg.message_id))
+        .send()
+        .await
+        .unwrap();
 
     assert_eq!(sent_msg.text, response.text);
 }
 
-#[test]
-pub fn send_chat_action_works() {
+#[tokio::test]
+async fn send_chat_action_works() {
     let rutebot = common::create_client();
     let chat_id = common::get_chat_id();
 
-    let response: bool = run_one(
-        rutebot
-            .prepare_api_request(SendChatAction::new(chat_id, ChatAction::Typing))
-            .send(),
-    );
+    let response: bool = rutebot
+        .prepare_api_request(SendChatAction::new(chat_id, ChatAction::Typing))
+        .send()
+        .await
+        .unwrap();
 
     assert_eq!(response, true);
 }
 
-#[test]
-pub fn get_updates_works() {
+#[tokio::test]
+async fn get_updates_works() {
     let rutebot = common::create_client();
 
-    let _response: Vec<Update> = run_one(rutebot.prepare_api_request(GetUpdates::new()).send());
+    let _response: Vec<Update> = rutebot.prepare_api_request(GetUpdates::new()).send().await.unwrap();
 }
 
-#[test]
-pub fn send_document_works() {
+#[tokio::test]
+async fn send_document_works() {
     let rutebot = common::create_client();
     let chat_id = common::get_chat_id();
     let keyboard = InlineKeyboard {
@@ -109,23 +100,17 @@ pub fn send_document_works() {
         )
     };
 
-    let response: Document = run_one(rutebot.prepare_api_request(request).send())
-        .document
-        .unwrap();
+    let response: Document = rutebot.prepare_api_request(request).send().await.unwrap().document.unwrap();
+    let file_handle = rutebot.prepare_api_request(GetFile::new(&response.file_id)).send().await.unwrap();
+    let downloaded_document = rutebot.download_file(&file_handle.file_path.unwrap()).await.unwrap();
 
-    let downloaded_document = run_one(
-        rutebot
-            .prepare_api_request(GetFile::new(&response.file_id))
-            .send()
-            .and_then(move |x| rutebot.download_file(&x.file_path.unwrap())),
-    );
     assert_eq!(response.file_size, Some(5));
     assert_eq!(response.file_name, Some("superfile".to_owned()));
     assert_eq!(downloaded_document, vec![1, 2, 3, 4, 5]);
 }
 
-#[test]
-pub fn send_document_with_thumb_works() {
+#[tokio::test]
+async fn send_document_with_thumb_works() {
     let rutebot = common::create_client();
     let chat_id = common::get_chat_id();
     let mut photo_content = Vec::new();
@@ -145,17 +130,15 @@ pub fn send_document_with_thumb_works() {
         )
     };
 
-    let response: Document = run_one(rutebot.prepare_api_request(request).send())
-        .document
-        .unwrap();
+    let response: Document = rutebot.prepare_api_request(request).send().await.unwrap().document.unwrap();
 
     assert_eq!(response.file_size, Some(5));
     assert_eq!(response.file_name, Some("superfile".to_owned()));
     assert_eq!(response.thumb.is_some(), true);
 }
 
-#[test]
-pub fn send_photo_works() {
+#[tokio::test]
+async fn send_photo_works() {
     let rutebot = common::create_client();
     let chat_id = common::get_chat_id();
     let mut photo_content = Vec::new();
@@ -172,13 +155,13 @@ pub fn send_photo_works() {
         },
     );
 
-    let response: Message = run_one(rutebot.prepare_api_request(request).send());
+    let response: Message = rutebot.prepare_api_request(request).send().await.unwrap();
 
     assert_eq!(response.photo.is_some(), true);
 }
 
-#[test]
-pub fn send_audio_works() {
+#[tokio::test]
+async fn send_audio_works() {
     let rutebot = common::create_client();
     let chat_id = common::get_chat_id();
     let mut audio_content = Vec::new();
@@ -199,21 +182,15 @@ pub fn send_audio_works() {
         )
     };
 
-    let response: Audio = run_one(rutebot.prepare_api_request(request).send())
-        .audio
-        .unwrap();
+    let response: Audio = rutebot.prepare_api_request(request).send().await.unwrap().audio.unwrap();
+    let file_handle = rutebot.prepare_api_request(GetFile::new(&response.file_id)).send().await.unwrap();
+    let downloaded_audio = rutebot.download_file(&file_handle.file_path.unwrap()).await.unwrap();
 
-    let downloaded_audio = run_one(
-        rutebot
-            .prepare_api_request(GetFile::new(&response.file_id))
-            .send()
-            .and_then(move |x| rutebot.download_file(&x.file_path.unwrap())),
-    );
     assert_eq!(downloaded_audio.len(), audio_size);
 }
 
-#[test]
-pub fn send_video_works() {
+#[tokio::test]
+async fn send_video_works() {
     let rutebot = common::create_client();
     let chat_id = common::get_chat_id();
     let mut video_content = Vec::new();
@@ -231,28 +208,19 @@ pub fn send_video_works() {
         },
     );
 
-    let response: Video = run_one(rutebot.prepare_api_request(request).send())
-        .video
-        .unwrap();
+    let response: Video = rutebot.prepare_api_request(request).send().await.unwrap().video.unwrap();
+    let file_handle = rutebot.prepare_api_request(GetFile::new(&response.file_id)).send().await.unwrap();
+    let downloaded_video = rutebot.download_file(&file_handle.file_path.unwrap()).await.unwrap();
 
-    let downloaded_video = run_one(
-        rutebot
-            .prepare_api_request(GetFile::new(&response.file_id))
-            .send()
-            .and_then(move |x| rutebot.download_file(&x.file_path.unwrap())),
-    );
     assert_eq!(downloaded_video.len(), video_size);
 }
 
-#[test]
-pub fn send_animation_works() {
+#[tokio::test]
+async fn send_animation_works() {
     let rutebot = common::create_client();
     let chat_id = common::get_chat_id();
     let mut gif_content = Vec::new();
-    File::open("./tests/sample_gif.gif")
-        .unwrap()
-        .read_to_end(&mut gif_content)
-        .unwrap();
+    File::open("./tests/sample_gif.gif").unwrap().read_to_end(&mut gif_content).unwrap();
     let request = SendAnimation {
         width: Some(808),
         height: Some(538),
@@ -266,13 +234,13 @@ pub fn send_animation_works() {
         )
     };
 
-    let response: Message = run_one(rutebot.prepare_api_request(request).send());
+    let response: Message = rutebot.prepare_api_request(request).send().await.unwrap();
 
     assert_eq!(response.animation.is_some(), true);
 }
 
-#[test]
-pub fn send_voice_works() {
+#[tokio::test]
+async fn send_voice_works() {
     let rutebot = common::create_client();
     let chat_id = common::get_chat_id();
     let mut voice_content = Vec::new();
@@ -290,21 +258,15 @@ pub fn send_voice_works() {
         },
     );
 
-    let response: Voice = run_one(rutebot.prepare_api_request(request).send())
-        .voice
-        .unwrap();
+    let response: Voice = (rutebot.prepare_api_request(request).send().await.unwrap()).voice.unwrap();
+    let file_handle = rutebot.prepare_api_request(GetFile::new(&response.file_id)).send().await.unwrap();
+    let downloaded_voice = rutebot.download_file(&file_handle.file_path.unwrap()).await.unwrap();
 
-    let downloaded_voice = run_one(
-        rutebot
-            .prepare_api_request(GetFile::new(&response.file_id))
-            .send()
-            .and_then(move |x| rutebot.download_file(&x.file_path.unwrap())),
-    );
     assert_eq!(downloaded_voice.len(), voice_size);
 }
 
-#[test]
-pub fn send_video_note_works() {
+#[tokio::test]
+async fn send_video_note_works() {
     let rutebot = common::create_client();
     let chat_id = common::get_chat_id();
     let mut video_note_content = Vec::new();
@@ -322,21 +284,15 @@ pub fn send_video_note_works() {
         },
     );
 
-    let response: VideoNote = run_one(rutebot.prepare_api_request(request).send())
-        .video_note
-        .unwrap();
+    let response: VideoNote = (rutebot.prepare_api_request(request).send().await.unwrap()).video_note.unwrap();
+    let file_handle = rutebot.prepare_api_request(GetFile::new(&response.file_id)).send().await.unwrap();
+    let downloaded_video_note = rutebot.download_file(&file_handle.file_path.unwrap()).await.unwrap();
 
-    let downloaded_video_note = run_one(
-        rutebot
-            .prepare_api_request(GetFile::new(&response.file_id))
-            .send()
-            .and_then(move |x| rutebot.download_file(&x.file_path.unwrap())),
-    );
     assert_eq!(downloaded_video_note.len(), video_note_size);
 }
 
-#[test]
-pub fn send_media_group_works() {
+#[tokio::test]
+async fn send_media_group_works() {
     let rutebot = common::create_client();
     let chat_id = common::get_chat_id();
     let mut video_note_content = Vec::new();
@@ -365,129 +321,115 @@ pub fn send_media_group_works() {
         ],
     );
 
-    let response: Vec<Message> = run_one(rutebot.prepare_api_request(request).send());
+    let response: Vec<Message> = rutebot.prepare_api_request(request).send().await.unwrap();
 
     assert_eq!(response.len(), 2);
 }
 
-#[test]
-pub fn send_location_works() {
+#[tokio::test]
+async fn send_location_works() {
     let rutebot = common::create_client();
     let chat_id = common::get_chat_id();
     let request = SendLocation::new(chat_id, 63.4, 32.2);
 
-    let response: Message = run_one(rutebot.prepare_api_request(request).send());
+    let response: Message = rutebot.prepare_api_request(request).send().await.unwrap();
 
     assert_eq!(response.location.is_some(), true);
 }
 
-#[test]
-pub fn edit_location_works() {
+#[tokio::test]
+async fn edit_location_works() {
     let rutebot = common::create_client();
     let chat_id = common::get_chat_id();
     let request = SendLocation {
         live_period: Some(60),
         ..SendLocation::new(chat_id, 63.4, 32.2)
     };
-    let location: Message = run_one(rutebot.prepare_api_request(request).send());
+    let location: Message = rutebot.prepare_api_request(request).send().await.unwrap();
     let edit_request = EditLiveLocation::new_message(chat_id, location.message_id, 63.2, 32.1);
 
-    if let EditedMessage::Message(message) =
-        run_one(rutebot.prepare_api_request(edit_request).send())
-    {
+    if let EditedMessage::Message(message) = rutebot.prepare_api_request(edit_request).send().await.unwrap() {
         assert_eq!(message.location.is_some(), true);
     } else {
         panic!("Returned true.");
     }
 }
 
-#[test]
-pub fn stop_location_works() {
+#[tokio::test]
+async fn stop_location_works() {
     let rutebot = common::create_client();
     let chat_id = common::get_chat_id();
     let request = SendLocation {
         live_period: Some(60),
         ..SendLocation::new(chat_id, 63.4, 32.2)
     };
-    let location: Message = run_one(rutebot.prepare_api_request(request).send());
+    let location: Message = rutebot.prepare_api_request(request).send().await.unwrap();
     let stop_request = StopLiveLocation::new_chat(chat_id, location.message_id);
 
-    if let EditedMessage::Message(message) =
-        run_one(rutebot.prepare_api_request(stop_request).send())
-    {
+    if let EditedMessage::Message(message) = rutebot.prepare_api_request(stop_request).send().await.unwrap() {
         assert_eq!(message.location.is_some(), true);
     } else {
         panic!("Returned true.");
     }
 }
 
-#[test]
-pub fn send_venue_works() {
+#[tokio::test]
+async fn send_venue_works() {
     let rutebot = common::create_client();
     let chat_id = common::get_chat_id();
     let request = SendVenue::new(chat_id, 63.4, 32.2, "test_title", "test_address");
 
-    let venue: Venue = run_one(rutebot.prepare_api_request(request).send())
-        .venue
-        .unwrap();
+    let venue: Venue = (rutebot.prepare_api_request(request).send().await.unwrap()).venue.unwrap();
 
     assert_eq!(venue.address, "test_address");
     assert_eq!(venue.title, "test_title");
 }
 
-#[test]
-pub fn send_contact_works() {
+#[tokio::test]
+async fn send_contact_works() {
     let rutebot = common::create_client();
     let chat_id = common::get_chat_id();
     let request = SendContact::new(chat_id, "+79506470372", "imya");
 
-    let contact: Contact = run_one(rutebot.prepare_api_request(request).send())
-        .contact
-        .unwrap();
+    let contact: Contact = (rutebot.prepare_api_request(request).send().await.unwrap()).contact.unwrap();
 
     assert_eq!(contact.phone_number, "+79506470372");
     assert_eq!(contact.first_name, "imya");
 }
 
-#[test]
-pub fn send_poll_works() {
+#[tokio::test]
+async fn send_poll_works() {
     let rutebot = common::create_client();
     let chat_id = common::get_chat_id();
-    let request = SendPoll::new(
-        chat_id,
-        "to be or not to be",
-        &["to be", "do not to be", "see results"],
-    );
+    let request = SendPoll::new(chat_id, "to be or not to be", &["to be", "do not to be", "see results"]);
 
-    let poll: Poll = run_one(rutebot.prepare_api_request(request).send())
-        .poll
-        .unwrap();
+    let poll: Poll = (rutebot.prepare_api_request(request).send().await.unwrap()).poll.unwrap();
 
     assert_eq!(&poll.question, "to be or not to be");
 }
 
-#[test]
-pub fn get_user_profile_photos_works() {
+#[tokio::test]
+async fn get_user_profile_photos_works() {
     let rutebot = common::create_client();
     let user_id = common::get_user_id();
     let request = GetUserProfilePhotos::new(user_id);
 
-    let photos: UserProfilePhotos = run_one(rutebot.prepare_api_request(request).send());
+    let photos: UserProfilePhotos = rutebot.prepare_api_request(request).send().await.unwrap();
 
     assert_eq!(photos.total_count, photos.photos.len() as i64)
 }
 
-#[test]
-pub fn export_chat_invite_link_works() {
+#[tokio::test]
+async fn export_chat_invite_link_works() {
     let rutebot = common::create_client();
     let chat_id = common::get_chat_id();
     let request = ExportChatInviteLink::new(chat_id);
 
-    let _photos: String = run_one(rutebot.prepare_api_request(request).send());
+    let _photos: String = rutebot.prepare_api_request(request).send().await.unwrap();
 }
 
-#[test]
-pub fn set_chat_photo_works() {
+#[tokio::test]
+async fn set_chat_photo_works() {
     let rutebot = common::create_client();
     let chat_id = common::get_chat_id();
     let mut photo_content = Vec::new();
@@ -497,13 +439,13 @@ pub fn set_chat_photo_works() {
         .unwrap();
     let request = SetChatPhoto::new(chat_id, photo_content);
 
-    let is_changed: bool = run_one(rutebot.prepare_api_request(request).send());
+    let is_changed: bool = rutebot.prepare_api_request(request).send().await.unwrap();
 
     assert_eq!(is_changed, true);
 }
 
-#[test]
-pub fn delete_chat_photo_works() {
+#[tokio::test]
+async fn delete_chat_photo_works() {
     let rutebot = common::create_client();
     let chat_id = common::get_chat_id();
     let mut photo_content = Vec::new();
@@ -512,129 +454,124 @@ pub fn delete_chat_photo_works() {
         .read_to_end(&mut photo_content)
         .unwrap();
     let set_request = SetChatPhoto::new(chat_id, photo_content);
-    run_one(rutebot.prepare_api_request(set_request).send());
+    (rutebot.prepare_api_request(set_request).send().await.unwrap());
     let request = DeleteChatPhoto::new(chat_id);
 
-    let is_deleted = run_one(rutebot.prepare_api_request(request).send());
+    let is_deleted = rutebot.prepare_api_request(request).send().await.unwrap();
 
     assert_eq!(is_deleted, true);
 }
 
-#[test]
-pub fn set_chat_title_works() {
+#[tokio::test]
+async fn set_chat_title_works() {
     let rutebot = common::create_client();
     let chat_id = common::get_chat_id();
     let request = SetChatTitle::new(chat_id, "new_title");
 
-    let title_set = run_one(rutebot.prepare_api_request(request).send());
+    let title_set = rutebot.prepare_api_request(request).send().await.unwrap();
 
     assert_eq!(title_set, true);
 }
 
-#[test]
-pub fn set_chat_description_works() {
+#[tokio::test]
+async fn set_chat_description_works() {
     let rutebot = common::create_client();
     let chat_id = common::get_chat_id();
     let new_description = format!("new description. {:?}", Instant::now());
     let request = SetChatDescription::new_description(chat_id, &new_description);
 
-    let description_set = run_one(rutebot.prepare_api_request(request).send());
+    let description_set = rutebot.prepare_api_request(request).send().await.unwrap();
 
     assert_eq!(description_set, true);
 }
 
-#[test]
-pub fn pin_chat_message_works() {
+#[tokio::test]
+async fn pin_chat_message_works() {
     let rutebot = common::create_client();
     let chat_id = common::get_chat_id();
-    let new_message: Message = run_one(
-        rutebot
-            .prepare_api_request(SendMessage::new(chat_id, "Some text"))
-            .send(),
-    );
+    let new_message: Message = rutebot
+        .prepare_api_request(SendMessage::new(chat_id, "Some text"))
+        .send()
+        .await
+        .unwrap();
     let request = PinChatMessage {
         disable_notification: true,
         ..PinChatMessage::new(chat_id, new_message.message_id)
     };
 
-    let pinned = run_one(rutebot.prepare_api_request(request).send());
+    let pinned = rutebot.prepare_api_request(request).send().await.unwrap();
 
     assert_eq!(pinned, true);
 }
 
-#[test]
-pub fn unpin_chat_message_works() {
+#[tokio::test]
+async fn unpin_chat_message_works() {
     let rutebot = common::create_client();
     let chat_id = common::get_chat_id();
     let request = UnpinChatMessage::new(chat_id);
 
-    let pinned = run_one(rutebot.prepare_api_request(request).send());
+    let pinned = rutebot.prepare_api_request(request).send().await.unwrap();
 
     assert_eq!(pinned, true);
 }
 
-#[test]
-pub fn get_chat_works() {
+#[tokio::test]
+async fn get_chat_works() {
     let rutebot = common::create_client();
     let chat_id = common::get_chat_id();
     let request = GetChat::new(chat_id);
 
-    let chat: Chat = run_one(rutebot.prepare_api_request(request).send());
+    let chat: Chat = rutebot.prepare_api_request(request).send().await.unwrap();
 
     assert_eq!(chat.id, chat_id);
 }
 
-#[test]
-pub fn get_chat_administrators_works() {
+#[tokio::test]
+async fn get_chat_administrators_works() {
     let rutebot = common::create_client();
     let chat_id = common::get_chat_id();
     let request = GetChatAdministrators::new(chat_id);
 
-    let chat: Vec<ChatMember> = run_one(rutebot.prepare_api_request(request).send());
+    let chat: Vec<ChatMember> = rutebot.prepare_api_request(request).send().await.unwrap();
 
-    assert_eq!(chat.len() > 0, true);
+    assert_eq!(chat.is_empty(), false);
 }
 
-#[test]
-pub fn get_chat_members_count_works() {
+#[tokio::test]
+async fn get_chat_members_count_works() {
     let rutebot = common::create_client();
     let chat_id = common::get_chat_id();
     let request = GetChatMembersCount::new(chat_id);
 
-    let members_count: i64 = run_one(rutebot.prepare_api_request(request).send());
+    let members_count: i64 = rutebot.prepare_api_request(request).send().await.unwrap();
 
     assert_eq!(members_count > 0, true);
 }
 
-#[test]
-pub fn edit_message_text_works() {
+#[tokio::test]
+async fn edit_message_text_works() {
     let rutebot = common::create_client();
     let chat_id = common::get_chat_id();
-    let text_message: Message = run_one(
-        rutebot
-            .prepare_api_request(SendMessage::new(chat_id, "Some text"))
-            .send(),
-    );
+    let text_message: Message = rutebot
+        .prepare_api_request(SendMessage::new(chat_id, "Some text"))
+        .send()
+        .await
+        .unwrap();
     let edit_request = EditMessageText::new_message(chat_id, text_message.message_id, "new text");
 
-    if let EditedMessage::Message(message) =
-        run_one(rutebot.prepare_api_request(edit_request).send())
-    {
+    if let EditedMessage::Message(message) = rutebot.prepare_api_request(edit_request).send().await.unwrap() {
         assert_eq!(message.text.unwrap(), "new text");
     } else {
         panic!("Returned true.");
     }
 }
 
-#[test]
-pub fn edit_message_caption_works() {
+#[tokio::test]
+async fn edit_message_caption_works() {
     let rutebot = common::create_client();
     let chat_id = common::get_chat_id();
     let mut gif_content = Vec::new();
-    File::open("./tests/sample_gif.gif")
-        .unwrap()
-        .read_to_end(&mut gif_content)
-        .unwrap();
+    File::open("./tests/sample_gif.gif").unwrap().read_to_end(&mut gif_content).unwrap();
     let request = SendAnimation {
         width: Some(808),
         height: Some(538),
@@ -649,21 +586,18 @@ pub fn edit_message_caption_works() {
         )
     };
 
-    let animation: Message = run_one(rutebot.prepare_api_request(request).send());
-    let edit_request =
-        EditMessageCaption::new_message(chat_id, animation.message_id, "new caption");
+    let animation: Message = rutebot.prepare_api_request(request).send().await.unwrap();
+    let edit_request = EditMessageCaption::new_message(chat_id, animation.message_id, "new caption");
 
-    if let EditedMessage::Message(message) =
-        run_one(rutebot.prepare_api_request(edit_request).send())
-    {
+    if let EditedMessage::Message(message) = rutebot.prepare_api_request(edit_request).send().await.unwrap() {
         assert_eq!(&message.caption.unwrap(), "new caption");
     } else {
         panic!("Returned true.");
     }
 }
 
-#[test]
-pub fn edit_message_media_works() {
+#[tokio::test]
+async fn edit_message_media_works() {
     let rutebot = common::create_client();
     let chat_id = common::get_chat_id();
     let mut old_video = Vec::new();
@@ -673,10 +607,7 @@ pub fn edit_message_media_works() {
         .unwrap()
         .read_to_end(&mut old_video)
         .unwrap();
-    File::open("./tests/sample_video.mp4")
-        .unwrap()
-        .read_to_end(&mut new_video)
-        .unwrap();
+    File::open("./tests/sample_video.mp4").unwrap().read_to_end(&mut new_video).unwrap();
     File::open("./tests/photo_test.jpg")
         .unwrap()
         .read_to_end(&mut photo_content)
@@ -689,7 +620,7 @@ pub fn edit_message_media_works() {
             thumb: None,
         },
     );
-    let response: Message = run_one(rutebot.prepare_api_request(request).send());
+    let response: Message = rutebot.prepare_api_request(request).send().await.unwrap();
     let edit_video = EditMessageMedia::new_message(
         chat_id,
         response.message_id,
@@ -700,8 +631,7 @@ pub fn edit_message_media_works() {
         })),
     );
 
-    if let EditedMessage::Message(message) = run_one(rutebot.prepare_api_request(edit_video).send())
-    {
+    if let EditedMessage::Message(message) = rutebot.prepare_api_request(edit_video).send().await.unwrap() {
         assert_eq!(message.video.is_some(), true);
         assert_eq!(message.video.unwrap().thumb.is_some(), true);
     } else {
@@ -709,54 +639,49 @@ pub fn edit_message_media_works() {
     }
 }
 
-#[test]
-pub fn stop_poll_works() {
+#[tokio::test]
+async fn stop_poll_works() {
     let rutebot = common::create_client();
     let chat_id = common::get_chat_id();
-    let request = SendPoll::new(
-        chat_id,
-        "to be or not to be",
-        &["to be", "do not to be", "see results"],
-    );
-    let msg_with_poll: Message = run_one(rutebot.prepare_api_request(request).send());
+    let request = SendPoll::new(chat_id, "to be or not to be", &["to be", "do not to be", "see results"]);
+    let msg_with_poll: Message = rutebot.prepare_api_request(request).send().await.unwrap();
     let stop_poll_request = StopPoll::new(chat_id, msg_with_poll.message_id);
 
-    let response: Poll = run_one(rutebot.prepare_api_request(stop_poll_request).send());
+    let response: Poll = rutebot.prepare_api_request(stop_poll_request).send().await.unwrap();
 
     assert_eq!(&response.question, "to be or not to be");
 }
 
-#[test]
-pub fn delete_message_works() {
+#[tokio::test]
+async fn delete_message_works() {
     let rutebot = common::create_client();
     let chat_id = common::get_chat_id();
-    let response: Message = run_one(
-        rutebot
-            .prepare_api_request(SendMessage::new(chat_id, "Some text"))
-            .send(),
-    );
+    let response: Message = rutebot
+        .prepare_api_request(SendMessage::new(chat_id, "Some text"))
+        .send()
+        .await
+        .unwrap();
     let delete_message_request = DeleteMessage::new(chat_id, response.message_id);
 
-    let response: bool = run_one(rutebot.prepare_api_request(delete_message_request).send());
+    let response: bool = rutebot.prepare_api_request(delete_message_request).send().await.unwrap();
 
     assert_eq!(response, true);
 }
 
-#[test]
-pub fn message_entity_values_extracted_correctly() {
+#[tokio::test]
+async fn message_entity_values_extracted_correctly() {
     let rutebot = common::create_client();
     let chat_id = common::get_chat_id();
-    let weird_text =
-        "великий и могучий: [экзамл.ком](http://example.com/) очень могучий и великий";
+    let weird_text = "великий и могучий: [экзамл.ком](http://example.com/) очень могучий и великий";
 
-    let response: Message = run_one(
-        rutebot
-            .prepare_api_request(SendMessage {
-                parse_mode: Some(ParseMode::Markdown),
-                ..SendMessage::new(chat_id, weird_text)
-            })
-            .send(),
-    );
+    let response: Message = rutebot
+        .prepare_api_request(SendMessage {
+            parse_mode: Some(ParseMode::Markdown),
+            ..SendMessage::new(chat_id, weird_text)
+        })
+        .send()
+        .await
+        .unwrap();
     let text = &response.text.unwrap();
     let entities = response.entities.unwrap();
     let values = entities
@@ -769,7 +694,7 @@ pub fn message_entity_values_extracted_correctly() {
         Some(MessageEntityValue::TextLink { link, text }) => {
             assert_eq!(link.as_str(), "http://example.com/");
             assert_eq!(text.as_str(), "экзамл.ком");
-        }
+        },
         x => panic!("wrong message entity: {:?}", x),
     }
 }

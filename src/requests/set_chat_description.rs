@@ -29,6 +29,7 @@ impl<'a> SetChatDescription<'a> {
             description: None,
         }
     }
+
     pub fn new_description(chat_id: impl Into<ChatId<'a>>, description: &'a str) -> Self {
         Self {
             chat_id: chat_id.into(),

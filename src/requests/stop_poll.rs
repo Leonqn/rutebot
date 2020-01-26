@@ -1,7 +1,9 @@
 use serde::Serialize;
 
-use crate::requests::{ChatId, ReplyMarkup, Request};
-use crate::responses::Poll;
+use crate::{
+    requests::{ChatId, ReplyMarkup, Request},
+    responses::Poll,
+};
 
 /// Use this struct to stop a poll which was sent by the bot. On success, the stopped `Poll` with the final results is returned.
 #[derive(Serialize, Debug, Clone)]
