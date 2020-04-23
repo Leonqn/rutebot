@@ -184,28 +184,26 @@ impl Rutebot {
         let api = self.clone();
         futures_util::stream::unfold(
             (start_offset, updates_filter, api),
-            |(offset, updates_filter, api)| {
-                async move {
-                    let request = GetUpdates {
-                        offset,
-                        limit: None,
-                        timeout: Some(10),
-                        allowed_updates: updates_filter.as_ref().map(Vec::as_slice),
-                    };
-                    let response = api.prepare_api_request(request).send().await;
-                    let new_offset = response
-                        .as_ref()
-                        .ok()
-                        .and_then(|updates| {
-                            updates
-                                .iter()
-                                .map(|update| update.update_id)
-                                .max()
-                                .map(|max_update_id| max_update_id + 1)
-                        })
-                        .or(offset);
-                    Some((response, (new_offset, updates_filter, api)))
-                }
+            |(offset, updates_filter, api)| async move {
+                let request = GetUpdates {
+                    offset,
+                    limit: None,
+                    timeout: Some(10),
+                    allowed_updates: updates_filter.as_ref().map(Vec::as_slice),
+                };
+                let response = api.prepare_api_request(request).send().await;
+                let new_offset = response
+                    .as_ref()
+                    .ok()
+                    .and_then(|updates| {
+                        updates
+                            .iter()
+                            .map(|update| update.update_id)
+                            .max()
+                            .map(|max_update_id| max_update_id + 1)
+                    })
+                    .or(offset);
+                Some((response, (new_offset, updates_filter, api)))
             },
         )
         .map_ok(|updates| futures_util::stream::iter(updates).map(Ok))
