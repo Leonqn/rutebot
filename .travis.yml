@@ -19,4 +19,4 @@ script:
   - cargo fmt -- --check
   # Only run tests when environment variables are available, because they will fail otherwise.
   # For details, see https://docs.travis-ci.com/user/pull-requests/#pull-requests-and-security-restrictions.
-  - 'if [ "$TRAVIS_PULL_REQUEST" == "false" ]; then cargo test --verbose --all-targets -- --test-threads=1; else echo "Tests do not run on PRs for security reasons."; fi'
+  - 'if [ "$TRAVIS_PULL_REQUEST" == "false" ]; then RUST_TEST_THREADS=1 cargo test --verbose --all-targets; else echo "Tests do not run on PRs for security reasons."; fi'
