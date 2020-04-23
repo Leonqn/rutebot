@@ -1,4 +1,4 @@
-use std::{error::Error as StdError, ops::Not};
+use std::ops::Not;
 
 use hyper::Body;
 use hyper_multipart_rfc7578::client::{multipart, multipart::Form};
@@ -124,7 +124,7 @@ pub(crate) fn add_json_body<S: Serialize + Sized>(
     request_builder
         .header("content-type", "application/json")
         .body(Body::from(json_bytes))
-        .map_err(|x| Error::RequestBuilt(x.description().to_string()))
+        .map_err(|x| Error::RequestBuilt(x.to_string()))
 }
 
 pub(crate) fn add_form_body(
@@ -132,7 +132,7 @@ pub(crate) fn add_form_body(
     form: Form<'static>,
 ) -> Result<hyper::http::request::Request<Body>, Error> {
     form.set_body_convert::<hyper::Body, multipart::Body>(request_builder)
-        .map_err(|x| Error::RequestBuilt(x.description().to_string()))
+        .map_err(|x| Error::RequestBuilt(x.to_string()))
 }
 
 pub(crate) fn add_file_to_form(form: &mut Form, file: FileKind, upload_type: Option<&str>) {
