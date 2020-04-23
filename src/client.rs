@@ -186,35 +186,37 @@ impl Rutebot {
         let api = self.clone();
         futures_util::stream::unfold(
             (start_offset, updates_filter, api),
-            |(offset, updates_filter, api)| {
-                async move {
-                    let request = GetUpdates {
-                        offset,
-                        limit: None,
-                        timeout: Some(10),
-                        allowed_updates: updates_filter.as_ref().map(Vec::as_slice),
-                    };
-                    let response = api.prepare_api_request(request).send().await;
-                    let new_offset = match &response {
-                        Ok(updates) => updates
-                            .iter()
-                            .map(|update| update.update_id)
-                            .max()
-                            .map(|max_update_id| max_update_id + 1),
-                        Err(Error::Api {
-                            error_code: 429,
-                            parameters:
-                                Some(ResponseParameters {
-                                    retry_after: Some(retry_after),
-                                    ..
-                                }),
-                            ..
-                        }) => offset,
-                        Err(Error::Serde(_)) => Some(-1),
-                    };
+            |(offset, updates_filter, api)| async move {
+                let request = GetUpdates {
+                    offset,
+                    limit: None,
+                    timeout: Some(10),
+                    allowed_updates: updates_filter.as_ref().map(Vec::as_slice),
+                };
+                let response = api.prepare_api_request(request).send().await;
+                let new_offset = match &response {
+                    Ok(updates) => updates
+                        .iter()
+                        .map(|update| update.update_id)
+                        .max()
+                        .map(|max_update_id| max_update_id + 1),
+                    Err(Error::Api {
+                        error_code: 429,
+                        parameters:
+                            Some(ResponseParameters {
+                                retry_after: Some(retry_after),
+                                ..
+                            }),
+                        ..
+                    }) => {
+                        tokio::time::delay_for(Duration::from_secs(*retry_after as u64)).await;
+                        offset
+                    }
+                    Err(Error::Serde(_)) => Some(-1),
+                    _ => offset,
+                };
 
-                    Some((response, (new_offset, updates_filter, api)))
-                }
+                Some((response, (new_offset, updates_filter, api)))
             },
         )
         .map_ok(|updates| futures_util::stream::iter(updates).map(Ok))
