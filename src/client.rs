@@ -13,8 +13,10 @@ use hyper_tls::HttpsConnector;
 use serde::de::DeserializeOwned;
 use serde_json;
 
+use crate::responses::ResponseParameters;
 use std::io::Read;
 use std::marker::PhantomData;
+use std::time::Duration;
 
 const BASE_API_URI: &str = "https://api.telegram.org/bot";
 const GET_FILE_URI: &str = "https://api.telegram.org/file/bot";
@@ -184,26 +186,35 @@ impl Rutebot {
         let api = self.clone();
         futures_util::stream::unfold(
             (start_offset, updates_filter, api),
-            |(offset, updates_filter, api)| async move {
-                let request = GetUpdates {
-                    offset,
-                    limit: None,
-                    timeout: Some(10),
-                    allowed_updates: updates_filter.as_ref().map(Vec::as_slice),
-                };
-                let response = api.prepare_api_request(request).send().await;
-                let new_offset = response
-                    .as_ref()
-                    .ok()
-                    .and_then(|updates| {
-                        updates
+            |(offset, updates_filter, api)| {
+                async move {
+                    let request = GetUpdates {
+                        offset,
+                        limit: None,
+                        timeout: Some(10),
+                        allowed_updates: updates_filter.as_ref().map(Vec::as_slice),
+                    };
+                    let response = api.prepare_api_request(request).send().await;
+                    let new_offset = match &response {
+                        Ok(updates) => updates
                             .iter()
                             .map(|update| update.update_id)
                             .max()
-                            .map(|max_update_id| max_update_id + 1)
-                    })
-                    .or(offset);
-                Some((response, (new_offset, updates_filter, api)))
+                            .map(|max_update_id| max_update_id + 1),
+                        Err(Error::Api {
+                            error_code: 429,
+                            parameters:
+                                Some(ResponseParameters {
+                                    retry_after: Some(retry_after),
+                                    ..
+                                }),
+                            ..
+                        }) => offset,
+                        Err(Error::Serde(_)) => Some(-1),
+                    };
+
+                    Some((response, (new_offset, updates_filter, api)))
+                }
             },
         )
         .map_ok(|updates| futures_util::stream::iter(updates).map(Ok))
