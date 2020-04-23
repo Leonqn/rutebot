@@ -2,6 +2,10 @@ use std::{self, env};
 
 use rutebot::client::Rutebot;
 use str;
+use std::sync::Mutex;
+use once_cell::sync::Lazy;
+
+pub static MUTEX: Lazy<Mutex<()>> = Lazy::new(|| Mutex::new(()));
 
 pub fn create_client() -> Rutebot {
     let token = env::var_os("TEST_TOKEN")
