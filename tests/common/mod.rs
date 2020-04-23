@@ -4,10 +4,12 @@ use once_cell::sync::Lazy;
 use rutebot::client::Rutebot;
 use std::sync::Mutex;
 use str;
+use std::time::Duration;
 
 pub static MUTEX: Lazy<Mutex<()>> = Lazy::new(|| Mutex::new(()));
 
 pub fn create_client() -> Rutebot {
+    std::thread::sleep(Duration::from_secs(5));
     let token = env::var_os("TEST_TOKEN")
         .expect("Please specify a token in the TEST_TOKEN environment variable.\nThat bot will be used for sending the test messages.");
     let token = token.to_string_lossy();
