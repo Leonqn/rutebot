@@ -6,7 +6,7 @@ use crate::{
     requests::{GetUpdates, UpdateKind},
     responses::{TgResponse, Update},
 };
-use bytes::{buf::BufExt as _, Buf};
+use bytes::{buf::BufMut as _, Buf};
 use futures_util::{stream::Stream, StreamExt, TryStreamExt};
 use hyper::{client::HttpConnector, Body, Client, Request};
 use hyper_tls::HttpsConnector;
@@ -209,7 +209,7 @@ impl Rutebot {
                             }),
                         ..
                     }) => {
-                        tokio::time::delay_for(Duration::from_secs(*retry_after as u64)).await;
+                        tokio::time::sleep(Duration::from_secs(*retry_after as u64)).await;
                         offset
                     }
                     Err(Error::Serde(_)) => Some(-1),
