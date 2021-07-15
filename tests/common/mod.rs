@@ -1,10 +1,9 @@
-use std::{self, env};
+use std::env;
 
 use once_cell::sync::Lazy;
 use rutebot::client::Rutebot;
 use std::sync::Mutex;
 use std::time::Duration;
-use str;
 
 pub static MUTEX: Lazy<Mutex<()>> = Lazy::new(|| Mutex::new(()));
 

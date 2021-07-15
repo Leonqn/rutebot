@@ -6,7 +6,7 @@ use crate::{
     requests::{GetUpdates, UpdateKind},
     responses::{TgResponse, Update},
 };
-use bytes::{buf::BufExt as _, Buf};
+use bytes::Buf;
 use futures_util::{stream::Stream, StreamExt, TryStreamExt};
 use hyper::{client::HttpConnector, Body, Client, Request};
 use hyper_tls::HttpsConnector;
@@ -191,7 +191,7 @@ impl Rutebot {
                     offset,
                     limit: None,
                     timeout: Some(10),
-                    allowed_updates: updates_filter.as_ref().map(Vec::as_slice),
+                    allowed_updates: updates_filter.as_deref(),
                 };
                 let response = api.prepare_api_request(request).send().await;
                 let new_offset = match &response {
@@ -209,7 +209,7 @@ impl Rutebot {
                             }),
                         ..
                     }) => {
-                        tokio::time::delay_for(Duration::from_secs(*retry_after as u64)).await;
+                        tokio::time::sleep(Duration::from_secs(*retry_after as u64)).await;
                         offset
                     }
                     Err(Error::Serde(_)) => Some(-1),

@@ -195,11 +195,7 @@ pub enum FileKind<'a> {
 
 impl<'a> FileKind<'a> {
     pub(crate) fn is_input_file(&self) -> bool {
-        if let FileKind::InputFile { .. } = &self {
-            true
-        } else {
-            false
-        }
+        matches!(self, FileKind::InputFile { .. })
     }
 
     pub(crate) fn serialize_attach<S: Serializer>(
@@ -583,8 +579,8 @@ pub enum ParseMode {
     Markdown,
 }
 
-#[serde(untagged)]
 #[derive(Serialize, Debug, Clone)]
+#[serde(untagged)]
 pub enum MessageOrInlineMessageId<'a> {
     Inline {
         inline_message_id: &'a str,
