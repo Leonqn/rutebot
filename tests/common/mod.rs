@@ -1,11 +1,7 @@
 use std::env;
 
-use once_cell::sync::Lazy;
 use rutebot::client::Rutebot;
-use std::sync::Mutex;
 use std::time::Duration;
-
-pub static MUTEX: Lazy<Mutex<()>> = Lazy::new(|| Mutex::new(()));
 
 pub fn create_client() -> Rutebot {
     std::thread::sleep(Duration::from_secs(5));

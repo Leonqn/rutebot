@@ -1,0 +1,35 @@
+name: CI
+
+on:
+  push:
+    branches: [ master ]
+  pull_request:
+
+env:
+  CARGO_TERM_COLOR: always
+
+jobs:
+  ci:
+
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v2
+    - name: Install latest stable
+      uses: actions-rs/toolchain@v1
+      with:
+          toolchain: stable
+          override: true
+          components: rustfmt, clippy
+    - uses: Swatinem/rust-cache@v1
+    - name: clippy
+      run: cargo clippy -- -D warnings
+    - name: fmt
+      run: cargo fmt -- --check
+    - name: Run tests
+      run: cargo test --verbose -- --test-threads=1
+      env:
+        TEST_CHAT_ID: ${{ secrets.CHAT_ID }}
+        TEST_USER_ID: ${{ secrets.USER_ID }}
+        TEST_TOKEN: ${{ secrets.TOKEN }}
+        RUST_BACKTRACE: 1

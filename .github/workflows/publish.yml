@@ -1,0 +1,20 @@
+name: publish
+
+on:
+  push:
+    tags:
+    - '*'
+
+jobs:
+  build:
+
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v2
+    - uses: actions-rs/toolchain@v1
+      with:
+          toolchain: stable
+          override: true
+    - uses: katyo/publish-crates@141b2ec132c90c9108452db8e5d05c938bb05d16
+      with:
+          registry-token: ${{ secrets.CRATES }}

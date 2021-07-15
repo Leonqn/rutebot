@@ -1,6 +1,5 @@
 use pretty_assertions::assert_eq;
 
-use crate::common::MUTEX;
 use rutebot::{
     requests::{
         ChatAction, DeleteChatPhoto, DeleteMessage, EditLiveLocation, EditMessageCaption,
@@ -24,7 +23,6 @@ mod common;
 
 #[tokio::test]
 async fn get_me_works() {
-    let _lock = MUTEX.lock().unwrap();
     let rutebot = common::create_client();
 
     let response: User = rutebot.prepare_api_request(GetMe).send().await.unwrap();
@@ -34,7 +32,6 @@ async fn get_me_works() {
 
 #[tokio::test]
 async fn send_message_works() {
-    let _lock = MUTEX.lock().unwrap();
     let rutebot = common::create_client();
     let chat_id = common::get_chat_id();
 
@@ -49,7 +46,6 @@ async fn send_message_works() {
 
 #[tokio::test]
 async fn forward_message_works() {
-    let _lock = MUTEX.lock().unwrap();
     let rutebot = common::create_client();
     let chat_id = common::get_chat_id();
     let sent_msg: Message = rutebot
@@ -69,7 +65,6 @@ async fn forward_message_works() {
 
 #[tokio::test]
 async fn send_chat_action_works() {
-    let _lock = MUTEX.lock().unwrap();
     let rutebot = common::create_client();
     let chat_id = common::get_chat_id();
 
@@ -84,7 +79,6 @@ async fn send_chat_action_works() {
 
 #[tokio::test]
 async fn get_updates_works() {
-    let _lock = MUTEX.lock().unwrap();
     let rutebot = common::create_client();
 
     let _response: Vec<Update> = rutebot
@@ -96,7 +90,6 @@ async fn get_updates_works() {
 
 #[tokio::test]
 async fn send_document_works() {
-    let _lock = MUTEX.lock().unwrap();
     let rutebot = common::create_client();
     let chat_id = common::get_chat_id();
     let keyboard = InlineKeyboard {
@@ -142,7 +135,6 @@ async fn send_document_works() {
 
 #[tokio::test]
 async fn send_document_with_thumb_works() {
-    let _lock = MUTEX.lock().unwrap();
     let rutebot = common::create_client();
     let chat_id = common::get_chat_id();
     let mut photo_content = Vec::new();
@@ -177,7 +169,6 @@ async fn send_document_with_thumb_works() {
 
 #[tokio::test]
 async fn send_photo_works() {
-    let _lock = MUTEX.lock().unwrap();
     let rutebot = common::create_client();
     let chat_id = common::get_chat_id();
     let mut photo_content = Vec::new();
@@ -201,7 +192,6 @@ async fn send_photo_works() {
 
 #[tokio::test]
 async fn send_audio_works() {
-    let _lock = MUTEX.lock().unwrap();
     let rutebot = common::create_client();
     let chat_id = common::get_chat_id();
     let mut audio_content = Vec::new();
@@ -244,7 +234,6 @@ async fn send_audio_works() {
 
 #[tokio::test]
 async fn send_video_works() {
-    let _lock = MUTEX.lock().unwrap();
     let rutebot = common::create_client();
     let chat_id = common::get_chat_id();
     let mut video_content = Vec::new();
@@ -284,7 +273,6 @@ async fn send_video_works() {
 
 #[tokio::test]
 async fn send_animation_works() {
-    let _lock = MUTEX.lock().unwrap();
     let rutebot = common::create_client();
     let chat_id = common::get_chat_id();
     let mut gif_content = Vec::new();
@@ -312,7 +300,6 @@ async fn send_animation_works() {
 
 #[tokio::test]
 async fn send_voice_works() {
-    let _lock = MUTEX.lock().unwrap();
     let rutebot = common::create_client();
     let chat_id = common::get_chat_id();
     let mut voice_content = Vec::new();
@@ -348,7 +335,6 @@ async fn send_voice_works() {
 
 #[tokio::test]
 async fn send_video_note_works() {
-    let _lock = MUTEX.lock().unwrap();
     let rutebot = common::create_client();
     let chat_id = common::get_chat_id();
     let mut video_note_content = Vec::new();
@@ -384,7 +370,6 @@ async fn send_video_note_works() {
 
 #[tokio::test]
 async fn send_media_group_works() {
-    let _lock = MUTEX.lock().unwrap();
     let rutebot = common::create_client();
     let chat_id = common::get_chat_id();
     let mut video_note_content = Vec::new();
@@ -420,7 +405,6 @@ async fn send_media_group_works() {
 
 #[tokio::test]
 async fn send_location_works() {
-    let _lock = MUTEX.lock().unwrap();
     let rutebot = common::create_client();
     let chat_id = common::get_chat_id();
     let request = SendLocation::new(chat_id, 63.4, 32.2);
@@ -432,7 +416,6 @@ async fn send_location_works() {
 
 #[tokio::test]
 async fn edit_location_works() {
-    let _lock = MUTEX.lock().unwrap();
     let rutebot = common::create_client();
     let chat_id = common::get_chat_id();
     let request = SendLocation {
@@ -456,7 +439,6 @@ async fn edit_location_works() {
 
 #[tokio::test]
 async fn stop_location_works() {
-    let _lock = MUTEX.lock().unwrap();
     let rutebot = common::create_client();
     let chat_id = common::get_chat_id();
     let request = SendLocation {
@@ -480,7 +462,6 @@ async fn stop_location_works() {
 
 #[tokio::test]
 async fn send_venue_works() {
-    let _lock = MUTEX.lock().unwrap();
     let rutebot = common::create_client();
     let chat_id = common::get_chat_id();
     let request = SendVenue::new(chat_id, 63.4, 32.2, "test_title", "test_address");
@@ -495,7 +476,6 @@ async fn send_venue_works() {
 
 #[tokio::test]
 async fn send_contact_works() {
-    let _lock = MUTEX.lock().unwrap();
     let rutebot = common::create_client();
     let chat_id = common::get_chat_id();
     let request = SendContact::new(chat_id, "+79506470372", "imya");
@@ -510,7 +490,6 @@ async fn send_contact_works() {
 
 #[tokio::test]
 async fn send_poll_works() {
-    let _lock = MUTEX.lock().unwrap();
     let rutebot = common::create_client();
     let chat_id = common::get_chat_id();
     let request = SendPoll::new(
@@ -528,7 +507,6 @@ async fn send_poll_works() {
 
 #[tokio::test]
 async fn get_user_profile_photos_works() {
-    let _lock = MUTEX.lock().unwrap();
     let rutebot = common::create_client();
     let user_id = common::get_user_id();
     let request = GetUserProfilePhotos::new(user_id);
@@ -540,7 +518,6 @@ async fn get_user_profile_photos_works() {
 
 #[tokio::test]
 async fn export_chat_invite_link_works() {
-    let _lock = MUTEX.lock().unwrap();
     let rutebot = common::create_client();
     let chat_id = common::get_chat_id();
     let request = ExportChatInviteLink::new(chat_id);
@@ -550,7 +527,6 @@ async fn export_chat_invite_link_works() {
 
 #[tokio::test]
 async fn set_chat_photo_works() {
-    let _lock = MUTEX.lock().unwrap();
     let rutebot = common::create_client();
     let chat_id = common::get_chat_id();
     let mut photo_content = Vec::new();
@@ -567,7 +543,6 @@ async fn set_chat_photo_works() {
 
 #[tokio::test]
 async fn delete_chat_photo_works() {
-    let _lock = MUTEX.lock().unwrap();
     let rutebot = common::create_client();
     let chat_id = common::get_chat_id();
     let mut photo_content = Vec::new();
@@ -590,7 +565,6 @@ async fn delete_chat_photo_works() {
 
 #[tokio::test]
 async fn set_chat_title_works() {
-    let _lock = MUTEX.lock().unwrap();
     let rutebot = common::create_client();
     let chat_id = common::get_chat_id();
     let request = SetChatTitle::new(chat_id, "new_title");
@@ -602,7 +576,6 @@ async fn set_chat_title_works() {
 
 #[tokio::test]
 async fn set_chat_description_works() {
-    let _lock = MUTEX.lock().unwrap();
     let rutebot = common::create_client();
     let chat_id = common::get_chat_id();
     let new_description = format!("new description. {:?}", Instant::now());
@@ -615,7 +588,6 @@ async fn set_chat_description_works() {
 
 #[tokio::test]
 async fn pin_chat_message_works() {
-    let _lock = MUTEX.lock().unwrap();
     let rutebot = common::create_client();
     let chat_id = common::get_chat_id();
     let new_message: Message = rutebot
@@ -635,7 +607,6 @@ async fn pin_chat_message_works() {
 
 #[tokio::test]
 async fn unpin_chat_message_works() {
-    let _lock = MUTEX.lock().unwrap();
     let rutebot = common::create_client();
     let chat_id = common::get_chat_id();
     let request = UnpinChatMessage::new(chat_id);
@@ -647,7 +618,6 @@ async fn unpin_chat_message_works() {
 
 #[tokio::test]
 async fn get_chat_works() {
-    let _lock = MUTEX.lock().unwrap();
     let rutebot = common::create_client();
     let chat_id = common::get_chat_id();
     let request = GetChat::new(chat_id);
@@ -659,7 +629,6 @@ async fn get_chat_works() {
 
 #[tokio::test]
 async fn get_chat_administrators_works() {
-    let _lock = MUTEX.lock().unwrap();
     let rutebot = common::create_client();
     let chat_id = common::get_chat_id();
     let request = GetChatAdministrators::new(chat_id);
@@ -671,7 +640,6 @@ async fn get_chat_administrators_works() {
 
 #[tokio::test]
 async fn get_chat_members_count_works() {
-    let _lock = MUTEX.lock().unwrap();
     let rutebot = common::create_client();
     let chat_id = common::get_chat_id();
     let request = GetChatMembersCount::new(chat_id);
@@ -683,7 +651,6 @@ async fn get_chat_members_count_works() {
 
 #[tokio::test]
 async fn edit_message_text_works() {
-    let _lock = MUTEX.lock().unwrap();
     let rutebot = common::create_client();
     let chat_id = common::get_chat_id();
     let text_message: Message = rutebot
@@ -707,7 +674,6 @@ async fn edit_message_text_works() {
 
 #[tokio::test]
 async fn edit_message_caption_works() {
-    let _lock = MUTEX.lock().unwrap();
     let rutebot = common::create_client();
     let chat_id = common::get_chat_id();
     let mut gif_content = Vec::new();
@@ -747,7 +713,6 @@ async fn edit_message_caption_works() {
 
 #[tokio::test]
 async fn edit_message_media_works() {
-    let _lock = MUTEX.lock().unwrap();
     let rutebot = common::create_client();
     let chat_id = common::get_chat_id();
     let mut old_video = Vec::new();
@@ -799,7 +764,6 @@ async fn edit_message_media_works() {
 
 #[tokio::test]
 async fn stop_poll_works() {
-    let _lock = MUTEX.lock().unwrap();
     let rutebot = common::create_client();
     let chat_id = common::get_chat_id();
     let request = SendPoll::new(
@@ -821,7 +785,6 @@ async fn stop_poll_works() {
 
 #[tokio::test]
 async fn delete_message_works() {
-    let _lock = MUTEX.lock().unwrap();
     let rutebot = common::create_client();
     let chat_id = common::get_chat_id();
     let response: Message = rutebot
@@ -842,7 +805,6 @@ async fn delete_message_works() {
 
 #[tokio::test]
 async fn message_entity_values_extracted_correctly() {
-    let _lock = MUTEX.lock().unwrap();
     let rutebot = common::create_client();
     let chat_id = common::get_chat_id();
     let weird_text = "великий и могучий: [экзамл.ком](http://example.com/) очень могучий и великий";
