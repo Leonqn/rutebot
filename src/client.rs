@@ -44,9 +44,9 @@ impl<TResponse: DeserializeOwned> ApiRequest<TResponse> {
     /// Send request to telegram bot api.
     /// ## Example
     /// ```
-    /// # use rutebot::requests::{AllowedUpdate, GetUpdates};
+    /// # use rutebot::requests::{UpdateKind, GetUpdates};
     /// # let bot = rutebot::client::Rutebot::new("token");
-    /// # let allowed_updates = [AllowedUpdate::Message];
+    /// # let allowed_updates = [UpdateKind::Message];
     /// # let get_updates = GetUpdates {
     /// #    allowed_updates: Some(&allowed_updates),
     /// #    ..GetUpdates::new()
@@ -140,10 +140,12 @@ impl Rutebot {
     /// Download file by its file_id
     /// ```
     /// # use rutebot::requests::GetFile;
+    /// # async {
     /// let bot = rutebot::client::Rutebot::new("token");
     /// let get_file = GetFile::new("file-id");
-    /// let file_handle = bot.prepare_api_request(&get_file).await?;
-    /// let file_bytes = bot.download_file(&file.file_path.as_ref().map_or("ru-RU", String::as_str)).await?;
+    /// let file_handle = bot.prepare_api_request(get_file).send().await.unwrap();
+    /// let file_bytes = bot.download_file(file_handle.file_path.as_ref().map_or("ru-RU", String::as_str)).await.unwrap();
+    /// # };
     /// ```
     pub async fn download_file(&self, file_path: &str) -> Result<Vec<u8>, Error> {
         let uri = format!("{}{}/{}", GET_FILE_URI, self.inner.token, file_path)
