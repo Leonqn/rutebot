@@ -11,7 +11,7 @@ readme = "README.md"
 repository = "https://github.com/Leonqn/rutebot"
 
 [dependencies]
-hyper =  { version = "0.14", features = ["client", "http2"] }
+hyper =  { version = "0.14", features = ["client", "http1"] }
 hyper-tls = "0.5"
 futures-util = "0.3"
 serde = { version = "1", features = ["derive"] }
