@@ -1,5 +1,4 @@
 # rutebot
-[![Build Status](https://travis-ci.org/Leonqn/rutebot.svg?branch=master)](https://travis-ci.org/Leonqn/rutebot)
 [![Crates.io](https://img.shields.io/crates/v/rutebot.svg)](https://crates.io/crates/rutebot)
 [![doc.rs](https://docs.rs/rutebot/badge.svg)](https://docs.rs/rutebot)
 [![License MIT](https://img.shields.io/badge/license-MIT-blue.svg)](https://github.com/Leonqn/rutebot/LICENSE)
