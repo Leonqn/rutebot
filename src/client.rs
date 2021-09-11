@@ -214,7 +214,7 @@ impl Rutebot {
                         tokio::time::sleep(Duration::from_secs(*retry_after as u64)).await;
                         offset
                     }
-                    Err(Error::Serde(_)) => Some(-1),
+                    Err(Error::Serde(err)) => offset + 1,
                     _ => offset,
                 };
 
