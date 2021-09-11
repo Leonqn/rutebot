@@ -106,7 +106,7 @@ impl Rutebot {
     ///
     /// Use Request structs from `requests` module for preparing needed api method
     /// ## Example
-    /// Prepare request to recieve all unconfirmed messages. After creating request you can send it by method `send()`
+    /// Prepare request to recieve all unconfirmed messages. After creating request you should send it by method `send()`
     /// ```
     /// # use rutebot::requests::{UpdateKind, GetUpdates};
     /// let bot = rutebot::client::Rutebot::new("token");
@@ -180,6 +180,10 @@ impl Rutebot {
         }
     }
 
+    /// Accept all incoming updates. This method uses long poll requests to telegram bot API.
+    ///
+    /// You can specify `start_offset` - update id from which bot will receive new updates, otherwise bot will receive all unconfirmed updates
+    /// and `updates_filter` which specifies the kind of updates you want to receive
     pub fn incoming_updates(
         &self,
         start_offset: Option<i64>,

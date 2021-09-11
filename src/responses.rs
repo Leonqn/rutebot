@@ -472,7 +472,7 @@ pub struct Game {
     /// Brief description of the game or high scores included in the game message.
     /// Can be automatically edited to include current high scores for the game when the bot
     /// calls [set_game_score], or manually edited using
-    /// [edit_message_text]. 0-4096 characters
+    /// [crate::requests::EditMessageText]. 0-4096 characters
     pub text: Option<String>,
 
     /// Special entities that appear in text, such as usernames, URLs, bot commands, etc
@@ -706,24 +706,24 @@ pub struct Chat {
     /// True if a group has ‘All Members Are Admins’ enabled
     pub all_members_are_administrators: Option<bool>,
 
-    /// Chat photo. Returned only in [get_chat]
+    /// Chat photo. Returned only in [`crate::requests::GetChat`]
     pub photo: Option<ChatPhoto>,
 
-    /// Description, for supergroups and channel chats. Returned only in [get_chat]
+    /// Description, for supergroups and channel chats. Returned only in [`crate::requests::GetChat`]
     pub description: Option<String>,
 
     /// Chat invite link, for supergroups and channel chats. Each administrator in a chat generates
-    /// their own invite links, so the bot must first generate the link using [export_chat_invite_link].
-    /// Returned only in [get_chat]
+    /// their own invite links, so the bot must first generate the link using [crate::requests::ExportChatInviteLink].
+    /// Returned only in [`crate::requests::GetChat`]
     pub invite_link: Option<String>,
 
-    /// Pinned message, for supergroups and channel chats. Returned only in [get_chat]
+    /// Pinned message, for supergroups and channel chats. Returned only in [`crate::requests::GetChat`]
     pub pinned_message: Option<Box<Message>>,
 
-    /// For supergroups, name of group sticker set. Returned only in [get_chat]
+    /// For supergroups, name of group sticker set. Returned only in [`crate::requests::GetChat`]
     pub sticker_set_name: Option<String>,
 
-    /// True, if the bot can change the group sticker set. Returned only in [get_chat]
+    /// True, if the bot can change the group sticker set. Returned only in [`crate::requests::GetChat`]
     pub can_set_sticker_set: Option<bool>,
 }
 
