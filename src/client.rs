@@ -104,7 +104,7 @@ impl Rutebot {
 
     /// Prepare request for sending. Generic method for interaction with telegram bot api.
     ///
-    /// Use Request structs from `requests` module for preparing needed api method
+    /// Use Request structs from [`crate::requests`] module for preparing needed api method
     /// ## Example
     /// Prepare request to recieve all unconfirmed messages. After creating request you should send it by method `send()`
     /// ```
@@ -135,7 +135,7 @@ impl Rutebot {
     }
 
     /// Download file from telegram. Before downloading you need to prepare file and obtain `file_path`
-    /// using `GetFileRequest`, see example below.
+    /// using [`crate::requests::GetFile`], see example below.
     /// ## Example
     /// Download file by its file_id
     /// ```
