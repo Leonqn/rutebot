@@ -12,6 +12,7 @@ use hyper::{client::HttpConnector, Body, Client, Request};
 use hyper_tls::HttpsConnector;
 use serde::de::DeserializeOwned;
 use serde_json;
+use tokio::time::timeout;
 
 use crate::responses::ResponseParameters;
 use std::io::Read;
@@ -199,14 +200,18 @@ impl Rutebot {
                     timeout: Some(10),
                     allowed_updates: updates_filter.as_deref(),
                 };
-                let response = api.prepare_api_request(request).send().await;
+                let response = timeout(
+                    Duration::from_secs(15),
+                    api.prepare_api_request(request).send(),
+                )
+                .await;
                 let new_offset = match &response {
-                    Ok(updates) => updates
+                    Ok(Ok(updates)) => updates
                         .iter()
                         .map(|update| update.update_id)
                         .max()
                         .map(|max_update_id| max_update_id + 1),
-                    Err(Error::Api {
+                    Ok(Err(Error::Api {
                         error_code: 429,
                         parameters:
                             Some(ResponseParameters {
@@ -214,15 +219,22 @@ impl Rutebot {
                                 ..
                             }),
                         ..
-                    }) => {
+                    })) => {
                         tokio::time::sleep(Duration::from_secs(*retry_after as u64)).await;
                         offset
                     }
-                    Err(Error::Serde(_err)) => offset.map(|x| x + 1),
+                    Ok(Err(Error::Serde(_err))) => offset.map(|x| x + 1),
+                    Err(_) => {
+                        println!("Timeout!");
+                        offset
+                    }
                     _ => offset,
                 };
 
-                Some((response, (new_offset, updates_filter, api)))
+                Some((
+                    response.unwrap_or_else(|_| Err(Error::RequestBuilt("Bad errror".to_string()))),
+                    (new_offset, updates_filter, api),
+                ))
             },
         )
         .map_ok(|updates| futures_util::stream::iter(updates).map(Ok))
