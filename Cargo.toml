@@ -1,6 +1,6 @@
 [package]
 name = "rutebot"
-version = "0.7.1"
+version = "0.7.2"
 authors = ["Ilya Titkov <ilya@titkov.me>"]
 edition = "2018"
 keywords = ["telegram", "bot", "telegram-api", "telegram-bot"]
