@@ -19,7 +19,8 @@ serde_json = "1"
 hyper-multipart-rfc7578 = "0.5"
 tokio = { version = "1", features = ["time"] }
 bytes = "1"
+fure = "0.4"
 
 [dev-dependencies]
-pretty_assertions = "0.7"
+pretty_assertions = "1"
 tokio = { version = "1", features = ["full"] }

@@ -1,4 +1,7 @@
-use std::sync::Arc;
+use std::{
+    future::{pending, Pending},
+    sync::Arc,
+};
 
 use crate::{
     error::Error,
@@ -7,11 +10,17 @@ use crate::{
     responses::{TgResponse, Update},
 };
 use bytes::Buf;
-use futures_util::{stream::Stream, StreamExt, TryStreamExt};
+use fure::Policy;
+use futures_util::{
+    future::{ready, BoxFuture},
+    stream::Stream,
+    FutureExt, StreamExt, TryStreamExt,
+};
 use hyper::{client::HttpConnector, Body, Client, Request};
 use hyper_tls::HttpsConnector;
 use serde::de::DeserializeOwned;
 use serde_json;
+use tokio::time::{error::Elapsed, timeout};
 
 use crate::responses::ResponseParameters;
 use std::io::Read;
@@ -193,31 +202,27 @@ impl Rutebot {
         futures_util::stream::unfold(
             (start_offset, updates_filter, api),
             |(offset, updates_filter, api)| async move {
-                let request = GetUpdates {
-                    offset,
-                    limit: None,
-                    timeout: Some(10),
-                    allowed_updates: updates_filter.as_deref(),
+                let send_request = || {
+                    let request = GetUpdates {
+                        offset,
+                        limit: None,
+                        timeout: Some(10),
+                        allowed_updates: updates_filter.as_deref(),
+                    };
+                    timeout(
+                        Duration::from_secs(10),
+                        api.prepare_api_request(request).send(),
+                    )
                 };
-                let response = api.prepare_api_request(request).send().await;
+                let response = fure::retry(send_request, UpdatesRetry)
+                    .await
+                    .expect("Timeout error must not happen");
                 let new_offset = match &response {
                     Ok(updates) => updates
                         .iter()
                         .map(|update| update.update_id)
                         .max()
                         .map(|max_update_id| max_update_id + 1),
-                    Err(Error::Api {
-                        error_code: 429,
-                        parameters:
-                            Some(ResponseParameters {
-                                retry_after: Some(retry_after),
-                                ..
-                            }),
-                        ..
-                    }) => {
-                        tokio::time::sleep(Duration::from_secs(*retry_after as u64)).await;
-                        offset
-                    }
                     Err(Error::Serde(_err)) => offset.map(|x| x + 1),
                     _ => offset,
                 };
@@ -227,5 +232,44 @@ impl Rutebot {
         )
         .map_ok(|updates| futures_util::stream::iter(updates).map(Ok))
         .try_flatten()
+    }
+}
+
+struct UpdatesRetry;
+
+impl Policy<Result<Vec<Update>, Error>, Elapsed> for UpdatesRetry {
+    type ForceRetryFuture = Pending<()>;
+
+    type RetryFuture = BoxFuture<'static, Self>;
+
+    fn force_retry_after(&self) -> Self::ForceRetryFuture {
+        pending()
+    }
+
+    fn retry(
+        self,
+        result: Option<Result<&Result<Vec<Update>, Error>, &Elapsed>>,
+    ) -> Option<Self::RetryFuture> {
+        match result {
+            Some(Ok(Err(Error::Api {
+                error_code: 429,
+                parameters:
+                    Some(ResponseParameters {
+                        retry_after: Some(retry_after),
+                        ..
+                    }),
+                ..
+            }))) => {
+                let retry_after = *retry_after;
+                let wait_fut = async move {
+                    tokio::time::sleep(Duration::from_secs(retry_after as u64)).await;
+                    Self
+                }
+                .boxed();
+                Some(wait_fut)
+            }
+            Some(Err(_)) => Some(ready(Self).boxed()),
+            _ => None,
+        }
     }
 }
