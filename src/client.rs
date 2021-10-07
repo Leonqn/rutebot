@@ -210,7 +210,7 @@ impl Rutebot {
                         allowed_updates: updates_filter.as_deref(),
                     };
                     timeout(
-                        Duration::from_secs(10),
+                        Duration::from_secs(15),
                         api.prepare_api_request(request).send(),
                     )
                 };
