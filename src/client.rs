@@ -1,5 +1,5 @@
 use std::{
-    future::{pending, Pending},
+    future::{pending, ready, Pending, Ready},
     sync::Arc,
 };
 
@@ -12,7 +12,7 @@ use crate::{
 use bytes::Buf;
 use fure::Policy;
 use futures_util::{
-    future::{ready, BoxFuture},
+    future::{BoxFuture, Either},
     stream::Stream,
     FutureExt, StreamExt, TryStreamExt,
 };
@@ -240,7 +240,7 @@ struct UpdatesRetry;
 impl Policy<Result<Vec<Update>, Error>, Elapsed> for UpdatesRetry {
     type ForceRetryFuture = Pending<()>;
 
-    type RetryFuture = BoxFuture<'static, Self>;
+    type RetryFuture = Either<BoxFuture<'static, Self>, Ready<Self>>;
 
     fn force_retry_after(&self) -> Self::ForceRetryFuture {
         pending()
@@ -266,9 +266,10 @@ impl Policy<Result<Vec<Update>, Error>, Elapsed> for UpdatesRetry {
                     Self
                 }
                 .boxed();
-                Some(wait_fut)
+                Some(Either::Left(wait_fut))
             }
-            Some(Err(_)) => Some(ready(Self).boxed()),
+            Some(Ok(Ok(v))) if v.is_empty() => Some(Either::Right(ready(Self))),
+            Some(Err(_)) => Some(Either::Right(ready(Self))),
             _ => None,
         }
     }
