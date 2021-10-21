@@ -2,7 +2,7 @@
 name = "rutebot"
 version = "0.7.4"
 authors = ["Ilya Titkov <ilya@titkov.me>"]
-edition = "2018"
+edition = "2021"
 keywords = ["telegram", "bot", "telegram-api", "telegram-bot"]
 license = "MIT"
 description = "Telegram bot api bindings"
