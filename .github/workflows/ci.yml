@@ -26,8 +26,15 @@ jobs:
       run: cargo clippy -- -D warnings
     - name: fmt
       run: cargo fmt -- --check
-    - name: Run tests
+    - name: Run tests (native-tls)
       run: cargo test --verbose -- --test-threads=1
+      env:
+        TEST_CHAT_ID: ${{ secrets.CHAT_ID }}
+        TEST_USER_ID: ${{ secrets.USER_ID }}
+        TEST_TOKEN: ${{ secrets.TOKEN }}
+        RUST_BACKTRACE: 1
+    - name: Run tests (rustls-tls)
+      run: cargo test --verbose --no-default-features --features rustls-tls -- --test-threads=1
       env:
         TEST_CHAT_ID: ${{ secrets.CHAT_ID }}
         TEST_USER_ID: ${{ secrets.USER_ID }}

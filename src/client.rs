@@ -17,6 +17,9 @@ use futures_util::{
     FutureExt, StreamExt, TryStreamExt,
 };
 use hyper::{client::HttpConnector, Body, Client, Request};
+#[cfg(feature = "rustls-tls")]
+use hyper_rustls::HttpsConnector;
+#[cfg(feature = "default")]
 use hyper_tls::HttpsConnector;
 use serde::de::DeserializeOwned;
 use serde_json;
@@ -103,7 +106,15 @@ impl<TResponse: DeserializeOwned> ApiRequest<TResponse> {
 impl Rutebot {
     /// Create telegram bot api client
     pub fn new<S: Into<String>>(token: S) -> Self {
-        let http_client = Client::builder().build::<_, Body>(HttpsConnector::new());
+        #[cfg(feature = "default")]
+        let https = HttpsConnector::new();
+        #[cfg(feature = "rustls-tls")]
+        let https = hyper_rustls::HttpsConnectorBuilder::new()
+            .with_native_roots()
+            .https_only()
+            .enable_http1()
+            .build();
+        let http_client = Client::builder().build::<_, Body>(https);
         let token = token.into();
 
         Rutebot {
